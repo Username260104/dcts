@@ -1,0 +1,212 @@
+{
+  "industry": {
+    "뷰티/코스메틱": {
+      "label": "뷰티/코스메틱",
+      "boost": [
+        "LUX-B",
+        "NAT-A",
+        "SOP-A",
+        "SOP-B"
+      ],
+      "suppress": [],
+      "effect": "LUX-B, NAT-A, SOP-A, SOP-B 가중치 ↑"
+    },
+    "F&B / 식음료": {
+      "label": "F&B / 식음료",
+      "boost": [
+        "WRM-A",
+        "NAT-C",
+        "CMF-A",
+        "VIV-A"
+      ],
+      "suppress": [],
+      "effect": "WRM-A, NAT-C, CMF-A, VIV-A 가중치 ↑"
+    },
+    "테크 / SaaS": {
+      "label": "테크 / SaaS",
+      "boost": [
+        "MOD-A",
+        "TRS-B",
+        "SOP-C",
+        "CLN-C"
+      ],
+      "suppress": [],
+      "effect": "MOD-A, TRS-B, SOP-C, CLN-C 가중치 ↑"
+    },
+    "금융 / 법률": {
+      "label": "금융 / 법률",
+      "boost": [
+        "TRS-A",
+        "TRS-B",
+        "LUX-A"
+      ],
+      "suppress": [],
+      "effect": "TRS-A, TRS-B, LUX-A 가중치 ↑"
+    },
+    "패션 / 라이프스타일": {
+      "label": "패션 / 라이프스타일",
+      "boost": [
+        "SOP-A",
+        "SOP-B",
+        "TRD-A",
+        "LUX-D"
+      ],
+      "suppress": [],
+      "effect": "SOP-A, SOP-B, TRD-A, LUX-D 가중치 ↑"
+    },
+    "교육 / 의료": {
+      "label": "교육 / 의료",
+      "boost": [
+        "TRS-C",
+        "CMF-C",
+        "CLN-B"
+      ],
+      "suppress": [],
+      "effect": "TRS-C, CMF-C, CLN-B 가중치 ↑"
+    },
+    "엔터 / 미디어": {
+      "label": "엔터 / 미디어",
+      "boost": [
+        "IMP-B",
+        "VIV-A",
+        "TRD-C",
+        "MOD-B"
+      ],
+      "suppress": [],
+      "effect": "IMP-B, VIV-A, TRD-C, MOD-B 가중치 ↑"
+    },
+    "공공 / 비영리": {
+      "label": "공공 / 비영리",
+      "boost": [
+        "TRS-A",
+        "CMF-C",
+        "NAT-B"
+      ],
+      "suppress": [],
+      "effect": "TRS-A, CMF-C, NAT-B 가중치 ↑"
+    },
+    "스포츠 / 아웃도어": {
+      "label": "스포츠 / 아웃도어",
+      "boost": [
+        "VIV-B",
+        "IMP-A",
+        "NAT-B"
+      ],
+      "suppress": [],
+      "effect": "VIV-B, IMP-A, NAT-B 가중치 ↑"
+    },
+    "키즈 / 교육완구": {
+      "label": "키즈 / 교육완구",
+      "boost": [
+        "VIV-C",
+        "CMF-B",
+        "CLN-B"
+      ],
+      "suppress": [],
+      "effect": "VIV-C, CMF-B, CLN-B 가중치 ↑"
+    }
+  },
+  "pricePosition": {
+    "럭셔리 (상위 5%)": {
+      "label": "럭셔리 (상위 5%)",
+      "boost": [
+        "SOP-A"
+      ],
+      "suppress": [],
+      "effect": "LUX 계열 전체, SOP-A 가중치 ↑ / VIV, CMF 가중치 ↓"
+    },
+    "프리미엄 (상위 20%)": {
+      "label": "프리미엄 (상위 20%)",
+      "boost": [
+        "LUX-B",
+        "LUX-C",
+        "NAT-A"
+      ],
+      "suppress": [],
+      "effect": "LUX-B, LUX-C, NAT-A, SOP 계열 가중치 ↑"
+    },
+    "미들 (중간)": {
+      "label": "미들 (중간)",
+      "boost": [],
+      "suppress": [],
+      "effect": "제한 없음. 전 분기 동등"
+    },
+    "매스 (대중)": {
+      "label": "매스 (대중)",
+      "boost": [
+        "TRD-C"
+      ],
+      "suppress": [
+        "LUX-A",
+        "LUX-D"
+      ],
+      "effect": "VIV, CMF, TRD-C 가중치 ↑ / LUX-A, LUX-D 가중치 ↓"
+    }
+  },
+  "projectStage": {
+    "1차 시안 피드백": {
+      "label": "1차 시안 피드백",
+      "boost": [],
+      "suppress": [],
+      "effect": "질문 범위 넓게. 탐색적 모드",
+      "questionBreadth": "wide"
+    },
+    "2차 수정 피드백": {
+      "label": "2차 수정 피드백",
+      "boost": [],
+      "suppress": [],
+      "effect": "질문 범위 좁게. 이전 결과 참조",
+      "questionBreadth": "narrow"
+    },
+    "3차 이상 수정": {
+      "label": "3차 이상 수정",
+      "boost": [],
+      "suppress": [],
+      "effect": "질문 매우 구체적. 토큰 수준 미세조정",
+      "questionBreadth": "micro",
+      "warnDirectionChange": true
+    }
+  },
+  "targetAge": {
+    "10~20대": {
+      "label": "10~20대",
+      "boost": [
+        "MOD-C",
+        "UNQ-C"
+      ],
+      "suppress": [],
+      "effect": "TRD, VIV, MOD-C, UNQ-C 가중치 ↑"
+    },
+    "30대": {
+      "label": "30대",
+      "boost": [
+        "MOD-A",
+        "SOP-B",
+        "TRD-B"
+      ],
+      "suppress": [],
+      "effect": "MOD-A, SOP-B, TRD-B 가중치 ↑"
+    },
+    "40대+": {
+      "label": "40대+",
+      "boost": [
+        "LUX-A",
+        "TRS-A",
+        "SOP-A",
+        "CMF-A"
+      ],
+      "suppress": [],
+      "effect": "LUX-A, TRS-A, SOP-A, CMF-A 가중치 ↑"
+    },
+    "전연령": {
+      "label": "전연령",
+      "boost": [
+        "CLN-B",
+        "TRS-C",
+        "CMF-C"
+      ],
+      "suppress": [],
+      "effect": "CLN-B, TRS-C, CMF-C 가중치 ↑ / 극단 분기 가중치 ↓"
+    }
+  }
+}

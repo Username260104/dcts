@@ -1,0 +1,384 @@
+[
+  {
+    "id": 1,
+    "expression": "좀 더 고급스럽게 해주세요",
+    "type": "directional",
+    "axis": "품격/가치",
+    "candidateBranches": [
+      "LUX-A",
+      "LUX-B",
+      "LUX-C",
+      "LUX-D"
+    ],
+    "coExpressions": [
+      "근데 너무 올드하진 않게",
+      "세련되게"
+    ],
+    "riskLevel": 5,
+    "entryQuestion": "고급스러움에도 여러 결이 있는데요, 지금 시안에서 어떤 느낌을 더 살리고 싶으세요?"
+  },
+  {
+    "id": 2,
+    "expression": "더 모던하게 해주세요",
+    "type": "directional",
+    "axis": "시대감",
+    "candidateBranches": [
+      "MOD-A",
+      "MOD-B",
+      "MOD-C"
+    ],
+    "coExpressions": [
+      "좀 더 요즘 느낌으로",
+      "트렌디하게"
+    ],
+    "riskLevel": 4,
+    "entryQuestion": "모던함도 방향이 다양한데요, 지금 시안이 어떤 점에서 모던하지 않다고 느끼셨어요?"
+  },
+  {
+    "id": 3,
+    "expression": "좀 더 깔끔하게 정리해주세요",
+    "type": "directional",
+    "axis": "정돈도",
+    "candidateBranches": [
+      "CLN-A",
+      "CLN-B",
+      "CLN-C"
+    ],
+    "coExpressions": [
+      "심플하게",
+      "정돈된 느낌으로"
+    ],
+    "riskLevel": 4,
+    "entryQuestion": "깔끔함을 더하고 싶으신 거군요. 지금 시안에서 어떤 부분이 산만하게 느껴지셨어요?"
+  },
+  {
+    "id": 4,
+    "expression": "좀 더 따뜻한 느낌으로요",
+    "type": "directional",
+    "axis": "온도감",
+    "candidateBranches": [
+      "WRM-A",
+      "WRM-B",
+      "WRM-C"
+    ],
+    "coExpressions": [
+      "인간적인",
+      "편안한"
+    ],
+    "riskLevel": 3,
+    "entryQuestion": "따뜻함에도 종류가 있어요. 자연 속에 있는 느낌의 따뜻함인가요, 사람 곁에 있는 느낌의 따뜻함인가요?"
+  },
+  {
+    "id": 5,
+    "expression": "더 트렌디하게 해주세요",
+    "type": "directional",
+    "axis": "시의성",
+    "candidateBranches": [
+      "TRD-A",
+      "TRD-B",
+      "TRD-C"
+    ],
+    "coExpressions": [
+      "요즘 느낌",
+      "MZ 감성"
+    ],
+    "riskLevel": 4,
+    "entryQuestion": "트렌디하다는 게 어떤 쪽인지 좀 더 여쭤볼게요. 지금 시안이 어떤 면에서 올드하다고 느끼셨어요?"
+  },
+  {
+    "id": 6,
+    "expression": "신뢰감이 좀 부족해요",
+    "type": "directional",
+    "axis": "안정성",
+    "candidateBranches": [
+      "TRS-A",
+      "TRS-B",
+      "TRS-C"
+    ],
+    "coExpressions": [
+      "좀 더 믿음직스럽게",
+      "안정적으로"
+    ],
+    "riskLevel": 3,
+    "entryQuestion": "어떤 종류의 신뢰감을 더하고 싶으세요? 공식적인 격식일까요, 데이터로 보여주는 확신일까요?"
+  },
+  {
+    "id": 7,
+    "expression": "좀 더 활기차게 해주세요",
+    "type": "directional",
+    "axis": "에너지",
+    "candidateBranches": [
+      "VIV-A",
+      "VIV-B",
+      "VIV-C"
+    ],
+    "coExpressions": [
+      "역동적으로",
+      "밝게"
+    ],
+    "riskLevel": 3,
+    "entryQuestion": "활기찬 느낌이요. 밝고 유쾌한 쪽인가요, 역동적이고 빠른 느낌인가요?"
+  },
+  {
+    "id": 8,
+    "expression": "자연스러운 느낌이었으면 좋겠어요",
+    "type": "directional",
+    "axis": "소재감",
+    "candidateBranches": [
+      "NAT-A",
+      "NAT-B",
+      "NAT-C"
+    ],
+    "coExpressions": [
+      "친환경적인",
+      "오가닉"
+    ],
+    "riskLevel": 3,
+    "entryQuestion": "자연스러움도 여러 방향이에요. 고급 자연주의인가요, 환경 메시지가 중요한 건가요, 정원 같은 힐링 느낌인가요?"
+  },
+  {
+    "id": 9,
+    "expression": "임팩트가 좀 부족해요",
+    "type": "directional",
+    "axis": "자극도",
+    "candidateBranches": [
+      "IMP-A",
+      "IMP-B",
+      "IMP-C"
+    ],
+    "coExpressions": [
+      "눈에 확 들어오게",
+      "강렬하게"
+    ],
+    "riskLevel": 4,
+    "entryQuestion": "임팩트를 더 원하시는 거군요. 어둡고 강한 힘인가요, 선명한 색으로 확 끄는 느낌인가요, 여백으로 긴장감을 주는 건가요?"
+  },
+  {
+    "id": 10,
+    "expression": "좀 더 세련되게 해주세요",
+    "type": "directional",
+    "axis": "완성도",
+    "candidateBranches": [
+      "SOP-A",
+      "SOP-B",
+      "SOP-C"
+    ],
+    "coExpressions": [
+      "고급스럽게",
+      "감각적으로"
+    ],
+    "riskLevel": 5,
+    "entryQuestion": "세련됨이라는 게 지금 시안에서 뭐가 부족하다고 느끼신 건지 여쭤볼게요."
+  },
+  {
+    "id": 11,
+    "expression": "좀 더 친근한 느낌으로요",
+    "type": "directional",
+    "axis": "접근성",
+    "candidateBranches": [
+      "CMF-A",
+      "CMF-B",
+      "CMF-C"
+    ],
+    "coExpressions": [
+      "편안하게",
+      "부드럽게"
+    ],
+    "riskLevel": 3,
+    "entryQuestion": "친근함을 더하고 싶으신 거군요. 집 같은 편안함인가요, 말 걸기 쉬운 유쾌함인가요?"
+  },
+  {
+    "id": 12,
+    "expression": "좀 더 독특했으면 좋겠어요",
+    "type": "directional",
+    "axis": "차별성",
+    "candidateBranches": [
+      "UNQ-A",
+      "UNQ-B",
+      "UNQ-C"
+    ],
+    "coExpressions": [
+      "개성 있게",
+      "남들이랑 다르게"
+    ],
+    "riskLevel": 4,
+    "entryQuestion": "독특함의 방향을 좀 더 여쭤볼게요. 규칙을 깨는 파격인가요, 수공예 같은 유일무이함인가요?"
+  },
+  {
+    "id": 13,
+    "expression": "너무 딱딱해요",
+    "type": "negative",
+    "axis": "권위↔친근 축",
+    "candidateBranches": [
+      "TRS-A",
+      "LUX-A"
+    ],
+    "coExpressions": [
+      "차가워요",
+      "무서워요"
+    ],
+    "riskLevel": 3,
+    "entryQuestion": "딱딱하다고 느끼신 부분이 구체적으로 어디인지 여쭤볼게요. 색감인가요, 글씨 느낌인가요, 전체 분위기인가요?"
+  },
+  {
+    "id": 14,
+    "expression": "너무 가벼워 보여요",
+    "type": "negative",
+    "axis": "에너지↔품격 축",
+    "candidateBranches": [],
+    "coExpressions": [
+      "싸 보여요",
+      "장난감 같아요"
+    ],
+    "riskLevel": 4,
+    "entryQuestion": "가볍다고 느끼시는 게 색감 때문인가요, 전체적인 구성 때문인가요, 글씨체 때문인가요?"
+  },
+  {
+    "id": 15,
+    "expression": "촌스러워요",
+    "type": "negative",
+    "axis": "세련↔투박 축",
+    "candidateBranches": [],
+    "coExpressions": [
+      "올드해요",
+      "구려요"
+    ],
+    "riskLevel": 5,
+    "entryQuestion": "촌스럽다고 느끼시는 포인트를 찾아볼게요. 몇 가지 비교를 보여드릴 테니 어느 쪽이 더 원하시는 느낌인지 골라주세요."
+  },
+  {
+    "id": 16,
+    "expression": "유치해 보여요",
+    "type": "negative",
+    "axis": "성숙↔유아 축",
+    "candidateBranches": [
+      "VIV-C",
+      "CMF-B"
+    ],
+    "coExpressions": [
+      "애들 것 같아요",
+      "장난스러워요"
+    ],
+    "riskLevel": 4,
+    "entryQuestion": "좀 더 성숙한 느낌을 원하시는 거군요. 어떤 방향의 성숙함인지 몇 가지 비교를 보여드릴게요."
+  },
+  {
+    "id": 17,
+    "expression": "너무 심심해요",
+    "type": "negative",
+    "axis": "자극↔절제 축",
+    "candidateBranches": [],
+    "coExpressions": [
+      "밋밋해요",
+      "눈에 안 들어와요"
+    ],
+    "riskLevel": 4,
+    "entryQuestion": "좀 더 눈길을 끄는 요소가 필요하신 거군요. 색으로 힘을 줄까요, 구성을 역동적으로 바꿀까요, 질감을 더할까요?"
+  },
+  {
+    "id": 18,
+    "expression": "너무 복잡해요",
+    "type": "negative",
+    "axis": "밀도↔여백 축",
+    "candidateBranches": [],
+    "coExpressions": [
+      "정신없어요",
+      "어지러워요"
+    ],
+    "riskLevel": 3,
+    "entryQuestion": "복잡하다고 느끼시는 게 정보량 때문인가요, 색이 많아서인가요, 요소들이 가까이 붙어 있어서인가요?"
+  },
+  {
+    "id": 19,
+    "expression": "차가워요 / 감정이 없어요",
+    "type": "negative",
+    "axis": "온도 축",
+    "candidateBranches": [
+      "CLN-C",
+      "LUX-C",
+      "MOD-A"
+    ],
+    "coExpressions": [
+      "기계적이에요",
+      "인간미가 없어요"
+    ],
+    "riskLevel": 3,
+    "entryQuestion": "좀 더 온기를 느끼고 싶으신 거군요. 자연적인 온기인가요, 사람 느낌의 온기인가요?"
+  },
+  {
+    "id": 20,
+    "expression": "올드해요 / 구식이에요",
+    "type": "negative",
+    "axis": "시대감 축",
+    "candidateBranches": [
+      "LUX-A",
+      "TRS-A",
+      "WRM-C"
+    ],
+    "coExpressions": [
+      "요즘 느낌이 아니에요"
+    ],
+    "riskLevel": 4,
+    "entryQuestion": "더 현대적인 느낌을 원하시는 거군요. 테크 쪽 모던함인가요, 문화적 감각의 모던함인가요?"
+  },
+  {
+    "id": 21,
+    "expression": "뭔가 부족해요",
+    "type": "ambiguous",
+    "axis": "불명",
+    "candidateBranches": [],
+    "coExpressions": [
+      "단독 사용 빈번"
+    ],
+    "riskLevel": 5,
+    "entryQuestion": "어느 부분이 아쉬운지 같이 찾아볼게요. 지금부터 두 가지 방향을 보여드릴 테니, 직감적으로 끌리는 쪽을 골라주세요."
+  },
+  {
+    "id": 22,
+    "expression": "그냥 별로예요",
+    "type": "ambiguous",
+    "axis": "불명",
+    "candidateBranches": [],
+    "coExpressions": [
+      "구체적 이유 없이 사용"
+    ],
+    "riskLevel": 5,
+    "entryQuestion": "괜찮아요, 같이 찾아보면 돼요. 몇 가지 다른 느낌을 보여드릴 테니, '이건 좀 낫다' 싶은 걸 골라주세요."
+  },
+  {
+    "id": 23,
+    "expression": "좀 더 있어 보였으면 좋겠어요",
+    "type": "ambiguous",
+    "axis": "품격/세련 복합",
+    "candidateBranches": [],
+    "coExpressions": [
+      "퀄리티가 높아 보이게"
+    ],
+    "riskLevel": 5,
+    "entryQuestion": "'있어 보인다'는 말이 여러 뜻일 수 있어요. 비싸 보이는 건가요, 감각적으로 보이는 건가요, 전문적으로 보이는 건가요?"
+  },
+  {
+    "id": 24,
+    "expression": "뭔가 안 어울려요",
+    "type": "ambiguous",
+    "axis": "조화 축",
+    "candidateBranches": [],
+    "coExpressions": [
+      "따로 노는 느낌"
+    ],
+    "riskLevel": 4,
+    "entryQuestion": "안 어울린다고 느끼시는 게 색감끼리인가요, 글씨와 그림인가요, 전체 분위기와 특정 부분인가요?"
+  },
+  {
+    "id": 25,
+    "expression": "경쟁사랑 너무 비슷해요",
+    "type": "ambiguous",
+    "axis": "차별성 축",
+    "candidateBranches": [],
+    "coExpressions": [
+      "다른 데랑 구분이 안 돼요"
+    ],
+    "riskLevel": 4,
+    "entryQuestion": "어떤 경쟁사가 떠오르셨어요? 그 브랜드와 어떤 점이 비슷하다고 느끼셨는지 알면 방향을 잡기 훨씬 쉬워요."
+  }
+]
