@@ -5,6 +5,7 @@ import { saveBrief } from '@/lib/briefStore';
 import { generateBriefSummary } from '@/lib/llmOrchestrator';
 import type {
     Branch,
+    BriefDecisionStep,
     BriefOutput,
     DesignToken,
     GenerateBriefRequest,
@@ -46,6 +47,19 @@ function generateFallbackSummary(
         adjustmentNotes: '온톨로지 토큰과 현재 맥락을 기준으로 브리프를 생성했습니다.',
         confusionWarnings,
     };
+}
+
+function buildDecisionTrail(sessionState: GenerateBriefRequest['sessionState']): BriefDecisionStep[] {
+    return sessionState.answerHistory.map((answer) => ({
+        question: answer.question,
+        selectedOption: answer.selectedLabel,
+        availableOptions: answer.options.map((option) => option.label),
+        nextAction: answer.nextAction ?? 'conclusion',
+        nextPrompt: answer.nextQuestion,
+        nextOptions: answer.nextOptions?.map((option) => option.label),
+        nextReason:
+            answer.nextReason?.trim() || '이 선택을 반영해 다음 분기 또는 최종 해석이 이어졌습니다.',
+    }));
 }
 
 export async function POST(
@@ -131,6 +145,7 @@ export async function POST(
             confusionWarnings: llmSummary.confusionWarnings,
             references: primaryBranch.references,
             antiReferences,
+            decisionTrail: buildDecisionTrail(sessionState),
         };
 
         await saveBrief(sessionId, brief, llmSummary);

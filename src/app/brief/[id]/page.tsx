@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { DecisionTrailSection } from '@/components/brief/DecisionTrailSection';
 import { exportBriefToPdf } from '@/lib/briefExport';
 import type { BriefOutput, LLMBriefResponse } from '@/types/ontology';
 
@@ -196,6 +197,10 @@ export default function BriefPermalinkPage() {
                                 </div>
                             </div>
                         )}
+                    </Section>
+
+                    <Section title="G. 선택 흐름 설명">
+                        <DecisionTrailSection decisionTrail={brief.decisionTrail ?? []} />
                     </Section>
                 </div>
 

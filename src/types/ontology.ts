@@ -124,6 +124,7 @@ export interface BriefOutput {
     confusionWarnings: string[];
     references: string[];
     antiReferences: string[];
+    decisionTrail: BriefDecisionStep[];
 }
 
 export interface LLMQuestionOption {
@@ -185,6 +186,20 @@ export interface LLMAnswerRecord {
     options: LLMQuestionOption[];
     selectedLabel: string;
     selectedDirection: string;
+    nextAction?: 'question' | 'conclusion';
+    nextQuestion?: string;
+    nextOptions?: LLMQuestionOption[];
+    nextReason?: string;
+}
+
+export interface BriefDecisionStep {
+    question: string;
+    selectedOption: string;
+    availableOptions: string[];
+    nextAction: 'question' | 'conclusion';
+    nextPrompt?: string;
+    nextOptions?: string[];
+    nextReason: string;
 }
 
 export interface StartSessionRequest {

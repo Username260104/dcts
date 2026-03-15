@@ -19,6 +19,13 @@ import type {
 
 const LLM_TIMEOUT_MS = Number(process.env.LLM_TIMEOUT_MS ?? '15000');
 const DETAIL_FOCUS_SEQUENCE = ['color', 'typography', 'layout', 'imagery', 'texture'] as const;
+const DETAIL_FOCUS_LABELS: Record<string, string> = {
+    color: '컬러',
+    typography: '타이포그래피',
+    layout: '레이아웃',
+    imagery: '이미지',
+    texture: '텍스처',
+};
 
 function withTimeout<T>(promise: Promise<T>): Promise<T> {
     const timeoutPromise = new Promise<never>((_, reject) =>
@@ -149,6 +156,38 @@ function createStaticDetailFollowUp(sessionState: SessionState): LLMFollowUpResp
         secondaryBranch: sessionState.secondaryBranch ?? null,
         reasoning: sessionState.reasoning,
     };
+}
+
+function buildNextStepReason(
+    sessionState: SessionState,
+    followUp: LLMFollowUpResponse
+): string {
+    if (followUp.converged) {
+        return followUp.reasoning?.trim() || '누적된 선택이 한 방향으로 수렴해 최종 해석을 확정했습니다.';
+    }
+
+    if (followUp.detailFocus) {
+        const focusLabel = DETAIL_FOCUS_LABELS[followUp.detailFocus] ?? followUp.detailFocus;
+        const primaryBranch = sessionState.primaryBranch
+            ? getBranchById(sessionState.primaryBranch)
+            : null;
+
+        if (primaryBranch) {
+            return `${primaryBranch.branchLabel} 방향은 유지하고 ${focusLabel} 디테일을 더 구체화해야 해서 다음 선택지를 제안했습니다.`;
+        }
+
+        return `${focusLabel} 기준으로 남은 후보를 더 선명하게 가르기 위해 다음 선택지를 제안했습니다.`;
+    }
+
+    if (followUp.eliminationReason?.trim()) {
+        return followUp.eliminationReason.trim();
+    }
+
+    if (followUp.eliminatedNow.length > 0) {
+        return `방금 선택으로 ${followUp.eliminatedNow.length}개 후보를 제외했고, 남은 후보를 더 좁히기 위해 다음 선택지를 제안했습니다.`;
+    }
+
+    return '방금 선택을 반영해 남은 후보를 더 좁히기 위한 다음 선택지를 제안했습니다.';
 }
 
 function appendDetailTracking(
@@ -340,6 +379,24 @@ export async function POST(
                 followUp,
                 updatedState.detailQuestionCount ?? 0
             );
+        }
+
+        const enrichedAnswerHistory = [...finalState.answerHistory];
+        const latestAnswerIndex = enrichedAnswerHistory.length - 1;
+
+        if (latestAnswerIndex >= 0) {
+            enrichedAnswerHistory[latestAnswerIndex] = {
+                ...enrichedAnswerHistory[latestAnswerIndex],
+                nextAction: followUp.converged ? 'conclusion' : 'question',
+                nextQuestion: followUp.converged ? undefined : followUp.question,
+                nextOptions: followUp.converged ? undefined : followUp.options,
+                nextReason: buildNextStepReason(finalState, followUp),
+            };
+
+            finalState = {
+                ...finalState,
+                answerHistory: enrichedAnswerHistory,
+            };
         }
 
         const response: SubmitAnswerResponse & { usedFallback: boolean } = {

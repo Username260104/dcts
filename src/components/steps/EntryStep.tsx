@@ -21,28 +21,16 @@ export default function EntryStep() {
             <div className="mb-8 text-center">
                 <h1 className="text-2xl font-bold text-gray-900">DCTS</h1>
                 <p className="text-sm text-gray-500">Design Communication Translation System</p>
-                <p className="mt-4 text-base text-gray-700">
-                    클라이언트가 실제로 전달하고 싶은 피드백을 자연스럽게 적어 주세요.
-                </p>
+                <p className="mt-4 text-lg text-gray-700 sm:text-xl">전달하고 싶던 피드백을 자연스럽게 적어 주세요.</p>
             </div>
 
             <div className="mb-6 w-full max-w-lg">
-                <div className="flex items-start gap-3">
-                    <textarea
-                        value={feedbackText}
-                        onChange={(event) => setFeedbackText(event.target.value)}
-                        placeholder={'예: "조금 더 고급스럽게 해주세요."\n"너무 촌스러워요."\n"뭔가 조금 더 밝은 느낌이었으면 좋겠어요."'}
-                        className="h-32 flex-1 resize-none rounded-xl border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder-gray-400 transition-all focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gray-900"
-                    />
-                    <button
-                        type="button"
-                        onClick={() => refineFeedback()}
-                        disabled={feedbackText.trim().length === 0 || isRefiningFeedback}
-                        className="shrink-0 rounded-xl border border-gray-300 px-4 py-3 text-sm font-medium text-gray-700 transition-all hover:border-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-400"
-                    >
-                        {isRefiningFeedback ? '다듬는 중...' : '표현 다듬기'}
-                    </button>
-                </div>
+                <textarea
+                    value={feedbackText}
+                    onChange={(event) => setFeedbackText(event.target.value)}
+                    placeholder={`예) "조금 더 고급스럽게 보여요."\n"너무 촌스러워요."\n"뭔가 조금 더 밝고 정돈됐으면 좋겠어요."`}
+                    className="h-32 w-full resize-none rounded-2xl border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder-gray-400 transition-all focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gray-900"
+                />
 
                 {refinedFeedbackText ? (
                     <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-4">
@@ -60,7 +48,7 @@ export default function EntryStep() {
                                         : 'border border-gray-300 bg-white text-gray-700 hover:border-gray-500'
                                 }`}
                             >
-                                이 표현으로 진행
+                                다듬은 표현으로 진행
                             </button>
                             <button
                                 type="button"
@@ -99,13 +87,23 @@ export default function EntryStep() {
                 </div>
             </div>
 
-            <button
-                onClick={() => setStep('context')}
-                disabled={feedbackText.trim().length === 0}
-                className="rounded-xl bg-gray-900 px-8 py-3 text-base font-medium text-white transition-all hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-300"
-            >
-                다음
-            </button>
+            <div className="flex w-full max-w-lg flex-col gap-3 sm:flex-row sm:justify-end">
+                <button
+                    type="button"
+                    onClick={() => refineFeedback()}
+                    disabled={feedbackText.trim().length === 0 || isRefiningFeedback}
+                    className="inline-flex min-h-12 items-center justify-center rounded-xl border border-gray-300 bg-white px-5 py-3 text-[15px] font-medium text-gray-700 transition-all hover:border-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400"
+                >
+                    {isRefiningFeedback ? '다듬는 중...' : '표현 다듬기'}
+                </button>
+                <button
+                    onClick={() => setStep('context')}
+                    disabled={feedbackText.trim().length === 0}
+                    className="inline-flex min-h-12 items-center justify-center rounded-xl bg-gray-900 px-8 py-3 text-[15px] font-medium text-white transition-all hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-300 sm:min-w-28"
+                >
+                    다음
+                </button>
+            </div>
         </div>
     );
 }

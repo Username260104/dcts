@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { DecisionTrailSection } from '@/components/brief/DecisionTrailSection';
 import { exportBriefToPdf } from '@/lib/briefExport';
 import { useSessionStore } from '@/store/sessionStore';
 
@@ -228,6 +229,10 @@ export default function BriefStep() {
                             </div>
                         )}
                     </div>
+                </Section>
+
+                <Section title="G. 선택 흐름 설명">
+                    <DecisionTrailSection decisionTrail={brief.decisionTrail ?? []} />
                 </Section>
             </div>
 
