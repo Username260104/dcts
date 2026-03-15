@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "expression": "좀 더 고급스럽게 해주세요",
+    "expression": "조금 더 고급스럽고 정제된 느낌이면 좋겠습니다",
     "type": "directional",
     "axis": "품격/가치",
     "candidateBranches": [
@@ -19,7 +19,7 @@
   },
   {
     "id": 2,
-    "expression": "더 모던하게 해주세요",
+    "expression": "조금 더 현대적이고 세련된 방향이면 좋겠습니다",
     "type": "directional",
     "axis": "시대감",
     "candidateBranches": [
@@ -36,7 +36,7 @@
   },
   {
     "id": 3,
-    "expression": "좀 더 깔끔하게 정리해주세요",
+    "expression": "조금 더 간결하고 정돈된 인상이면 좋겠습니다",
     "type": "directional",
     "axis": "정돈도",
     "candidateBranches": [
@@ -53,7 +53,7 @@
   },
   {
     "id": 4,
-    "expression": "좀 더 따뜻한 느낌으로요",
+    "expression": "조금 더 따뜻하고 편안한 느낌이면 좋겠습니다",
     "type": "directional",
     "axis": "온도감",
     "candidateBranches": [
@@ -70,7 +70,7 @@
   },
   {
     "id": 5,
-    "expression": "더 트렌디하게 해주세요",
+    "expression": "조금 더 트렌디하되 가볍지 않으면 좋겠습니다",
     "type": "directional",
     "axis": "시의성",
     "candidateBranches": [
@@ -87,7 +87,7 @@
   },
   {
     "id": 6,
-    "expression": "신뢰감이 좀 부족해요",
+    "expression": "신뢰감이 조금 더 잘 느껴졌으면 좋겠습니다",
     "type": "directional",
     "axis": "안정성",
     "candidateBranches": [
@@ -104,7 +104,7 @@
   },
   {
     "id": 7,
-    "expression": "좀 더 활기차게 해주세요",
+    "expression": "조금 더 생동감 있고 활기찬 분위기면 좋겠습니다",
     "type": "directional",
     "axis": "에너지",
     "candidateBranches": [
@@ -121,7 +121,7 @@
   },
   {
     "id": 8,
-    "expression": "자연스러운 느낌이었으면 좋겠어요",
+    "expression": "조금 더 자연스럽고 편안한 무드면 좋겠습니다",
     "type": "directional",
     "axis": "소재감",
     "candidateBranches": [
