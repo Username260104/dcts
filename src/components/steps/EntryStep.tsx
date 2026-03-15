@@ -17,11 +17,15 @@ export default function EntryStep() {
     const setStep = useSessionStore((state) => state.setStep);
 
     return (
-        <div className="flex min-h-[60vh] flex-col items-center justify-center px-4">
+        <div className="flex w-full max-w-2xl flex-col items-center justify-center px-4">
             <div className="mb-8 text-center">
-                <h1 className="text-2xl font-bold text-gray-900">DCTS</h1>
-                <p className="text-sm text-gray-500">Design Communication Translation System</p>
-                <p className="mt-4 text-lg text-gray-700 sm:text-xl">전달하고 싶던 피드백을 자연스럽게 적어 주세요.</p>
+                <p
+                    className="mt-4 text-xl font-bold text-gray-700 sm:text-2xl"
+                    style={{ fontFamily: 'Pretendard, Arial, Helvetica, sans-serif', fontWeight: 700 }}
+                >
+                    전달하고 싶던 피드백을 자연스럽게 적어 주세요
+                    <span className="signal-dot">.</span>
+                </p>
             </div>
 
             <div className="mb-6 w-full max-w-lg">

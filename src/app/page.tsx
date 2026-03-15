@@ -9,7 +9,7 @@ export default function Home() {
     const setError = useSessionStore((state) => state.setError);
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="flex min-h-screen flex-col bg-white">
             <header className="sticky top-0 z-10 border-b border-gray-100 bg-white/80 backdrop-blur-sm">
                 <ProgressBar />
             </header>
@@ -26,7 +26,7 @@ export default function Home() {
                 </div>
             )}
 
-            <main className="mx-auto max-w-2xl">
+            <main className="flex flex-1 items-center justify-center px-4 py-8">
                 <StepContainer />
             </main>
 
