@@ -1,19 +1,20 @@
 'use client';
 
-import { useSessionStore } from '@/store/sessionStore';
 import { getBranchById } from '@/lib/questionEngine';
+import { useSessionStore } from '@/store/sessionStore';
 
 export default function ConfirmStep() {
-    const convergenceResult = useSessionStore((s) => s.convergenceResult);
-    const sessionState = useSessionStore((s) => s.sessionState);
-    const generateBrief = useSessionStore((s) => s.generateBrief);
-    const setStep = useSessionStore((s) => s.setStep);
-    const isLoading = useSessionStore((s) => s.isLoading);
+    const convergenceResult = useSessionStore((state) => state.convergenceResult);
+    const sessionState = useSessionStore((state) => state.sessionState);
+    const usedFallback = useSessionStore((state) => state.usedFallback);
+    const generateBrief = useSessionStore((state) => state.generateBrief);
+    const refineSession = useSessionStore((state) => state.refineSession);
+    const isLoading = useSessionStore((state) => state.isLoading);
 
     if (!convergenceResult) {
         return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <p className="text-gray-400">결과를 분석하고 있어요...</p>
+            <div className="flex min-h-[60vh] items-center justify-center">
+                <p className="text-gray-400">결과를 정리하고 있습니다.</p>
             </div>
         );
     }
@@ -23,85 +24,84 @@ export default function ConfirmStep() {
         ? getBranchById(convergenceResult.secondaryBranch)
         : null;
 
-    const handleConfirm = async () => {
-        await generateBrief();
-    };
-
-    const handleRetry = () => {
-        setStep('entry');
-        useSessionStore.getState().reset();
-    };
-
     return (
         <div className="flex flex-col items-center px-4 py-8">
-            <div className="text-center mb-8">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-green-600 text-xl">!</span>
+            <div className="mb-8 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                    <span className="text-xl text-green-600">!</span>
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1">
+                <h2 className="mb-1 text-xl font-bold text-gray-900">
                     이렇게 이해했어요
                 </h2>
                 <p className="text-sm text-gray-500">
-                    맞는지 확인해주세요
+                    맞는지 확인해 주세요
                 </p>
             </div>
 
+            <div
+                className={`mb-6 w-full max-w-lg rounded-xl px-4 py-3 text-sm ${
+                    usedFallback
+                        ? 'border border-amber-200 bg-amber-50 text-amber-700'
+                        : 'border border-emerald-200 bg-emerald-50 text-emerald-700'
+                }`}
+            >
+                {usedFallback
+                    ? '이 결과는 정적 fallback 엔진이 수렴시킨 결과입니다.'
+                    : '이 결과는 LLM 해석을 기반으로 수렴된 결과입니다.'}
+            </div>
+
             <div className="w-full max-w-lg space-y-4">
-                {/* 1순위 분기 */}
                 {primaryBranch && (
-                    <div className="bg-gray-50 rounded-2xl p-6">
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="px-2 py-0.5 bg-gray-900 text-white text-xs rounded-full">
+                    <div className="rounded-2xl bg-gray-50 p-6">
+                        <div className="mb-3 flex items-center gap-2">
+                            <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs text-white">
                                 1순위
                             </span>
                             <span className="text-sm font-medium text-gray-700">
                                 {primaryBranch.branchLabel}
                             </span>
                         </div>
-                        <p className="text-base text-gray-900 leading-relaxed">
+                        <p className="text-base leading-relaxed text-gray-900">
                             {primaryBranch.descriptionClient}
                         </p>
                     </div>
                 )}
 
-                {/* 2순위 분기 */}
                 {secondaryBranch && (
-                    <div className="bg-white border border-gray-200 rounded-2xl p-6">
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-xs rounded-full">
-                                2순위
+                    <div className="rounded-2xl border border-gray-200 bg-white p-6">
+                        <div className="mb-3 flex items-center gap-2">
+                            <span className="rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600">
+                                참고
                             </span>
                             <span className="text-sm font-medium text-gray-700">
                                 {secondaryBranch.branchLabel}
                             </span>
                         </div>
-                        <p className="text-base text-gray-700 leading-relaxed">
+                        <p className="text-base leading-relaxed text-gray-700">
                             {secondaryBranch.descriptionClient}
                         </p>
                     </div>
                 )}
 
-                {/* 판정 근거 */}
                 {convergenceResult.reasoning && (
-                    <div className="px-4 py-3 bg-blue-50 rounded-xl">
-                        <p className="text-xs text-blue-600 font-medium mb-1">판정 근거</p>
+                    <div className="rounded-xl bg-blue-50 px-4 py-3">
+                        <p className="mb-1 text-xs font-medium text-blue-600">판단 근거</p>
                         <p className="text-sm text-blue-800">{convergenceResult.reasoning}</p>
                     </div>
                 )}
 
-                {/* 질문-응답 이력 */}
                 {sessionState && sessionState.answerHistory.length > 0 && (
                     <details className="group">
-                        <summary className="text-xs text-gray-400 cursor-pointer hover:text-gray-600">
-                            질문-응답 이력 보기
+                        <summary className="cursor-pointer text-xs text-gray-400 hover:text-gray-600">
+                            질문-답변 이력 보기
                         </summary>
-                        <div className="mt-2 space-y-2 pl-2 border-l-2 border-gray-200">
-                            {sessionState.answerHistory.map((a, i) => (
-                                <div key={i} className="text-xs text-gray-500">
-                                    <span className="font-medium">Q{i + 1}:</span> {a.question}
+                        <div className="mt-2 space-y-2 border-l-2 border-gray-200 pl-2">
+                            {sessionState.answerHistory.map((answer, index) => (
+                                <div key={`${answer.question}-${index}`} className="text-xs text-gray-500">
+                                    <span className="font-medium">Q{index + 1}:</span> {answer.question}
                                     <br />
-                                    <span className="text-gray-900 ml-4">
-                                        &rarr; {a.selectedLabel}
+                                    <span className="ml-4 text-gray-900">
+                                        &rarr; {answer.selectedLabel}
                                     </span>
                                 </div>
                             ))}
@@ -110,25 +110,22 @@ export default function ConfirmStep() {
                 )}
             </div>
 
-            {/* 버튼 */}
-            <div className="flex gap-3 mt-8">
+            <div className="mt-8 flex gap-3">
                 <button
-                    onClick={handleRetry}
-                    className="px-6 py-3 text-gray-600 border border-gray-300 rounded-xl
-                               hover:bg-gray-50 transition-all text-sm"
+                    onClick={() => refineSession()}
+                    disabled={isLoading}
+                    className="rounded-xl border border-gray-300 px-6 py-3 text-sm text-gray-600 transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:bg-gray-100"
                 >
-                    다시 하기
+                    아니요, 다시 물어봐주세요
                 </button>
                 <button
-                    onClick={handleConfirm}
+                    onClick={() => generateBrief()}
                     disabled={isLoading}
-                    className="px-8 py-3 bg-gray-900 text-white rounded-xl text-base font-medium
-                               disabled:bg-gray-300 disabled:cursor-not-allowed
-                               hover:bg-gray-800 transition-all flex items-center gap-2"
+                    className="flex items-center gap-2 rounded-xl bg-gray-900 px-8 py-3 text-base font-medium text-white transition-all hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-300"
                 >
                     {isLoading ? (
                         <>
-                            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                             브리프 생성 중...
                         </>
                     ) : (

@@ -1,0 +1,128 @@
+{
+  "brief": {
+    "originalFeedback": "좀 더 세련되게 해주세요",
+    "feedbackType": "directional",
+    "userContext": {
+      "industry": "금융 / 법률",
+      "pricePosition": "미들 (중간)",
+      "projectStage": "2차 수정 피드백",
+      "targetAge": "30대"
+    },
+    "generatedAt": "2026-03-14T18:39:26.161Z",
+    "clientSummary": "말씀하신 방향은 개발자들이 '이 사이트 잘 만들었다'고 하는 느낌. 정교하고 체계적인에 더 가깝습니다.",
+    "clientAntiSummary": "",
+    "primaryBranch": {
+      "adjective": "세련된",
+      "branchId": "SOP-C",
+      "branchLabel": "테크 세련",
+      "descriptionDesigner": "디자인 시스템적 정교함, UI/UX 엔지니어링 감각",
+      "descriptionClient": "개발자들이 '이 사이트 잘 만들었다'고 하는 느낌. 정교하고 체계적인",
+      "confusableBranches": [
+        "MOD-A",
+        "CLN-C",
+        "TRS-B",
+        "LUX-C"
+      ],
+      "distinctionKey": "MOD-A는 일반 사용자용 깔끔함, SOP-C는 전문가가 알아보는 정교함",
+      "contrastQuestion": "누구나 편한 깔끔함인가요, 아는 사람이 보면 감탄하는 정교함인가요?",
+      "antiSignals": [
+        "따뜻하게",
+        "인간적으로",
+        "감성적으로",
+        "손맛을 살려"
+      ],
+      "excludedTokens": [
+        "필기체",
+        "자연 소재 텍스처",
+        "따뜻한 일러스트",
+        "비정형 레이아웃"
+      ],
+      "references": [
+        "Linear",
+        "Vercel",
+        "Raycast"
+      ]
+    },
+    "secondaryBranch": {
+      "adjective": "세련된",
+      "branchId": "SOP-B",
+      "branchLabel": "코리안 세련",
+      "descriptionDesigner": "K-뷰티, K-디자인 감각. 한국적 절제와 의외성의 조합",
+      "descriptionClient": "젠틀몬스터 매장에 들어갔을 때의 느낌. 동양적인데 힙한",
+      "confusableBranches": [
+        "MOD-B",
+        "NAT-A",
+        "LUX-B"
+      ],
+      "distinctionKey": "MOD-B(아트 모던)는 서양 에디토리얼, SOP-B는 한국적 감각",
+      "contrastQuestion": "서양 매거진 같은 감각인가요, 한국적인 독특한 감각인가요?",
+      "antiSignals": [
+        "글로벌하게",
+        "서양적으로",
+        "대중적으로"
+      ],
+      "excludedTokens": [
+        "전형적 서양 에디토리얼",
+        "스위스 그리드",
+        "표준 팔레트"
+      ],
+      "references": [
+        "Sulwhasoo",
+        "젠틀몬스터",
+        "탬버린즈"
+      ]
+    },
+    "eliminatedBranches": [],
+    "interpretationRationale": "테크 세련(SOP-C) 기준으로 해석했습니다. 디자인 시스템적 정교함, UI/UX 엔지니어링 감각",
+    "designTokens": {
+      "branchId": "SOP-C",
+      "branchLabel": "테크 세련",
+      "colorDirection": "다크모드 기반. 뉴트럴 + 블루 강조. 채도 낮되 정밀한 포인트",
+      "typographyDirection": "기하학적 산세리프 + 모노스페이스. 시스템 서체. 정교한 타이포 스케일",
+      "layoutDirection": "8pt 그리드 시스템. 컴포넌트 기반. 마이크로 인터랙션 암시. 시스템 UI 참조",
+      "imageDirection": "UI 목업. 다크모드 스크린. 제품 디테일",
+      "textureDirection": "글래스, 뉴모피즘. 소프트 엘리베이션",
+      "neverDo": "필기체 금지. 자연 소재 텍스처 금지. 따뜻한 일러스트 금지. 비정형 레이아웃 금지"
+    },
+    "neverDoList": [
+      "필기체 금지",
+      "자연 소재 텍스처 금지",
+      "따뜻한 일러스트 금지",
+      "비정형 레이아웃 금지",
+      "필기체",
+      "자연 소재 텍스처",
+      "따뜻한 일러스트",
+      "비정형 레이아웃"
+    ],
+    "confusionWarnings": [
+      "테크 모던와 혼동 주의: MOD-A는 일반 사용자용 깔끔함, SOP-C는 전문가가 알아보는 정교함",
+      "샤프 클린와 혼동 주의: MOD-A는 일반 사용자용 깔끔함, SOP-C는 전문가가 알아보는 정교함",
+      "테크 신뢰와 혼동 주의: MOD-A는 일반 사용자용 깔끔함, SOP-C는 전문가가 알아보는 정교함",
+      "테크 프리미엄와 혼동 주의: MOD-A는 일반 사용자용 깔끔함, SOP-C는 전문가가 알아보는 정교함"
+    ],
+    "references": [
+      "Linear",
+      "Vercel",
+      "Raycast"
+    ],
+    "antiReferences": [
+      "Stripe (테크 모던 혼동 주의)",
+      "Figma (테크 모던 혼동 주의)",
+      "Linear (테크 모던 혼동 주의)",
+      "Bloomberg (샤프 클린 혼동 주의)"
+    ]
+  },
+  "llmSummary": {
+    "clientSummary": "말씀하신 방향은 개발자들이 '이 사이트 잘 만들었다'고 하는 느낌. 정교하고 체계적인에 더 가깝습니다.",
+    "clientAntiSummary": "",
+    "designerSummary": "테크 세련(SOP-C) 기준으로 해석했습니다. 디자인 시스템적 정교함, UI/UX 엔지니어링 감각",
+    "adjustmentNotes": "온톨로지 토큰과 현재 맥락을 기준으로 브리프를 생성했습니다.",
+    "confusionWarnings": [
+      "테크 모던와 혼동 주의: MOD-A는 일반 사용자용 깔끔함, SOP-C는 전문가가 알아보는 정교함",
+      "샤프 클린와 혼동 주의: MOD-A는 일반 사용자용 깔끔함, SOP-C는 전문가가 알아보는 정교함",
+      "테크 신뢰와 혼동 주의: MOD-A는 일반 사용자용 깔끔함, SOP-C는 전문가가 알아보는 정교함",
+      "테크 프리미엄와 혼동 주의: MOD-A는 일반 사용자용 깔끔함, SOP-C는 전문가가 알아보는 정교함"
+    ]
+  },
+  "createdAt": "2026-03-14T18:39:26.162Z"
+}

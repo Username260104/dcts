@@ -1,16 +1,17 @@
 import { create } from 'zustand';
 import type {
-    SessionStep,
-    UserContext,
-    SessionState,
-    LLMInitialAnalysis,
-    LLMQuestionOption,
     BriefOutput,
     LLMBriefResponse,
+    LLMInitialAnalysis,
+    LLMQuestionOption,
     QuestionType,
+    RefineFeedbackResponse,
+    RefineSessionResponse,
+    SessionState,
+    SessionStep,
+    UserContext,
 } from '@/types/ontology';
 
-// 현재 질문 정보
 interface CurrentQuestion {
     question: string;
     options: LLMQuestionOption[];
@@ -18,43 +19,28 @@ interface CurrentQuestion {
 }
 
 interface SessionStore {
-    // 세션 단계
     step: SessionStep;
     setStep: (step: SessionStep) => void;
-
-    // 사용자 입력
     feedbackText: string;
     setFeedbackText: (text: string) => void;
-
-    // 맥락 변수
+    refinedFeedbackText: string | null;
+    refineChoice: 'original' | 'refined' | null;
+    setRefineChoice: (choice: 'original' | 'refined') => void;
     userContext: UserContext;
     setUserContext: (ctx: Partial<UserContext>) => void;
-
-    // 세션 상태 (API에서 받아옴)
     sessionState: SessionState | null;
     setSessionState: (state: SessionState) => void;
-
-    // 초기 분석 결과
     initialAnalysis: LLMInitialAnalysis | null;
     setInitialAnalysis: (analysis: LLMInitialAnalysis) => void;
-
-    // 현재 질문
     currentQuestion: CurrentQuestion | null;
-    setCurrentQuestion: (q: CurrentQuestion | null) => void;
-
-    // 로딩 상태
+    setCurrentQuestion: (question: CurrentQuestion | null) => void;
     isLoading: boolean;
     setIsLoading: (loading: boolean) => void;
-
-    // 에러
+    isRefiningFeedback: boolean;
     error: string | null;
     setError: (error: string | null) => void;
-
-    // Fallback 사용 여부
     usedFallback: boolean;
     setUsedFallback: (used: boolean) => void;
-
-    // 수렴 결과
     converged: boolean;
     convergenceResult: {
         primaryBranch: string;
@@ -66,18 +52,14 @@ interface SessionStore {
         secondaryBranch: string | null;
         reasoning: string;
     }) => void;
-
-    // 브리프 출력
     brief: BriefOutput | null;
     llmSummary: LLMBriefResponse | null;
     setBrief: (brief: BriefOutput, llmSummary: LLMBriefResponse) => void;
-
-    // API 호출 함수
+    refineFeedback: () => Promise<void>;
     startSession: () => Promise<void>;
     submitAnswer: (selectedLabel: string, selectedDirection: string) => Promise<void>;
+    refineSession: () => Promise<void>;
     generateBrief: () => Promise<void>;
-
-    // 리셋
     reset: () => void;
     resetToContext: () => void;
 }
@@ -89,14 +71,26 @@ const initialUserContext: UserContext = {
     targetAge: '',
 };
 
+function resolveQuestionType(
+    type: QuestionType | undefined,
+    options: LLMQuestionOption[]
+): QuestionType {
+    if (type) return type;
+    if (options.length === 0) return 'free_text';
+    return 'text_choice';
+}
+
 export const useSessionStore = create<SessionStore>((set, get) => ({
     step: 'entry',
     feedbackText: '',
+    refinedFeedbackText: null,
+    refineChoice: null,
     userContext: { ...initialUserContext },
     sessionState: null,
     initialAnalysis: null,
     currentQuestion: null,
     isLoading: false,
+    isRefiningFeedback: false,
     error: null,
     usedFallback: false,
     converged: false,
@@ -105,9 +99,15 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     llmSummary: null,
 
     setStep: (step) => set({ step }),
-    setFeedbackText: (feedbackText) => set({ feedbackText }),
-    setUserContext: (ctx) => set((s) => ({
-        userContext: { ...s.userContext, ...ctx },
+    setFeedbackText: (feedbackText) => set({
+        feedbackText,
+        refinedFeedbackText: null,
+        refineChoice: null,
+        error: null,
+    }),
+    setRefineChoice: (refineChoice) => set({ refineChoice }),
+    setUserContext: (ctx) => set((state) => ({
+        userContext: { ...state.userContext, ...ctx },
     })),
     setSessionState: (sessionState) => set({ sessionState }),
     setInitialAnalysis: (initialAnalysis) => set({ initialAnalysis }),
@@ -121,24 +121,61 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     }),
     setBrief: (brief, llmSummary) => set({ brief, llmSummary }),
 
-    // 세션 시작 API 호출
-    startSession: async () => {
+    refineFeedback: async () => {
         const { feedbackText, userContext } = get();
-        set({ isLoading: true, error: null });
+        if (feedbackText.trim().length === 0) return;
+
+        set({ isRefiningFeedback: true, error: null });
 
         try {
-            const res = await fetch('/api/session/start', {
+            const response = await fetch('/api/session/refine-feedback', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ feedbackText, context: userContext }),
             });
 
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.error || '세션 시작 실패');
+            if (!response.ok) {
+                const errorBody = await response.json();
+                throw new Error(errorBody.error || '표현 다듬기에 실패했습니다.');
             }
 
-            const data = await res.json();
+            const data = await response.json() as RefineFeedbackResponse;
+
+            set({
+                refinedFeedbackText: data.refinedText,
+                refineChoice: null,
+                isRefiningFeedback: false,
+            });
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : '표현 다듬기 중 오류가 발생했습니다.',
+                isRefiningFeedback: false,
+            });
+        }
+    },
+
+    startSession: async () => {
+        const { feedbackText, refinedFeedbackText, refineChoice, userContext } = get();
+        const selectedFeedbackText =
+            refineChoice === 'refined' && refinedFeedbackText
+                ? refinedFeedbackText
+                : feedbackText;
+
+        set({ isLoading: true, error: null });
+
+        try {
+            const response = await fetch('/api/session/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ feedbackText: selectedFeedbackText, context: userContext }),
+            });
+
+            if (!response.ok) {
+                const errorBody = await response.json();
+                throw new Error(errorBody.error || '세션 시작에 실패했습니다.');
+            }
+
+            const data = await response.json();
 
             set({
                 sessionState: data.sessionState,
@@ -147,20 +184,19 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
                 currentQuestion: {
                     question: data.initialAnalysis.question,
                     options: data.initialAnalysis.options,
-                    type: 'text_choice' as QuestionType,
+                    type: resolveQuestionType(undefined, data.initialAnalysis.options),
                 },
                 step: 'questions',
                 isLoading: false,
             });
         } catch (error) {
             set({
-                error: error instanceof Error ? error.message : '알 수 없는 오류',
+                error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.',
                 isLoading: false,
             });
         }
     },
 
-    // 답변 제출 API 호출 (ISSUE 4b: 질문 텍스트/옵션 전달)
     submitAnswer: async (selectedLabel, selectedDirection) => {
         const { sessionState, currentQuestion } = get();
         if (!sessionState) return;
@@ -168,7 +204,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
         set({ isLoading: true, error: null });
 
         try {
-            const res = await fetch(`/api/session/${sessionState.sessionId}/answer`, {
+            const response = await fetch(`/api/session/${sessionState.sessionId}/answer`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -180,12 +216,12 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
                 }),
             });
 
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.error || '답변 처리 실패');
+            if (!response.ok) {
+                const errorBody = await response.json();
+                throw new Error(errorBody.error || '답변 처리에 실패했습니다.');
             }
 
-            const data = await res.json();
+            const data = await response.json();
 
             set({
                 sessionState: data.sessionState,
@@ -200,24 +236,70 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
                     currentQuestion: null,
                     step: 'confirm',
                 });
-            } else if (data.nextQuestion) {
+                return;
+            }
+
+            if (data.nextQuestion) {
                 set({
                     currentQuestion: {
                         question: data.nextQuestion.question,
                         options: data.nextQuestion.options,
-                        type: data.nextQuestion.type ?? 'text_choice',
+                        type: resolveQuestionType(data.nextQuestion.type, data.nextQuestion.options),
                     },
+                    step: 'questions',
                 });
             }
         } catch (error) {
             set({
-                error: error instanceof Error ? error.message : '알 수 없는 오류',
+                error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.',
                 isLoading: false,
             });
         }
     },
 
-    // 브리프 생성 API 호출
+    refineSession: async () => {
+        const { sessionState } = get();
+        if (!sessionState) return;
+
+        set({ isLoading: true, error: null });
+
+        try {
+            const response = await fetch(`/api/session/${sessionState.sessionId}/refine`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionState }),
+            });
+
+            if (!response.ok) {
+                const errorBody = await response.json();
+                throw new Error(errorBody.error || '추가 질문 생성에 실패했습니다.');
+            }
+
+            const data = await response.json() as RefineSessionResponse;
+
+            set({
+                sessionState: data.sessionState,
+                usedFallback: data.usedFallback ?? get().usedFallback,
+                currentQuestion: data.nextQuestion
+                    ? {
+                        question: data.nextQuestion.question,
+                        options: data.nextQuestion.options,
+                        type: resolveQuestionType(data.nextQuestion.type, data.nextQuestion.options),
+                    }
+                    : null,
+                converged: false,
+                convergenceResult: null,
+                step: 'questions',
+                isLoading: false,
+            });
+        } catch (error) {
+            set({
+                error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.',
+                isLoading: false,
+            });
+        }
+    },
+
     generateBrief: async () => {
         const { sessionState } = get();
         if (!sessionState) return;
@@ -225,18 +307,18 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
         set({ isLoading: true, error: null });
 
         try {
-            const res = await fetch(`/api/brief/${sessionState.sessionId}/generate`, {
+            const response = await fetch(`/api/brief/${sessionState.sessionId}/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sessionState }),
             });
 
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.error || '브리프 생성 실패');
+            if (!response.ok) {
+                const errorBody = await response.json();
+                throw new Error(errorBody.error || '브리프 생성에 실패했습니다.');
             }
 
-            const data = await res.json();
+            const data = await response.json();
 
             set({
                 brief: data.brief,
@@ -246,21 +328,23 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
             });
         } catch (error) {
             set({
-                error: error instanceof Error ? error.message : '알 수 없는 오류',
+                error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.',
                 isLoading: false,
             });
         }
     },
 
-    // 전체 리셋
     reset: () => set({
         step: 'entry',
         feedbackText: '',
+        refinedFeedbackText: null,
+        refineChoice: null,
         userContext: { ...initialUserContext },
         sessionState: null,
         initialAnalysis: null,
         currentQuestion: null,
         isLoading: false,
+        isRefiningFeedback: false,
         error: null,
         usedFallback: false,
         converged: false,
@@ -269,13 +353,13 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
         llmSummary: null,
     }),
 
-    // 맥락 설정으로 되돌아가기 (feedbackText/userContext 유지)
     resetToContext: () => set({
         step: 'context',
         sessionState: null,
         initialAnalysis: null,
         currentQuestion: null,
         isLoading: false,
+        isRefiningFeedback: false,
         error: null,
         usedFallback: false,
         converged: false,

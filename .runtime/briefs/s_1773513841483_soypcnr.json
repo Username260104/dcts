@@ -1,0 +1,154 @@
+{
+  "brief": {
+    "originalFeedback": "좀 더 독특했으면 좋겠어요",
+    "feedbackType": "directional",
+    "userContext": {
+      "industry": "뷰티/코스메틱",
+      "pricePosition": "미들 (중간)",
+      "projectStage": "2차 수정 피드백",
+      "targetAge": "10~20대"
+    },
+    "generatedAt": "2026-03-14T18:44:22.873Z",
+    "clientSummary": "말씀하신 방향은 '이걸 알아보는 너는 진짜다'라는 느낌. 소수만의 코드에 더 가깝습니다.",
+    "clientAntiSummary": "미술관에서 '이게 뭐지?' 하고 멈춰 서게 되는 느낌. 파격적이고 실험적인 쪽으로 가는 것은 아닌 것으로 해석했습니다.",
+    "primaryBranch": {
+      "adjective": "독특한/개성 있는",
+      "branchId": "UNQ-C",
+      "branchLabel": "서브컬처",
+      "descriptionDesigner": "특정 커뮤니티, 마니아, 언더그라운드. 아는 사람만 아는 멋",
+      "descriptionClient": "'이걸 알아보는 너는 진짜다'라는 느낌. 소수만의 코드",
+      "confusableBranches": [
+        "TRD-A",
+        "IMP-B"
+      ],
+      "distinctionKey": "TRD-A(하이프 트렌디)는 대중이 따라가는 힙, UNQ-C는 대중을 의도적으로 배제",
+      "contrastQuestion": "많은 사람이 힙하다고 느끼길 원하나요, 아는 사람만 알아보길 원하나요?",
+      "antiSignals": [
+        "대중적으로",
+        "누구나 이해하게",
+        "깔끔하게",
+        "정돈되게"
+      ],
+      "excludedTokens": [
+        "파스텔",
+        "정렬 그리드",
+        "라운드",
+        "표준 서체",
+        "밝은 톤"
+      ],
+      "references": [
+        "언더그라운드 레이블",
+        "독립 잡지"
+      ]
+    },
+    "secondaryBranch": {
+      "adjective": "독특한/개성 있는",
+      "branchId": "UNQ-B",
+      "branchLabel": "크래프트/아르티장",
+      "descriptionDesigner": "수공예, 장인정신, 하나뿐인 것. 사람 손의 흔적이 가치인",
+      "descriptionClient": "장인이 한 땀 한 땀 만든 느낌. 기계로는 못 만드는 유일함",
+      "confusableBranches": [
+        "WRM-A",
+        "WRM-C",
+        "NAT-A"
+      ],
+      "distinctionKey": "WRM-A(내추럴 웜)는 자연 소재의 온기, UNQ-B는 장인 손의 흔적",
+      "contrastQuestion": "자연이 만든 따뜻함인가요, 사람 손이 만든 유일함인가요?",
+      "antiSignals": [
+        "깔끔하게",
+        "시스템적으로",
+        "대량생산 느낌으로"
+      ],
+      "excludedTokens": [
+        "기하학적 산세리프",
+        "시스템 UI",
+        "플랫 디자인",
+        "균일한 그리드"
+      ],
+      "references": [
+        "소규모 공방",
+        "로컬 로스터리"
+      ]
+    },
+    "eliminatedBranches": [
+      {
+        "adjective": "독특한/개성 있는",
+        "branchId": "UNQ-A",
+        "branchLabel": "아방가르드",
+        "descriptionDesigner": "규칙 파괴, 실험적, 예술적. 기존 문법을 거부하는 독창성",
+        "descriptionClient": "미술관에서 '이게 뭐지?' 하고 멈춰 서게 되는 느낌. 파격적이고 실험적인",
+        "confusableBranches": [
+          "IMP-C",
+          "MOD-B"
+        ],
+        "distinctionKey": "MOD-B(아트 모던)는 예술적이되 문법 안, UNQ-A는 문법 자체를 깨는 것",
+        "contrastQuestion": "감각적이면서 이해 가능한 건가요, 이해보다 충격이 먼저 오는 건가요?",
+        "antiSignals": [
+          "대중적으로",
+          "누구나 좋아하게",
+          "무난하게",
+          "안전하게"
+        ],
+        "excludedTokens": [
+          "정렬된 그리드",
+          "파스텔",
+          "라운드",
+          "표준 레이아웃",
+          "일반적 서체"
+        ],
+        "references": [
+          "Comme des Garçons",
+          "Rick Owens"
+        ]
+      }
+    ],
+    "interpretationRationale": "서브컬처(UNQ-C) 기준으로 해석했습니다. 특정 커뮤니티, 마니아, 언더그라운드. 아는 사람만 아는 멋",
+    "designTokens": {
+      "branchId": "UNQ-C",
+      "branchLabel": "서브컬처",
+      "colorDirection": "블랙 베이스 + 경고색 (옐로/레드). 로파이 느낌. 거친 대비",
+      "typographyDirection": "DIY/스텐실 타이포. 타자기체. 모노스페이스. 로파이",
+      "layoutDirection": "콜라주. 진/스티커 느낌. DIY. 밀도 높되 의도된 지저분함",
+      "imageDirection": "스냅 포토. 로파이. 포토카피. 흑백 복사",
+      "textureDirection": "스티커, 테이프, 신문지. 포토카피 노이즈",
+      "neverDo": "파스텔 금지. 정렬 그리드 금지. 라운드 금지. 표준 서체 금지. 밝은 톤 금지"
+    },
+    "neverDoList": [
+      "파스텔 금지",
+      "정렬 그리드 금지",
+      "라운드 금지",
+      "표준 서체 금지",
+      "밝은 톤 금지",
+      "파스텔",
+      "정렬 그리드",
+      "라운드",
+      "표준 서체",
+      "밝은 톤"
+    ],
+    "confusionWarnings": [
+      "하이프 트렌디와 혼동 주의: TRD-A(하이프 트렌디)는 대중이 따라가는 힙, UNQ-C는 대중을 의도적으로 배제",
+      "비비드 임팩트와 혼동 주의: TRD-A(하이프 트렌디)는 대중이 따라가는 힙, UNQ-C는 대중을 의도적으로 배제"
+    ],
+    "references": [
+      "언더그라운드 레이블",
+      "독립 잡지"
+    ],
+    "antiReferences": [
+      "Supreme (하이프 트렌디 혼동 주의)",
+      "Off-White (하이프 트렌디 혼동 주의)",
+      "Nike SNKRS (하이프 트렌디 혼동 주의)",
+      "Spotify Wrapped (비비드 임팩트 혼동 주의)"
+    ]
+  },
+  "llmSummary": {
+    "clientSummary": "말씀하신 방향은 '이걸 알아보는 너는 진짜다'라는 느낌. 소수만의 코드에 더 가깝습니다.",
+    "clientAntiSummary": "미술관에서 '이게 뭐지?' 하고 멈춰 서게 되는 느낌. 파격적이고 실험적인 쪽으로 가는 것은 아닌 것으로 해석했습니다.",
+    "designerSummary": "서브컬처(UNQ-C) 기준으로 해석했습니다. 특정 커뮤니티, 마니아, 언더그라운드. 아는 사람만 아는 멋",
+    "adjustmentNotes": "온톨로지 토큰과 현재 맥락을 기준으로 브리프를 생성했습니다.",
+    "confusionWarnings": [
+      "하이프 트렌디와 혼동 주의: TRD-A(하이프 트렌디)는 대중이 따라가는 힙, UNQ-C는 대중을 의도적으로 배제",
+      "비비드 임팩트와 혼동 주의: TRD-A(하이프 트렌디)는 대중이 따라가는 힙, UNQ-C는 대중을 의도적으로 배제"
+    ]
+  },
+  "createdAt": "2026-03-14T18:44:22.873Z"
+}

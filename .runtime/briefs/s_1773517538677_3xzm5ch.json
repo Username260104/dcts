@@ -1,0 +1,535 @@
+{
+  "brief": {
+    "originalFeedback": "조금 더 고급스럽고 정리된 느낌이면 좋겠어요. 지금 안이 너무 화려하진 않은데, 아직 브랜드답게 힘이 느껴지진 않아요. 정보는 덜어내도 되는데 너무 차갑거나 딱딱해 보이진 않았으면 좋겠고, 첫인상에서 믿음직하면서도 세련됐다는 느낌이 났으면 해요.",
+    "feedbackType": "directional",
+    "userContext": {
+      "industry": "테크 / SaaS",
+      "pricePosition": "매스 (대중)",
+      "projectStage": "2차 수정 피드백",
+      "targetAge": "전연령"
+    },
+    "generatedAt": "2026-03-14T19:46:06.187Z",
+    "clientSummary": "전문적인 실력이 느껴지면서도 차갑지 않은, 따뜻하고 세련된 브랜드 이미지를 원하십니다. 정보의 밀도는 낮추되, 고객에게 신뢰와 안정감을 줄 수 있는 인간적인 브랜드의 힘을 강조하고자 합니다.",
+    "clientAntiSummary": "지나치게 화려하거나 차가운 느낌, 기계적이고 딱딱한 분위기는 지양합니다.",
+    "primaryBranch": {
+      "adjective": "신뢰감 있는",
+      "branchId": "TRS-C",
+      "branchLabel": "휴먼 신뢰",
+      "descriptionDesigner": "따뜻한 전문성, 접근 가능한 전문가. 사람이 보이는 신뢰",
+      "descriptionClient": "실력 있는 동네 의사 선생님 느낌. 믿음직하면서 따뜻한",
+      "confusableBranches": [
+        "WRM-B",
+        "CMF-C",
+        "CLN-B"
+      ],
+      "distinctionKey": "WRM-B(휴먼 웜)는 포용감, TRS-C는 전문성이 바탕에 있는 따뜻함",
+      "contrastQuestion": "모두를 감싸는 따뜻함인가요, 전문적이면서 따뜻한 건가요?",
+      "antiSignals": [
+        "힙하게",
+        "날카롭게",
+        "강렬하게",
+        "파격적으로"
+      ],
+      "excludedTokens": [
+        "네온",
+        "다크모드",
+        "해체 타이포",
+        "콜라주",
+        "스트릿 느낌"
+      ],
+      "references": [
+        "병원/클리닉 브랜딩",
+        "교육 기관"
+      ]
+    },
+    "secondaryBranch": null,
+    "eliminatedBranches": [
+      {
+        "adjective": "고급스러운",
+        "branchId": "LUX-D",
+        "branchLabel": "맥시멀 글램",
+        "descriptionDesigner": "화려함, 장식적 풍요, 시각적 과시. 숨기지 않는 럭셔리",
+        "descriptionClient": "파티에 온 것 같은 화려하고 눈부신 느낌. 골드, 반짝임, 풍성함",
+        "confusableBranches": [
+          "IMP-B",
+          "TRD-A"
+        ],
+        "distinctionKey": "IMP-B(비비드 임팩트)는 자극 목적, LUX-D는 풍요로움 표현",
+        "contrastQuestion": "시선을 확 잡는 강렬함인가요, 풍성하고 화려한 아름다움인가요?",
+        "antiSignals": [
+          "절제하게",
+          "심플하게",
+          "비워주세요",
+          "조용하게"
+        ],
+        "excludedTokens": [
+          "넓은 여백",
+          "뮤트 톤",
+          "얇은 서체",
+          "미니멀 레이아웃",
+          "모노크롬"
+        ],
+        "references": [
+          "Versace",
+          "Dolce & Gabbana",
+          "Balmain"
+        ]
+      },
+      {
+        "adjective": "강렬한/임팩트 있는",
+        "branchId": "IMP-B",
+        "branchLabel": "비비드 임팩트",
+        "descriptionDesigner": "선명한 색상 충돌, 네온, 시각적 자극. 눈이 안 돌아갈 수 없는",
+        "descriptionClient": "콘서트나 페스티벌 포스터 같은 느낌. 선명하고 강렬한 색으로 확 잡는",
+        "confusableBranches": [
+          "TRD-A",
+          "LUX-D",
+          "VIV-A"
+        ],
+        "distinctionKey": "VIV-A(팝 에너지)는 유쾌한 밝음, IMP-B는 공격적 자극",
+        "contrastQuestion": "밝고 즐거운 눈길 끌기인가요, 강하고 자극적인 눈길 끌기인가요?",
+        "antiSignals": [
+          "차분하게",
+          "절제해서",
+          "고급스럽게",
+          "조용하게"
+        ],
+        "excludedTokens": [
+          "뮤트 톤",
+          "넓은 여백",
+          "세리프 위주",
+          "소프트 라이팅",
+          "미니멀"
+        ],
+        "references": [
+          "Spotify Wrapped",
+          "MTV",
+          "페스티벌"
+        ]
+      },
+      {
+        "adjective": "발랄한/활기찬",
+        "branchId": "VIV-A",
+        "branchLabel": "팝 에너지",
+        "descriptionDesigner": "톡톡 튀는, 밝고 유쾌한. 컬러풀하고 즐거운 에너지",
+        "descriptionClient": "놀이공원에 온 것 같은 밝고 신나는 느낌",
+        "confusableBranches": [
+          "TRD-C",
+          "CMF-B",
+          "VIV-C"
+        ],
+        "distinctionKey": "TRD-C(컬처 트렌디)는 위트와 센스, VIV-A는 순수한 즐거움",
+        "contrastQuestion": "센스 있는 재미인가요, 밝고 에너지 넘치는 재미인가요?",
+        "antiSignals": [
+          "차분하게",
+          "고급스럽게",
+          "절제해서",
+          "조용하게"
+        ],
+        "excludedTokens": [
+          "뮤트 톤",
+          "넓은 여백",
+          "세리프 위주",
+          "다크모드",
+          "모노크롬"
+        ],
+        "references": [
+          "Fanta",
+          "LEGO",
+          "Nintendo"
+        ]
+      },
+      {
+        "adjective": "발랄한/활기찬",
+        "branchId": "VIV-B",
+        "branchLabel": "스포티 에너지",
+        "descriptionDesigner": "역동적, 퍼포먼스, 속도감. 움직임이 느껴지는 에너지",
+        "descriptionClient": "스포츠 경기장의 열기 같은 느낌. 빠르고 강하고 역동적인",
+        "confusableBranches": [
+          "IMP-A",
+          "IMP-B",
+          "TRD-A"
+        ],
+        "distinctionKey": "IMP-A(다크 임팩트)는 위압감, VIV-B는 역동적 에너지",
+        "contrastQuestion": "어둡고 강한 파워인가요, 밝고 역동적인 에너지인가요?",
+        "antiSignals": [
+          "편안하게",
+          "부드럽게",
+          "정적으로",
+          "조용하게"
+        ],
+        "excludedTokens": [
+          "파스텔",
+          "라운드 서체",
+          "넓은 여백",
+          "정적 레이아웃",
+          "소프트 톤"
+        ],
+        "references": [
+          "Nike",
+          "Red Bull",
+          "Gatorade"
+        ]
+      },
+      {
+        "adjective": "발랄한/활기찬",
+        "branchId": "VIV-C",
+        "branchLabel": "키즈/플레이풀",
+        "descriptionDesigner": "아이같은, 동글동글, 장난감 느낌. 순수한 놀이의 즐거움",
+        "descriptionClient": "장난감 가게에 온 것 같은 동글동글하고 귀여운 느낌",
+        "confusableBranches": [
+          "CMF-B",
+          "VIV-A",
+          "CLN-B"
+        ],
+        "distinctionKey": "VIV-A(팝 에너지)는 모든 연령의 활기, VIV-C는 아이 세계의 순수함",
+        "contrastQuestion": "모든 나이대가 즐거운 활기인가요, 아이처럼 순수하고 귀여운 느낌인가요?",
+        "antiSignals": [
+          "성숙하게",
+          "고급스럽게",
+          "전문적으로",
+          "날카롭게"
+        ],
+        "excludedTokens": [
+          "콘덴스드 서체",
+          "고대비 다크톤",
+          "앵글/대각선",
+          "기하학적 레이아웃"
+        ],
+        "references": [
+          "Pororo",
+          "레고듀플로",
+          "캐릭터 브랜드"
+        ]
+      },
+      {
+        "adjective": "트렌디한",
+        "branchId": "TRD-A",
+        "branchLabel": "하이프 트렌디",
+        "descriptionDesigner": "스트릿컬처, 한정판, FOMO. 소유하고 싶은 희소성",
+        "descriptionClient": "줄 서서 사는 한정판 느낌. 힙하고 갖고 싶은",
+        "confusableBranches": [
+          "IMP-B",
+          "LUX-D",
+          "UNQ-C"
+        ],
+        "distinctionKey": "IMP-B는 시각 자극 자체가 목적, TRD-A는 문화적 희소성 표현",
+        "contrastQuestion": "눈이 확 가는 시각적 자극인가요, '이거 아는 사람은 안다'는 힙함인가요?",
+        "antiSignals": [
+          "대중적으로",
+          "누구나 좋아하게",
+          "무난하게"
+        ],
+        "excludedTokens": [
+          "파스텔",
+          "라운드 요소",
+          "정적 레이아웃",
+          "넓은 여백",
+          "클래식 세리프"
+        ],
+        "references": [
+          "Supreme",
+          "Off-White",
+          "Nike SNKRS"
+        ]
+      },
+      {
+        "adjective": "트렌디한",
+        "branchId": "TRD-B",
+        "branchLabel": "디지털 트렌디",
+        "descriptionDesigner": "AI 시대, 제너러티브, 그래디언트, 3D. 기술이 만드는 새로움",
+        "descriptionClient": "AI가 만든 것 같은 느낌. 그래디언트, 반투명, 3D 요소",
+        "confusableBranches": [
+          "LUX-C",
+          "MOD-A",
+          "SOP-C"
+        ],
+        "distinctionKey": "LUX-C(테크 프리미엄)는 기술의 고급감, TRD-B는 기술의 신선함",
+        "contrastQuestion": "기술이 만드는 프리미엄감인가요, 기술이 만드는 신선하고 새로운 느낌인가요?",
+        "antiSignals": [
+          "전통적으로",
+          "자연스럽게",
+          "아날로그 감성으로"
+        ],
+        "excludedTokens": [
+          "세리프 서체",
+          "크래프트 텍스처",
+          "어스톤",
+          "빈티지 사진",
+          "손글씨"
+        ],
+        "references": [
+          "Nothing",
+          "Midjourney",
+          "Vercel"
+        ]
+      },
+      {
+        "adjective": "트렌디한",
+        "branchId": "TRD-C",
+        "branchLabel": "컬처 트렌디",
+        "descriptionDesigner": "MZ감성, 위트, 밈 문화. SNS 네이티브 감각",
+        "descriptionClient": "인스타그램/틱톡에서 바로 공유하고 싶은 느낌. 위트 있고 재미있는",
+        "confusableBranches": [
+          "CMF-B",
+          "VIV-A",
+          "MOD-C"
+        ],
+        "distinctionKey": "CMF-B(프렌들리 캐주얼)는 서비스의 친근함, TRD-C는 문화적 감각과 위트",
+        "contrastQuestion": "브랜드가 친근하게 다가가는 건가요, 브랜드가 센스 있게 노는 건가요?",
+        "antiSignals": [
+          "격식 있게",
+          "진지하게",
+          "신뢰감 있게",
+          "권위적으로"
+        ],
+        "excludedTokens": [
+          "포멀 레이아웃",
+          "대칭",
+          "네이비/다크 톤",
+          "기관적 서체",
+          "대형 여백"
+        ],
+        "references": [
+          "무신사",
+          "29CM",
+          "배달의민족"
+        ]
+      },
+      {
+        "adjective": "독특한/개성 있는",
+        "branchId": "UNQ-A",
+        "branchLabel": "아방가르드",
+        "descriptionDesigner": "규칙 파괴, 실험적, 예술적. 기존 문법을 거부하는 독창성",
+        "descriptionClient": "미술관에서 '이게 뭐지?' 하고 멈춰 서게 되는 느낌. 파격적이고 실험적인",
+        "confusableBranches": [
+          "IMP-C",
+          "MOD-B"
+        ],
+        "distinctionKey": "MOD-B(아트 모던)는 예술적이되 문법 안, UNQ-A는 문법 자체를 깨는 것",
+        "contrastQuestion": "감각적이면서 이해 가능한 건가요, 이해보다 충격이 먼저 오는 건가요?",
+        "antiSignals": [
+          "대중적으로",
+          "누구나 좋아하게",
+          "무난하게",
+          "안전하게"
+        ],
+        "excludedTokens": [
+          "정렬된 그리드",
+          "파스텔",
+          "라운드",
+          "표준 레이아웃",
+          "일반적 서체"
+        ],
+        "references": [
+          "Comme des Garçons",
+          "Rick Owens"
+        ]
+      },
+      {
+        "adjective": "독특한/개성 있는",
+        "branchId": "UNQ-B",
+        "branchLabel": "크래프트/아르티장",
+        "descriptionDesigner": "수공예, 장인정신, 하나뿐인 것. 사람 손의 흔적이 가치인",
+        "descriptionClient": "장인이 한 땀 한 땀 만든 느낌. 기계로는 못 만드는 유일함",
+        "confusableBranches": [
+          "WRM-A",
+          "WRM-C",
+          "NAT-A"
+        ],
+        "distinctionKey": "WRM-A(내추럴 웜)는 자연 소재의 온기, UNQ-B는 장인 손의 흔적",
+        "contrastQuestion": "자연이 만든 따뜻함인가요, 사람 손이 만든 유일함인가요?",
+        "antiSignals": [
+          "깔끔하게",
+          "시스템적으로",
+          "대량생산 느낌으로"
+        ],
+        "excludedTokens": [
+          "기하학적 산세리프",
+          "시스템 UI",
+          "플랫 디자인",
+          "균일한 그리드"
+        ],
+        "references": [
+          "소규모 공방",
+          "로컬 로스터리"
+        ]
+      },
+      {
+        "adjective": "독특한/개성 있는",
+        "branchId": "UNQ-C",
+        "branchLabel": "서브컬처",
+        "descriptionDesigner": "특정 커뮤니티, 마니아, 언더그라운드. 아는 사람만 아는 멋",
+        "descriptionClient": "'이걸 알아보는 너는 진짜다'라는 느낌. 소수만의 코드",
+        "confusableBranches": [
+          "TRD-A",
+          "IMP-B"
+        ],
+        "distinctionKey": "TRD-A(하이프 트렌디)는 대중이 따라가는 힙, UNQ-C는 대중을 의도적으로 배제",
+        "contrastQuestion": "많은 사람이 힙하다고 느끼길 원하나요, 아는 사람만 알아보길 원하나요?",
+        "antiSignals": [
+          "대중적으로",
+          "누구나 이해하게",
+          "깔끔하게",
+          "정돈되게"
+        ],
+        "excludedTokens": [
+          "파스텔",
+          "정렬 그리드",
+          "라운드",
+          "표준 서체",
+          "밝은 톤"
+        ],
+        "references": [
+          "언더그라운드 레이블",
+          "독립 잡지"
+        ]
+      },
+      {
+        "adjective": "고급스러운",
+        "branchId": "LUX-B",
+        "branchLabel": "미니멀 럭셔리",
+        "descriptionDesigner": "절제된 고급감, Less is More, 조용한 사치. 여백 자체가 가치",
+        "descriptionClient": "비싼 호텔 로비처럼, 아무것도 없는데 고급스러운 느낌",
+        "confusableBranches": [
+          "CLN-A",
+          "SOP-C",
+          "MOD-A"
+        ],
+        "distinctionKey": "CLN-A(스위스 미니멀)는 기능적 정리, LUX-B는 의도된 여유. 비운 이유가 다름",
+        "contrastQuestion": "불필요한 걸 치워서 깔끔한 건가요, 일부러 비워둬서 여유로운 건가요?",
+        "antiSignals": [
+          "알차게",
+          "정보가 많았으면",
+          "화려하게",
+          "눈에 확 띄게"
+        ],
+        "excludedTokens": [
+          "높은 정보밀도",
+          "그래디언트",
+          "형광 강조색",
+          "모노스페이스",
+          "대시보드 레이아웃",
+          "장식적 서체"
+        ],
+        "references": [
+          "Celine",
+          "Aesop",
+          "Bottega Veneta"
+        ]
+      },
+      {
+        "adjective": "세련된",
+        "branchId": "SOP-C",
+        "branchLabel": "테크 세련",
+        "descriptionDesigner": "디자인 시스템적 정교함, UI/UX 엔지니어링 감각",
+        "descriptionClient": "개발자들이 '이 사이트 잘 만들었다'고 하는 느낌. 정교하고 체계적인",
+        "confusableBranches": [
+          "MOD-A",
+          "CLN-C",
+          "TRS-B",
+          "LUX-C"
+        ],
+        "distinctionKey": "MOD-A는 일반 사용자용 깔끔함, SOP-C는 전문가가 알아보는 정교함",
+        "contrastQuestion": "누구나 편한 깔끔함인가요, 아는 사람이 보면 감탄하는 정교함인가요?",
+        "antiSignals": [
+          "따뜻하게",
+          "인간적으로",
+          "감성적으로",
+          "손맛을 살려"
+        ],
+        "excludedTokens": [
+          "필기체",
+          "자연 소재 텍스처",
+          "따뜻한 일러스트",
+          "비정형 레이아웃"
+        ],
+        "references": [
+          "Linear",
+          "Vercel",
+          "Raycast"
+        ]
+      },
+      {
+        "adjective": "깔끔한",
+        "branchId": "CLN-B",
+        "branchLabel": "소프트 클린",
+        "descriptionDesigner": "부드럽고 정돈된, 친근하면서 깨끗한. 라운드와 파스텔의 정돈",
+        "descriptionClient": "잘 정리된 방 같은 느낌. 깔끔한데 차갑지 않고 부드러운",
+        "confusableBranches": [
+          "CMF-A",
+          "CMF-C",
+          "WRM-B"
+        ],
+        "distinctionKey": "CMF-A(홈리 컴포트)는 편안함 중심, CLN-B는 정돈 중심인데 부드러운 것",
+        "contrastQuestion": "정돈된 느낌이 더 중요한가요, 편안한 느낌이 더 중요한가요?",
+        "antiSignals": [
+          "강렬하게",
+          "임팩트 있게",
+          "날카롭게",
+          "엣지 있게"
+        ],
+        "excludedTokens": [
+          "고대비 색상",
+          "앵글/대각선",
+          "콘덴스드 서체",
+          "다크모드",
+          "네온"
+        ],
+        "references": [
+          "Notion",
+          "Headspace",
+          "Calm"
+        ]
+      }
+    ],
+    "interpretationRationale": "TRS-C(휴먼 신뢰) 기반. 전문성을 상징하는 차분한 블루와 온기를 더하는 베이지/골드 톤을 조합하여 '접근 가능한 전문가'의 페르소나를 구축할 것.",
+    "designTokens": {
+      "branchId": "TRS-C",
+      "branchLabel": "휴먼 신뢰",
+      "colorDirection": "블루+웜톤 믹스. 차분한 블루 베이스에 베이지/골드 포인트. 대비 부드럽게",
+      "typographyDirection": "라운드 세리프 or 휴머니스트 산세리프. 따뜻하면서 전문적인 느낌",
+      "layoutDirection": "사진+텍스트 밸런스. 인간적 레이아웃. 너무 기계적이지 않게. 여백 적절히",
+      "imageDirection": "따뜻한 인물 사진. 자연광. 미소. 전문가이되 접근 가능한 느낌",
+      "textureDirection": "소프트 텍스처. 종이 느낌 약간",
+      "neverDo": "네온 금지. 다크모드 금지. 해체 타이포 금지. 콜라주 금지. 스트릿 느낌 금지"
+    },
+    "neverDoList": [
+      "네온 금지",
+      "다크모드 금지",
+      "해체 타이포 금지",
+      "콜라주 금지",
+      "스트릿 느낌 금지",
+      "네온",
+      "다크모드",
+      "해체 타이포",
+      "콜라주",
+      "스트릿 느낌"
+    ],
+    "confusionWarnings": [
+      "WRM-B(휴먼 웜)의 포용감과 혼동 주의: 전문적 실력이라는 명확한 톤앤매너 유지",
+      "CLN-B(소프트 클린)의 정적인 느낌과 혼동 주의: 인간적인 레이아웃과 따뜻한 색감으로 차별화"
+    ],
+    "references": [
+      "병원/클리닉 브랜딩",
+      "교육 기관"
+    ],
+    "antiReferences": [
+      "Airbnb (휴먼 웜 혼동 주의)",
+      "Mailchimp (휴먼 웜 혼동 주의)",
+      "Slack (휴먼 웜 혼동 주의)",
+      "존슨앤존슨 (케어 컴포트 혼동 주의)"
+    ]
+  },
+  "llmSummary": {
+    "clientSummary": "전문적인 실력이 느껴지면서도 차갑지 않은, 따뜻하고 세련된 브랜드 이미지를 원하십니다. 정보의 밀도는 낮추되, 고객에게 신뢰와 안정감을 줄 수 있는 인간적인 브랜드의 힘을 강조하고자 합니다.",
+    "clientAntiSummary": "지나치게 화려하거나 차가운 느낌, 기계적이고 딱딱한 분위기는 지양합니다.",
+    "designerSummary": "TRS-C(휴먼 신뢰) 기반. 전문성을 상징하는 차분한 블루와 온기를 더하는 베이지/골드 톤을 조합하여 '접근 가능한 전문가'의 페르소나를 구축할 것.",
+    "adjustmentNotes": "정보를 덜어내어 정돈된 느낌을 주되, 차가운 미니멀리즘이 되지 않도록 소프트한 텍스처와 자연광이 담긴 인물 이미지를 활용해 온기를 유지함.",
+    "confusionWarnings": [
+      "WRM-B(휴먼 웜)의 포용감과 혼동 주의: 전문적 실력이라는 명확한 톤앤매너 유지",
+      "CLN-B(소프트 클린)의 정적인 느낌과 혼동 주의: 인간적인 레이아웃과 따뜻한 색감으로 차별화"
+    ]
+  },
+  "createdAt": "2026-03-14T19:46:06.187Z"
+}

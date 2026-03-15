@@ -1,0 +1,478 @@
+{
+  "brief": {
+    "originalFeedback": "좀 더 세련되게 해주세요",
+    "feedbackType": "ambiguous",
+    "userContext": {
+      "industry": "뷰티/코스메틱",
+      "pricePosition": "프리미엄 (상위 20%)",
+      "projectStage": "2차 수정 피드백",
+      "targetAge": "30대"
+    },
+    "generatedAt": "2026-03-14T19:42:04.707Z",
+    "clientSummary": "미술관 포스터처럼 예술적이고 지적인 감각을 담은 세련된 디자인을 원하십니다. 패션 잡지에서 볼 수 있는 감각적인 우아함과 에디토리얼한 레이아웃을 통해 브랜드의 문화적 깊이를 표현하고자 합니다.",
+    "clientAntiSummary": "단순히 깔끔하기만 한 스마트함이나, 대중적이고 가벼운 느낌의 디자인은 지양합니다.",
+    "primaryBranch": {
+      "adjective": "모던한",
+      "branchId": "MOD-B",
+      "branchLabel": "아트 모던",
+      "descriptionDesigner": "갤러리 감성, 에디토리얼, 문화적 세련미. 예술적 현대감",
+      "descriptionClient": "멋진 잡지나 미술관 포스터 같은 느낌. 감각적이고 문화적인",
+      "confusableBranches": [
+        "SOP-A",
+        "SOP-B",
+        "IMP-C"
+      ],
+      "distinctionKey": "SOP-A(유러피안 세련)는 패션 중심, MOD-B는 아트/에디토리얼 중심",
+      "contrastQuestion": "패션지 같은 화려한 감각인가요, 미술관 같은 지적인 감각인가요?",
+      "antiSignals": [
+        "대중적으로",
+        "쉽게",
+        "친근하게",
+        "기능적으로"
+      ],
+      "excludedTokens": [
+        "시스템 UI",
+        "대시보드 레이아웃",
+        "라운드 요소",
+        "파스텔",
+        "일러스트"
+      ],
+      "references": [
+        "Kinfolk",
+        "Cereal Magazine"
+      ]
+    },
+    "secondaryBranch": null,
+    "eliminatedBranches": [
+      {
+        "adjective": "발랄한/활기찬",
+        "branchId": "VIV-A",
+        "branchLabel": "팝 에너지",
+        "descriptionDesigner": "톡톡 튀는, 밝고 유쾌한. 컬러풀하고 즐거운 에너지",
+        "descriptionClient": "놀이공원에 온 것 같은 밝고 신나는 느낌",
+        "confusableBranches": [
+          "TRD-C",
+          "CMF-B",
+          "VIV-C"
+        ],
+        "distinctionKey": "TRD-C(컬처 트렌디)는 위트와 센스, VIV-A는 순수한 즐거움",
+        "contrastQuestion": "센스 있는 재미인가요, 밝고 에너지 넘치는 재미인가요?",
+        "antiSignals": [
+          "차분하게",
+          "고급스럽게",
+          "절제해서",
+          "조용하게"
+        ],
+        "excludedTokens": [
+          "뮤트 톤",
+          "넓은 여백",
+          "세리프 위주",
+          "다크모드",
+          "모노크롬"
+        ],
+        "references": [
+          "Fanta",
+          "LEGO",
+          "Nintendo"
+        ]
+      },
+      {
+        "adjective": "발랄한/활기찬",
+        "branchId": "VIV-B",
+        "branchLabel": "스포티 에너지",
+        "descriptionDesigner": "역동적, 퍼포먼스, 속도감. 움직임이 느껴지는 에너지",
+        "descriptionClient": "스포츠 경기장의 열기 같은 느낌. 빠르고 강하고 역동적인",
+        "confusableBranches": [
+          "IMP-A",
+          "IMP-B",
+          "TRD-A"
+        ],
+        "distinctionKey": "IMP-A(다크 임팩트)는 위압감, VIV-B는 역동적 에너지",
+        "contrastQuestion": "어둡고 강한 파워인가요, 밝고 역동적인 에너지인가요?",
+        "antiSignals": [
+          "편안하게",
+          "부드럽게",
+          "정적으로",
+          "조용하게"
+        ],
+        "excludedTokens": [
+          "파스텔",
+          "라운드 서체",
+          "넓은 여백",
+          "정적 레이아웃",
+          "소프트 톤"
+        ],
+        "references": [
+          "Nike",
+          "Red Bull",
+          "Gatorade"
+        ]
+      },
+      {
+        "adjective": "발랄한/활기찬",
+        "branchId": "VIV-C",
+        "branchLabel": "키즈/플레이풀",
+        "descriptionDesigner": "아이같은, 동글동글, 장난감 느낌. 순수한 놀이의 즐거움",
+        "descriptionClient": "장난감 가게에 온 것 같은 동글동글하고 귀여운 느낌",
+        "confusableBranches": [
+          "CMF-B",
+          "VIV-A",
+          "CLN-B"
+        ],
+        "distinctionKey": "VIV-A(팝 에너지)는 모든 연령의 활기, VIV-C는 아이 세계의 순수함",
+        "contrastQuestion": "모든 나이대가 즐거운 활기인가요, 아이처럼 순수하고 귀여운 느낌인가요?",
+        "antiSignals": [
+          "성숙하게",
+          "고급스럽게",
+          "전문적으로",
+          "날카롭게"
+        ],
+        "excludedTokens": [
+          "콘덴스드 서체",
+          "고대비 다크톤",
+          "앵글/대각선",
+          "기하학적 레이아웃"
+        ],
+        "references": [
+          "Pororo",
+          "레고듀플로",
+          "캐릭터 브랜드"
+        ]
+      },
+      {
+        "adjective": "편안한/친근한",
+        "branchId": "CMF-A",
+        "branchLabel": "홈리 컴포트",
+        "descriptionDesigner": "집 같은, 일상적, 안락한. 익숙함이 주는 편안함",
+        "descriptionClient": "좋아하는 이불 속에 있는 느낌. 집처럼 편하고 안락한",
+        "confusableBranches": [
+          "WRM-A",
+          "CLN-B",
+          "NAT-C"
+        ],
+        "distinctionKey": "CLN-B(소프트 클린)는 정돈된 부드러움, CMF-A는 안락한 편안함",
+        "contrastQuestion": "깔끔하게 정돈된 편안함인가요, 이불처럼 폭 감싸는 편안함인가요?",
+        "antiSignals": [
+          "세련되게",
+          "날카롭게",
+          "임팩트 있게",
+          "고급스럽게"
+        ],
+        "excludedTokens": [
+          "고대비",
+          "기하학적 서체",
+          "다크모드",
+          "날카로운 각도",
+          "골드"
+        ],
+        "references": [
+          "IKEA",
+          "무인양품",
+          "오설록"
+        ]
+      },
+      {
+        "adjective": "편안한/친근한",
+        "branchId": "CMF-B",
+        "branchLabel": "프렌들리 캐주얼",
+        "descriptionDesigner": "말 걸기 쉬운, 유머, 인간적. 유쾌한 대화 상대 같은",
+        "descriptionClient": "재미있는 친구 같은 느낌. 편하고 유쾌하고 말 걸고 싶은",
+        "confusableBranches": [
+          "TRD-C",
+          "VIV-A",
+          "WRM-B"
+        ],
+        "distinctionKey": "VIV-A(팝 에너지)는 에너지 자체, CMF-B는 대화 가능한 유쾌함",
+        "contrastQuestion": "에너지가 넘치는 밝음인가요, 편하게 말 걸 수 있는 유쾌함인가요?",
+        "antiSignals": [
+          "격식 있게",
+          "무게감 있게",
+          "진지하게",
+          "권위적으로"
+        ],
+        "excludedTokens": [
+          "포멀 세리프",
+          "다크 톤",
+          "대칭 레이아웃",
+          "기관적 느낌"
+        ],
+        "references": [
+          "배달의민족",
+          "Slack",
+          "Mailchimp"
+        ]
+      },
+      {
+        "adjective": "편안한/친근한",
+        "branchId": "CMF-C",
+        "branchLabel": "케어 컴포트",
+        "descriptionDesigner": "돌봄, 안심, 신뢰와 따뜻함이 동시에. 보호받는 느낌",
+        "descriptionClient": "아플 때 잘 돌봐주는 사람이 있는 느낌. 안심되고 보호받는",
+        "confusableBranches": [
+          "TRS-C",
+          "WRM-B",
+          "CLN-B"
+        ],
+        "distinctionKey": "TRS-C(휴먼 신뢰)는 전문성의 따뜻함, CMF-C는 돌봄의 따뜻함",
+        "contrastQuestion": "전문가로서 믿음직한 따뜻함인가요, 보호해주는 돌봄의 따뜻함인가요?",
+        "antiSignals": [
+          "강렬하게",
+          "트렌디하게",
+          "힙하게",
+          "파격적으로"
+        ],
+        "excludedTokens": [
+          "네온",
+          "해체 타이포",
+          "다크모드",
+          "콜라주",
+          "스트릿 느낌"
+        ],
+        "references": [
+          "존슨앤존슨",
+          "아이 전문 브랜드"
+        ]
+      },
+      {
+        "adjective": "강렬한/임팩트 있는",
+        "branchId": "IMP-A",
+        "branchLabel": "다크 임팩트",
+        "descriptionDesigner": "어두운 힘, 파워, 위압감. 압도적인 존재감",
+        "descriptionClient": "영화 빌런이 등장하는 장면 같은 느낌. 어둡고 강하고 압도적인",
+        "confusableBranches": [
+          "VIV-B",
+          "LUX-D",
+          "TRD-A"
+        ],
+        "distinctionKey": "VIV-B(스포티 에너지)는 역동적 에너지, IMP-A는 정적인 위압감",
+        "contrastQuestion": "움직이는 에너지인가요, 움직이지 않아도 압도하는 힘인가요?",
+        "antiSignals": [
+          "밝게",
+          "친근하게",
+          "따뜻하게",
+          "부드럽게"
+        ],
+        "excludedTokens": [
+          "파스텔",
+          "라운드 요소",
+          "일러스트",
+          "밝은 배경",
+          "소프트 톤"
+        ],
+        "references": [
+          "Balenciaga",
+          "DC Comics",
+          "Matrix"
+        ]
+      },
+      {
+        "adjective": "강렬한/임팩트 있는",
+        "branchId": "IMP-B",
+        "branchLabel": "비비드 임팩트",
+        "descriptionDesigner": "선명한 색상 충돌, 네온, 시각적 자극. 눈이 안 돌아갈 수 없는",
+        "descriptionClient": "콘서트나 페스티벌 포스터 같은 느낌. 선명하고 강렬한 색으로 확 잡는",
+        "confusableBranches": [
+          "TRD-A",
+          "LUX-D",
+          "VIV-A"
+        ],
+        "distinctionKey": "VIV-A(팝 에너지)는 유쾌한 밝음, IMP-B는 공격적 자극",
+        "contrastQuestion": "밝고 즐거운 눈길 끌기인가요, 강하고 자극적인 눈길 끌기인가요?",
+        "antiSignals": [
+          "차분하게",
+          "절제해서",
+          "고급스럽게",
+          "조용하게"
+        ],
+        "excludedTokens": [
+          "뮤트 톤",
+          "넓은 여백",
+          "세리프 위주",
+          "소프트 라이팅",
+          "미니멀"
+        ],
+        "references": [
+          "Spotify Wrapped",
+          "MTV",
+          "페스티벌"
+        ]
+      },
+      {
+        "adjective": "세련된",
+        "branchId": "SOP-C",
+        "branchLabel": "테크 세련",
+        "descriptionDesigner": "디자인 시스템적 정교함, UI/UX 엔지니어링 감각",
+        "descriptionClient": "개발자들이 '이 사이트 잘 만들었다'고 하는 느낌. 정교하고 체계적인",
+        "confusableBranches": [
+          "MOD-A",
+          "CLN-C",
+          "TRS-B",
+          "LUX-C"
+        ],
+        "distinctionKey": "MOD-A는 일반 사용자용 깔끔함, SOP-C는 전문가가 알아보는 정교함",
+        "contrastQuestion": "누구나 편한 깔끔함인가요, 아는 사람이 보면 감탄하는 정교함인가요?",
+        "antiSignals": [
+          "따뜻하게",
+          "인간적으로",
+          "감성적으로",
+          "손맛을 살려"
+        ],
+        "excludedTokens": [
+          "필기체",
+          "자연 소재 텍스처",
+          "따뜻한 일러스트",
+          "비정형 레이아웃"
+        ],
+        "references": [
+          "Linear",
+          "Vercel",
+          "Raycast"
+        ]
+      },
+      {
+        "adjective": "고급스러운",
+        "branchId": "LUX-B",
+        "branchLabel": "미니멀 럭셔리",
+        "descriptionDesigner": "절제된 고급감, Less is More, 조용한 사치. 여백 자체가 가치",
+        "descriptionClient": "비싼 호텔 로비처럼, 아무것도 없는데 고급스러운 느낌",
+        "confusableBranches": [
+          "CLN-A",
+          "SOP-C",
+          "MOD-A"
+        ],
+        "distinctionKey": "CLN-A(스위스 미니멀)는 기능적 정리, LUX-B는 의도된 여유. 비운 이유가 다름",
+        "contrastQuestion": "불필요한 걸 치워서 깔끔한 건가요, 일부러 비워둬서 여유로운 건가요?",
+        "antiSignals": [
+          "알차게",
+          "정보가 많았으면",
+          "화려하게",
+          "눈에 확 띄게"
+        ],
+        "excludedTokens": [
+          "높은 정보밀도",
+          "그래디언트",
+          "형광 강조색",
+          "모노스페이스",
+          "대시보드 레이아웃",
+          "장식적 서체"
+        ],
+        "references": [
+          "Celine",
+          "Aesop",
+          "Bottega Veneta"
+        ]
+      },
+      {
+        "adjective": "세련된",
+        "branchId": "SOP-A",
+        "branchLabel": "유러피안 세련",
+        "descriptionDesigner": "파리지앵, 이탈리안, 유럽적 감각. 패션과 문화가 만드는 세련미",
+        "descriptionClient": "파리 패션위크 초대장 같은 느낌. 우아하고 감각적인",
+        "confusableBranches": [
+          "LUX-A",
+          "LUX-D",
+          "MOD-B"
+        ],
+        "distinctionKey": "LUX-A(올드머니)는 전통의 무게, SOP-A는 패션의 우아함",
+        "contrastQuestion": "전통에서 오는 품격인가요, 감각에서 오는 우아함인가요?",
+        "antiSignals": [
+          "캐주얼하게",
+          "편안하게",
+          "테크적으로",
+          "기능적으로"
+        ],
+        "excludedTokens": [
+          "시스템 UI",
+          "라운드 볼드",
+          "대시보드",
+          "일러스트",
+          "모노스페이스"
+        ],
+        "references": [
+          "Chanel",
+          "Dior",
+          "Prada"
+        ]
+      },
+      {
+        "adjective": "세련된",
+        "branchId": "SOP-B",
+        "branchLabel": "코리안 세련",
+        "descriptionDesigner": "K-뷰티, K-디자인 감각. 한국적 절제와 의외성의 조합",
+        "descriptionClient": "젠틀몬스터 매장에 들어갔을 때의 느낌. 동양적인데 힙한",
+        "confusableBranches": [
+          "MOD-B",
+          "NAT-A",
+          "LUX-B"
+        ],
+        "distinctionKey": "MOD-B(아트 모던)는 서양 에디토리얼, SOP-B는 한국적 감각",
+        "contrastQuestion": "서양 매거진 같은 감각인가요, 한국적인 독특한 감각인가요?",
+        "antiSignals": [
+          "글로벌하게",
+          "서양적으로",
+          "대중적으로"
+        ],
+        "excludedTokens": [
+          "전형적 서양 에디토리얼",
+          "스위스 그리드",
+          "표준 팔레트"
+        ],
+        "references": [
+          "Sulwhasoo",
+          "젠틀몬스터",
+          "탬버린즈"
+        ]
+      }
+    ],
+    "interpretationRationale": "MOD-B(아트 모던) 기반. 여백과 비대칭 레이아웃을 활용한 에디토리얼 구성, 세리프-산세리프 혼용 타이포그래피로 예술적 텐션 확보.",
+    "designTokens": {
+      "branchId": "MOD-B",
+      "branchLabel": "아트 모던",
+      "colorDirection": "뉴트럴 베이스 + 강한 포인트색 1개. 무채색 비중 높게. 컬러 사용 절제하되 쓸 때 과감하게",
+      "typographyDirection": "세리프+산세리프 믹스. 헤딩에 개성 있는 서체. 크기 대비 극대화. 타이포 자체가 비주얼",
+      "layoutDirection": "비대칭 에디토리얼. 매거진 스프레드 참조. 텍스트 블록을 이미지처럼 배치. 여백 과감하게",
+      "imageDirection": "아트 포토그래피. 필름 톤. 그레인. 스틸라이프. 연출된 구도",
+      "textureDirection": "종이 텍스처. 그레인 오버레이. 인쇄 질감",
+      "neverDo": "시스템 UI 금지. 대시보드 레이아웃 금지. 라운드 카드 금지. 파스텔 금지. 균일한 그리드만 사용 금지"
+    },
+    "neverDoList": [
+      "시스템 UI 금지",
+      "대시보드 레이아웃 금지",
+      "라운드 카드 금지",
+      "파스텔 금지",
+      "균일한 그리드만 사용 금지",
+      "시스템 UI",
+      "대시보드 레이아웃",
+      "라운드 요소",
+      "파스텔",
+      "일러스트"
+    ],
+    "confusionWarnings": [
+      "SOP-A(유러피안 세련)의 패션 중심 무드와 혼동 주의",
+      "SOP-B(코리안 세련)의 정제된 느낌과 혼동 주의",
+      "IMP-C(미니멀 임팩트)의 단순 미니멀리즘과 혼동 주의"
+    ],
+    "references": [
+      "Kinfolk",
+      "Cereal Magazine"
+    ],
+    "antiReferences": [
+      "Chanel (유러피안 세련 혼동 주의)",
+      "Dior (유러피안 세련 혼동 주의)",
+      "Prada (유러피안 세련 혼동 주의)",
+      "Sulwhasoo (코리안 세련 혼동 주의)"
+    ]
+  },
+  "llmSummary": {
+    "clientSummary": "미술관 포스터처럼 예술적이고 지적인 감각을 담은 세련된 디자인을 원하십니다. 패션 잡지에서 볼 수 있는 감각적인 우아함과 에디토리얼한 레이아웃을 통해 브랜드의 문화적 깊이를 표현하고자 합니다.",
+    "clientAntiSummary": "단순히 깔끔하기만 한 스마트함이나, 대중적이고 가벼운 느낌의 디자인은 지양합니다.",
+    "designerSummary": "MOD-B(아트 모던) 기반. 여백과 비대칭 레이아웃을 활용한 에디토리얼 구성, 세리프-산세리프 혼용 타이포그래피로 예술적 텐션 확보.",
+    "adjustmentNotes": "뉴트럴 베이스에 과감한 포인트 컬러 1개 사용. 시스템 UI적 요소(라운드 카드, 균일 그리드)를 배제하고 인쇄 매체적 질감과 구도를 우선 적용.",
+    "confusionWarnings": [
+      "SOP-A(유러피안 세련)의 패션 중심 무드와 혼동 주의",
+      "SOP-B(코리안 세련)의 정제된 느낌과 혼동 주의",
+      "IMP-C(미니멀 임팩트)의 단순 미니멀리즘과 혼동 주의"
+    ]
+  },
+  "createdAt": "2026-03-14T19:42:04.707Z"
+}

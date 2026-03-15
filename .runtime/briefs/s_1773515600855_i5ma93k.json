@@ -1,0 +1,157 @@
+{
+  "brief": {
+    "originalFeedback": "좀 더 세련되게 해주세요",
+    "feedbackType": "directional",
+    "userContext": {
+      "industry": "패션 / 라이프스타일",
+      "pricePosition": "프리미엄 (상위 20%)",
+      "projectStage": "2차 수정 피드백",
+      "targetAge": "30대"
+    },
+    "generatedAt": "2026-03-14T19:13:35.027Z",
+    "clientSummary": "말씀하신 방향은 젠틀몬스터 매장에 들어갔을 때의 느낌. 동양적인데 힙한에 더 가깝습니다.",
+    "clientAntiSummary": "파리 패션위크 초대장 같은 느낌. 우아하고 감각적인 쪽으로 가는 것은 아닌 것으로 해석했습니다.",
+    "primaryBranch": {
+      "adjective": "세련된",
+      "branchId": "SOP-B",
+      "branchLabel": "코리안 세련",
+      "descriptionDesigner": "K-뷰티, K-디자인 감각. 한국적 절제와 의외성의 조합",
+      "descriptionClient": "젠틀몬스터 매장에 들어갔을 때의 느낌. 동양적인데 힙한",
+      "confusableBranches": [
+        "MOD-B",
+        "NAT-A",
+        "LUX-B"
+      ],
+      "distinctionKey": "MOD-B(아트 모던)는 서양 에디토리얼, SOP-B는 한국적 감각",
+      "contrastQuestion": "서양 매거진 같은 감각인가요, 한국적인 독특한 감각인가요?",
+      "antiSignals": [
+        "글로벌하게",
+        "서양적으로",
+        "대중적으로"
+      ],
+      "excludedTokens": [
+        "전형적 서양 에디토리얼",
+        "스위스 그리드",
+        "표준 팔레트"
+      ],
+      "references": [
+        "Sulwhasoo",
+        "젠틀몬스터",
+        "탬버린즈"
+      ]
+    },
+    "secondaryBranch": {
+      "adjective": "세련된",
+      "branchId": "SOP-C",
+      "branchLabel": "테크 세련",
+      "descriptionDesigner": "디자인 시스템적 정교함, UI/UX 엔지니어링 감각",
+      "descriptionClient": "개발자들이 '이 사이트 잘 만들었다'고 하는 느낌. 정교하고 체계적인",
+      "confusableBranches": [
+        "MOD-A",
+        "CLN-C",
+        "TRS-B",
+        "LUX-C"
+      ],
+      "distinctionKey": "MOD-A는 일반 사용자용 깔끔함, SOP-C는 전문가가 알아보는 정교함",
+      "contrastQuestion": "누구나 편한 깔끔함인가요, 아는 사람이 보면 감탄하는 정교함인가요?",
+      "antiSignals": [
+        "따뜻하게",
+        "인간적으로",
+        "감성적으로",
+        "손맛을 살려"
+      ],
+      "excludedTokens": [
+        "필기체",
+        "자연 소재 텍스처",
+        "따뜻한 일러스트",
+        "비정형 레이아웃"
+      ],
+      "references": [
+        "Linear",
+        "Vercel",
+        "Raycast"
+      ]
+    },
+    "eliminatedBranches": [
+      {
+        "adjective": "세련된",
+        "branchId": "SOP-A",
+        "branchLabel": "유러피안 세련",
+        "descriptionDesigner": "파리지앵, 이탈리안, 유럽적 감각. 패션과 문화가 만드는 세련미",
+        "descriptionClient": "파리 패션위크 초대장 같은 느낌. 우아하고 감각적인",
+        "confusableBranches": [
+          "LUX-A",
+          "LUX-D",
+          "MOD-B"
+        ],
+        "distinctionKey": "LUX-A(올드머니)는 전통의 무게, SOP-A는 패션의 우아함",
+        "contrastQuestion": "전통에서 오는 품격인가요, 감각에서 오는 우아함인가요?",
+        "antiSignals": [
+          "캐주얼하게",
+          "편안하게",
+          "테크적으로",
+          "기능적으로"
+        ],
+        "excludedTokens": [
+          "시스템 UI",
+          "라운드 볼드",
+          "대시보드",
+          "일러스트",
+          "모노스페이스"
+        ],
+        "references": [
+          "Chanel",
+          "Dior",
+          "Prada"
+        ]
+      }
+    ],
+    "interpretationRationale": "코리안 세련(SOP-B) 기준으로 해석했습니다. K-뷰티, K-디자인 감각. 한국적 절제와 의외성의 조합",
+    "designTokens": {
+      "branchId": "SOP-B",
+      "branchLabel": "코리안 세련",
+      "colorDirection": "뉴트럴 베이스 + 골드/어스톤 포인트. 한국적 중간 톤. 채도 낮되 따뜻한 기운",
+      "typographyDirection": "모던 한글 세리프 or 고딕. 한글 아이덴티티 강화. 동양적 여백의 미",
+      "layoutDirection": "동양적 비대칭. 여백 과감. 한글 자체를 그래픽 요소로. 절제+의외성",
+      "imageDirection": "스틸라이프. 자연 소재. 한국적 오브제. 절제된 스타일링",
+      "textureDirection": "한지, 도자기 질감. 동양적 마감",
+      "neverDo": "전형적 서양 에디토리얼만 금지. 스위스 그리드만 금지. 표준화된 팔레트만 금지"
+    },
+    "neverDoList": [
+      "전형적 서양 에디토리얼만 금지",
+      "스위스 그리드만 금지",
+      "표준화된 팔레트만 금지",
+      "전형적 서양 에디토리얼",
+      "스위스 그리드",
+      "표준 팔레트"
+    ],
+    "confusionWarnings": [
+      "아트 모던와 혼동 주의: MOD-B(아트 모던)는 서양 에디토리얼, SOP-B는 한국적 감각",
+      "프리미엄 오가닉와 혼동 주의: MOD-B(아트 모던)는 서양 에디토리얼, SOP-B는 한국적 감각",
+      "미니멀 럭셔리와 혼동 주의: MOD-B(아트 모던)는 서양 에디토리얼, SOP-B는 한국적 감각"
+    ],
+    "references": [
+      "Sulwhasoo",
+      "젠틀몬스터",
+      "탬버린즈"
+    ],
+    "antiReferences": [
+      "Kinfolk (아트 모던 혼동 주의)",
+      "Cereal Magazine (아트 모던 혼동 주의)",
+      "Aesop (프리미엄 오가닉 혼동 주의)",
+      "Aveda (프리미엄 오가닉 혼동 주의)"
+    ]
+  },
+  "llmSummary": {
+    "clientSummary": "말씀하신 방향은 젠틀몬스터 매장에 들어갔을 때의 느낌. 동양적인데 힙한에 더 가깝습니다.",
+    "clientAntiSummary": "파리 패션위크 초대장 같은 느낌. 우아하고 감각적인 쪽으로 가는 것은 아닌 것으로 해석했습니다.",
+    "designerSummary": "코리안 세련(SOP-B) 기준으로 해석했습니다. K-뷰티, K-디자인 감각. 한국적 절제와 의외성의 조합",
+    "adjustmentNotes": "온톨로지 토큰과 현재 맥락을 기준으로 브리프를 생성했습니다.",
+    "confusionWarnings": [
+      "아트 모던와 혼동 주의: MOD-B(아트 모던)는 서양 에디토리얼, SOP-B는 한국적 감각",
+      "프리미엄 오가닉와 혼동 주의: MOD-B(아트 모던)는 서양 에디토리얼, SOP-B는 한국적 감각",
+      "미니멀 럭셔리와 혼동 주의: MOD-B(아트 모던)는 서양 에디토리얼, SOP-B는 한국적 감각"
+    ]
+  },
+  "createdAt": "2026-03-14T19:13:35.028Z"
+}

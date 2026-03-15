@@ -1,22 +1,52 @@
+import { promises as fs } from 'fs';
+import path from 'path';
 import type { BriefOutput, LLMBriefResponse } from '@/types/ontology';
 
-// MVP용 in-memory 브리프 저장소 (서버 재시작 시 초기화됨)
 interface StoredBrief {
     brief: BriefOutput;
     llmSummary: LLMBriefResponse;
     createdAt: string;
 }
 
-const store = new Map<string, StoredBrief>();
+const briefsDir = path.join(process.cwd(), '.runtime', 'briefs');
 
-export function saveBrief(id: string, brief: BriefOutput, llmSummary: LLMBriefResponse): void {
-    store.set(id, { brief, llmSummary, createdAt: new Date().toISOString() });
+function getBriefPath(id: string): string {
+    const safeId = id.replace(/[^a-zA-Z0-9_-]/g, '');
+    return path.join(briefsDir, `${safeId}.json`);
 }
 
-export function getBrief(id: string): StoredBrief | undefined {
-    return store.get(id);
+export async function saveBrief(
+    id: string,
+    brief: BriefOutput,
+    llmSummary: LLMBriefResponse
+): Promise<void> {
+    await fs.mkdir(briefsDir, { recursive: true });
+
+    const payload: StoredBrief = {
+        brief,
+        llmSummary,
+        createdAt: new Date().toISOString(),
+    };
+
+    await fs.writeFile(
+        getBriefPath(id),
+        JSON.stringify(payload, null, 2),
+        'utf-8'
+    );
 }
 
-export function hasBrief(id: string): boolean {
-    return store.has(id);
+export async function getBrief(id: string): Promise<StoredBrief | null> {
+    try {
+        const raw = await fs.readFile(getBriefPath(id), 'utf-8');
+        return JSON.parse(raw) as StoredBrief;
+    } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+            return null;
+        }
+        throw error;
+    }
+}
+
+export async function hasBrief(id: string): Promise<boolean> {
+    return (await getBrief(id)) !== null;
 }
