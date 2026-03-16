@@ -9,6 +9,7 @@ import type {
     LLMBriefResponse,
     LLMFollowUpResponse,
     LLMInitialAnalysis,
+    LLMQuestionOption,
     RefineFeedbackResponse,
     SessionState,
     UserContext,
@@ -18,6 +19,9 @@ import { MAX_QUESTIONS } from './constants';
 const branchData = branches as Branch[];
 const ctxData = context as ContextVariables;
 const tokenData = tokens as DesignToken[];
+const DETAIL_FOCUSES = ['color', 'typography', 'layout', 'imagery', 'texture'] as const;
+type DetailFocus = (typeof DETAIL_FOCUSES)[number];
+const UNCLEAR_OPTION_LABEL = '잘 모르겠어요';
 
 type LLMProvider = 'anthropic' | 'gemini';
 
@@ -112,8 +116,10 @@ Rules:
 - Do not use design jargon in questions or options.
 - Ask one question at a time.
 - Always frame questions relative to the current proposal.
+- First infer what the client likely means before mapping to ontology branches.
+- Make each question sound like it understood the client's feedback, not like it is exposing internal branch labels.
 - Keep the total question count to ${MAX_QUESTIONS} or fewer.
-- Prefer questions that reduce the candidate branches most effectively.
+- Prefer questions that resolve the most important remaining uncertainty while still helping narrow the candidate branches.
 - Output JSON only, with no markdown fences or extra prose.
 - Never invent branches outside the provided ontology.
 
@@ -138,6 +144,87 @@ function parseJSON<T>(text: string): T {
 function validateBranchIds(ids: string[]): string[] {
     const validIds = branchData.map((branch) => branch.branchId);
     return ids.filter((id) => validIds.includes(id));
+}
+
+function normalizeText(value: string | undefined, fallback: string): string {
+    const trimmed = value?.trim();
+    return trimmed && trimmed.length > 0 ? trimmed : fallback;
+}
+
+function normalizeUncertainAspects(values: string[] | undefined, fallbackAxis: string): string[] {
+    const normalized = (values ?? [])
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .slice(0, 3);
+
+    if (normalized.length > 0) {
+        return normalized;
+    }
+
+    return fallbackAxis.trim() ? [fallbackAxis.trim()] : ['어떤 방향 차이가 가장 중요한지'];
+}
+
+function splitDirection(direction: string): string[] {
+    return direction
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean);
+}
+
+function sanitizeQuestionOptions(
+    options: LLMQuestionOption[] | undefined,
+    allowedBranchIds: string[],
+    mode: 'branch' | 'detail'
+): LLMQuestionOption[] {
+    const sanitized = (options ?? [])
+        .map((option) => {
+            const label = option.label?.trim();
+            const direction = option.direction?.trim() ?? '';
+
+            if (!label) return null;
+
+            if (mode === 'detail') {
+                if (direction === '' || direction.startsWith('detail:')) {
+                    return { label, direction };
+                }
+
+                return null;
+            }
+
+            if (direction === '') {
+                return { label, direction };
+            }
+
+            const validDirectionIds = validateBranchIds(splitDirection(direction))
+                .filter((id) => allowedBranchIds.includes(id));
+
+            if (validDirectionIds.length === 0) {
+                return null;
+            }
+
+            return {
+                label,
+                direction: validDirectionIds.join(','),
+            };
+        })
+        .filter((option): option is LLMQuestionOption => option !== null);
+
+    if (sanitized.some((option) => option.direction === '')) {
+        return sanitized;
+    }
+
+    return [
+        ...sanitized.slice(0, 2),
+        { label: UNCLEAR_OPTION_LABEL, direction: '' },
+    ];
+}
+
+function normalizeDetailFocus(detailFocus: string | undefined): DetailFocus {
+    if (detailFocus && DETAIL_FOCUSES.includes(detailFocus as DetailFocus)) {
+        return detailFocus as DetailFocus;
+    }
+
+    return 'layout';
 }
 
 async function callAnthropic(systemPrompt: string, userMessage: string): Promise<string> {
@@ -233,13 +320,15 @@ Return this JSON exactly:
 {
   "feedbackType": "directional" | "negative" | "ambiguous",
   "axis": "string",
+  "intentInterpretation": "1-2 sentence Korean paraphrase of what the client seems to mean",
+  "uncertainAspects": ["remaining uncertainty 1", "remaining uncertainty 2"],
   "candidates": ["branch ids"],
   "eliminated": ["branch ids"],
   "question": "plain Korean question",
   "options": [
     { "label": "option text", "direction": "branchId or comma-separated branchIds" },
     { "label": "option text", "direction": "branchId or comma-separated branchIds" },
-    { "label": "잘 모르겠어요", "direction": "" }
+    { "label": "${UNCLEAR_OPTION_LABEL}", "direction": "" }
   ]
 }`;
 
@@ -252,6 +341,21 @@ Return this JSON exactly:
             const parsed = parseJSON<LLMInitialAnalysis>(rawResponse);
             parsed.candidates = validateBranchIds(parsed.candidates);
             parsed.eliminated = validateBranchIds(parsed.eliminated);
+            parsed.intentInterpretation = normalizeText(
+                parsed.intentInterpretation,
+                `클라이언트는 "${feedbackText}"라는 표현으로 현재 시안의 방향을 더 분명하게 설명하려고 합니다.`
+            );
+            parsed.uncertainAspects = normalizeUncertainAspects(parsed.uncertainAspects, parsed.axis);
+            parsed.options = sanitizeQuestionOptions(parsed.options, parsed.candidates, 'branch');
+            parsed.question = normalizeText(
+                parsed.question,
+                '지금 말씀하신 뜻에 더 가까운 쪽이 어느 방향인지 알려주세요.'
+            );
+
+            if (parsed.candidates.length === 0 || parsed.options.length < 2) {
+                throw new Error('Initial analysis did not produce enough valid candidates/options');
+            }
+
             return parsed;
         } catch (error) {
             lastError = error instanceof Error ? error : new Error(String(error));
@@ -333,6 +437,8 @@ ${compressContext(sessionState.userContext)}`;
 
     const userMessage = `Session state
 - Original feedback: "${sessionState.originalFeedback}"
+- Current interpretation: "${sessionState.intentInterpretation ?? '아직 정리되지 않음'}"
+- Remaining uncertainty: [${(sessionState.uncertainAspects ?? []).join(', ')}]
 - History:
 ${history || '(none)'}
 - Remaining candidates: [${sessionState.candidates.join(', ')}]
@@ -345,11 +451,13 @@ Return JSON:
   "eliminationReason": "string",
   "candidates": ["branch ids"],
   "converged": true | false,
+  "intentInterpretation": "updated Korean interpretation",
+  "uncertainAspects": ["remaining uncertainty 1", "remaining uncertainty 2"],
   "question": "plain Korean question if not converged",
   "options": [
     { "label": "option text", "direction": "branch id(s)" },
     { "label": "option text", "direction": "branch id(s)" },
-    { "label": "잘 모르겠어요", "direction": "" }
+    { "label": "${UNCLEAR_OPTION_LABEL}", "direction": "" }
   ],
   "primaryBranch": "branch id if converged",
   "secondaryBranch": "branch id or null if converged",
@@ -365,10 +473,35 @@ Return JSON:
             const parsed = parseJSON<LLMFollowUpResponse>(rawResponse);
             parsed.candidates = validateBranchIds(parsed.candidates);
             parsed.eliminatedNow = validateBranchIds(parsed.eliminatedNow);
+            parsed.intentInterpretation = normalizeText(
+                parsed.intentInterpretation,
+                sessionState.intentInterpretation ?? '클라이언트 의도 해석이 아직 충분히 정리되지 않았습니다.'
+            );
+            parsed.uncertainAspects = normalizeUncertainAspects(
+                parsed.uncertainAspects,
+                sessionState.uncertainAspects?.[0] ?? '어떤 방향 차이가 더 중요한지'
+            );
 
             if (parsed.primaryBranch) {
                 const validated = validateBranchIds([parsed.primaryBranch]);
                 parsed.primaryBranch = validated[0] || parsed.candidates[0];
+            }
+
+            if (parsed.secondaryBranch) {
+                const validated = validateBranchIds([parsed.secondaryBranch]);
+                parsed.secondaryBranch = validated[0] ?? null;
+            }
+
+            if (!parsed.converged) {
+                parsed.options = sanitizeQuestionOptions(parsed.options, parsed.candidates, 'branch');
+                parsed.question = normalizeText(
+                    parsed.question,
+                    '지금 말씀하신 뜻을 더 정확히 이해하려면 어느 쪽에 더 가까운지 알려주세요.'
+                );
+
+                if (parsed.candidates.length === 0 || (parsed.options?.length ?? 0) < 2) {
+                    throw new Error('Follow-up generation did not produce enough valid candidates/options');
+                }
             }
 
             return parsed;
@@ -402,7 +535,7 @@ export async function generateDetailQuestion(
         .map((answer, index) => `Q${index + 1}: "${answer.question}" -> "${answer.selectedLabel}"`)
         .join('\n');
     const usedDetailFocuses = sessionState.detailFocusHistory ?? [];
-    const remainingDetailFocuses = ['color', 'typography', 'layout', 'imagery', 'texture']
+    const remainingDetailFocuses = DETAIL_FOCUSES
         .filter((focus) => !usedDetailFocuses.includes(focus));
 
     const systemPrompt = `${BASE_SYSTEM_PROMPT}
@@ -418,6 +551,7 @@ You are now in the detail refinement phase.
 
     const userMessage = `Current resolved direction
 - Original feedback: "${sessionState.originalFeedback}"
+- Current interpretation: "${sessionState.intentInterpretation ?? '아직 정리되지 않음'}"
 - Primary branch: ${primaryBranch.branchId} (${primaryBranch.branchLabel})
 - Secondary branch: ${secondaryBranch ? `${secondaryBranch.branchId} (${secondaryBranch.branchLabel})` : 'none'}
 - Detail questions already asked: ${sessionState.detailQuestionCount ?? 0}
@@ -440,7 +574,7 @@ Return JSON:
   "options": [
     { "label": "option text", "direction": "detail:option-a" },
     { "label": "option text", "direction": "detail:option-b" },
-    { "label": "잘 모르겠어요", "direction": "detail:unclear" }
+    { "label": "${UNCLEAR_OPTION_LABEL}", "direction": "detail:unclear" }
   ]
 }`;
 
@@ -451,10 +585,23 @@ Return JSON:
         try {
             const rawResponse = await callLLM(systemPrompt, userMessage);
             const parsed = parseJSON<LLMFollowUpResponse>(rawResponse);
+            const normalizedDetailFocus = normalizeDetailFocus(parsed.detailFocus);
             parsed.candidates = validateBranchIds(parsed.candidates);
             parsed.eliminatedNow = [];
             parsed.converged = false;
-            parsed.detailFocus = parsed.detailFocus || remainingDetailFocuses[0] || 'layout';
+            parsed.detailFocus = remainingDetailFocuses.includes(normalizedDetailFocus)
+                ? normalizedDetailFocus
+                : remainingDetailFocuses[0] || 'layout';
+            parsed.options = sanitizeQuestionOptions(parsed.options, [], 'detail');
+            parsed.question = normalizeText(
+                parsed.question,
+                '이 방향을 더 구체화하려면 어떤 느낌으로 다듬는 게 좋을까요?'
+            );
+
+            if ((parsed.options?.length ?? 0) < 2) {
+                throw new Error('Detail question generation did not produce enough valid options');
+            }
+
             return parsed;
         } catch (error) {
             lastError = error instanceof Error ? error : new Error(String(error));
@@ -492,6 +639,7 @@ Return JSON only.
 
     const userMessage = `Final session result
 - Original feedback: "${sessionState.originalFeedback}"
+- Interpretation: "${sessionState.intentInterpretation ?? 'none'}"
 - Primary branch: ${primaryBranch ? `${primaryBranch.branchId} (${primaryBranch.branchLabel}) ${primaryBranch.descriptionDesigner}` : 'none'}
 - Secondary branch: ${secondaryBranch ? `${secondaryBranch.branchId} (${secondaryBranch.branchLabel})` : 'none'}
 - Eliminated branches: ${eliminatedBranches.map((branch) => branch ? `${branch.branchId}(${branch.branchLabel})` : '').join(', ') || 'none'}

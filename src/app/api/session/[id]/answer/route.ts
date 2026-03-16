@@ -35,6 +35,45 @@ function withTimeout<T>(promise: Promise<T>): Promise<T> {
     return Promise.race([promise, timeoutPromise]);
 }
 
+function parseDirectionIds(direction: string): string[] {
+    return direction
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean);
+}
+
+function hasInvalidSelectionDirection(sessionState: SessionState, selectedDirection: string): boolean {
+    if (!selectedDirection) {
+        return false;
+    }
+
+    if (sessionState.primaryBranch) {
+        return !selectedDirection.startsWith('detail:');
+    }
+
+    return parseDirectionIds(selectedDirection)
+        .some((branchId) => !sessionState.candidates.includes(branchId));
+}
+
+function hasInvalidFollowUpDirections(
+    followUp: LLMFollowUpResponse,
+    candidateIds: string[],
+    isDetailPhase: boolean
+): boolean {
+    return (followUp.options ?? []).some((option) => {
+        if (!option.direction) {
+            return false;
+        }
+
+        if (isDetailPhase) {
+            return !option.direction.startsWith('detail:');
+        }
+
+        return parseDirectionIds(option.direction)
+            .some((branchId) => !candidateIds.includes(branchId));
+    });
+}
+
 function shouldAskDetailQuestion(sessionState: SessionState, followUp: LLMFollowUpResponse): boolean {
     const detailQuestionCount = sessionState.detailQuestionCount ?? 0;
     return Boolean(
@@ -67,11 +106,11 @@ function createStaticDetailFollowUp(sessionState: SessionState): LLMFollowUpResp
             converged: false,
             type: 'text_choice',
             detailFocus: 'color',
-            question: '지금 방향을 유지한다면 색감은 어느 쪽이 더 맞을까요?',
+            question: '지금 방향을 유지한다면 색감은 어떤 쪽이 더 맞을까요?',
             options: [
-                { label: '채도는 절제하고 톤을 정돈하는 쪽이 좋아요.', direction: 'detail:color-restrained' },
-                { label: '색 대비를 조금 더 살려서 인상을 남기는 쪽이 좋아요.', direction: 'detail:color-contrast' },
-                { label: '아직은 잘 모르겠어요.', direction: 'detail:unclear' },
+                { label: '채도를 조금 누르고 차분하게 가면 좋겠어요.', direction: 'detail:color-restrained' },
+                { label: '대비를 조금 더 살려서 인상이 또렷하면 좋겠어요.', direction: 'detail:color-contrast' },
+                { label: '잘 모르겠어요', direction: 'detail:unclear' },
             ],
             primaryBranch: sessionState.primaryBranch,
             secondaryBranch: sessionState.secondaryBranch ?? null,
@@ -87,11 +126,11 @@ function createStaticDetailFollowUp(sessionState: SessionState): LLMFollowUpResp
             converged: false,
             type: 'text_choice',
             detailFocus: 'typography',
-            question: '문구가 보이는 방식은 어느 쪽이 더 어울릴까요?',
+            question: '문구가 보이는 방식은 어떤 쪽이 더 어울릴까요?',
             options: [
                 { label: '차분하고 정돈된 글자 느낌이 좋아요.', direction: 'detail:type-refined' },
                 { label: '조금 더 존재감 있고 인상이 남는 글자 느낌이 좋아요.', direction: 'detail:type-expressive' },
-                { label: '아직은 잘 모르겠어요.', direction: 'detail:unclear' },
+                { label: '잘 모르겠어요', direction: 'detail:unclear' },
             ],
             primaryBranch: sessionState.primaryBranch,
             secondaryBranch: sessionState.secondaryBranch ?? null,
@@ -107,11 +146,11 @@ function createStaticDetailFollowUp(sessionState: SessionState): LLMFollowUpResp
             converged: false,
             type: 'text_choice',
             detailFocus: 'layout',
-            question: '화면 구성은 어느 쪽이 더 맞을까요?',
+            question: '화면 구성은 어떤 쪽이 더 맞을까요?',
             options: [
-                { label: '여백을 두고 숨 쉬는 느낌이 있었으면 해요.', direction: 'detail:layout-airy' },
-                { label: '정보가 조금 더 또렷하게 잡히는 구성이 좋아요.', direction: 'detail:layout-structured' },
-                { label: '아직은 잘 모르겠어요.', direction: 'detail:unclear' },
+                { label: '여백이 조금 더 있고 숨 쉬는 느낌이면 좋겠어요.', direction: 'detail:layout-airy' },
+                { label: '정보가 조금 더 촘촘하게 모여 있으면 좋겠어요.', direction: 'detail:layout-structured' },
+                { label: '잘 모르겠어요', direction: 'detail:unclear' },
             ],
             primaryBranch: sessionState.primaryBranch,
             secondaryBranch: sessionState.secondaryBranch ?? null,
@@ -127,11 +166,11 @@ function createStaticDetailFollowUp(sessionState: SessionState): LLMFollowUpResp
             converged: false,
             type: 'text_choice',
             detailFocus: 'imagery',
-            question: '사진이나 그래픽 무드는 어느 쪽이 더 가까울까요?',
+            question: '사진이나 그래픽 분위기는 어떤 쪽이 더 가깝나요?',
             options: [
                 { label: '조용하고 절제된 분위기가 좋아요.', direction: 'detail:image-calm' },
                 { label: '조금 더 생생하고 존재감 있는 분위기가 좋아요.', direction: 'detail:image-vivid' },
-                { label: '아직은 잘 모르겠어요.', direction: 'detail:unclear' },
+                { label: '잘 모르겠어요', direction: 'detail:unclear' },
             ],
             primaryBranch: sessionState.primaryBranch,
             secondaryBranch: sessionState.secondaryBranch ?? null,
@@ -146,11 +185,11 @@ function createStaticDetailFollowUp(sessionState: SessionState): LLMFollowUpResp
         converged: false,
         type: 'text_choice',
         detailFocus: 'texture',
-        question: `${primaryBranch.branchLabel} 방향에서 마감감은 어느 쪽이 더 어울릴까요?`,
+        question: `${primaryBranch.branchLabel} 방향에서 마감감은 어떤 쪽이 더 어울릴까요?`,
         options: [
             { label: '매끈하고 정제된 마감이 좋아요.', direction: 'detail:texture-clean' },
-            { label: '조금 더 촉감이나 재질감이 느껴져도 좋아요.', direction: 'detail:texture-tactile' },
-            { label: '아직은 잘 모르겠어요.', direction: 'detail:unclear' },
+            { label: '조금 더 촉감이나 질감이 느껴져도 좋아요.', direction: 'detail:texture-tactile' },
+            { label: '잘 모르겠어요', direction: 'detail:unclear' },
         ],
         primaryBranch: sessionState.primaryBranch,
         secondaryBranch: sessionState.secondaryBranch ?? null,
@@ -163,7 +202,7 @@ function buildNextStepReason(
     followUp: LLMFollowUpResponse
 ): string {
     if (followUp.converged) {
-        return followUp.reasoning?.trim() || '누적된 선택이 한 방향으로 수렴해 최종 해석을 확정했습니다.';
+        return followUp.reasoning?.trim() || '누적된 선택을 바탕으로 가장 가까운 방향으로 해석을 정리했습니다.';
     }
 
     if (followUp.detailFocus) {
@@ -173,10 +212,10 @@ function buildNextStepReason(
             : null;
 
         if (primaryBranch) {
-            return `${primaryBranch.branchLabel} 방향은 유지하고 ${focusLabel} 디테일을 더 구체화해야 해서 다음 선택지를 제안했습니다.`;
+            return `${primaryBranch.branchLabel} 방향은 유지하고 ${focusLabel} 디테일을 더 구체화하기 위해 다음 선택지를 제안했습니다.`;
         }
 
-        return `${focusLabel} 기준으로 남은 후보를 더 선명하게 가르기 위해 다음 선택지를 제안했습니다.`;
+        return `${focusLabel} 기준으로 느낌 차이를 더 분명하게 가르기 위해 다음 선택지를 제안했습니다.`;
     }
 
     if (followUp.eliminationReason?.trim()) {
@@ -184,10 +223,10 @@ function buildNextStepReason(
     }
 
     if (followUp.eliminatedNow.length > 0) {
-        return `방금 선택으로 ${followUp.eliminatedNow.length}개 후보를 제외했고, 남은 후보를 더 좁히기 위해 다음 선택지를 제안했습니다.`;
+        return `방금 선택으로 ${followUp.eliminatedNow.length}개 후보를 제외하고, 남은 후보를 더 좁히기 위한 다음 선택지를 제안했습니다.`;
     }
 
-    return '방금 선택을 반영해 남은 후보를 더 좁히기 위한 다음 선택지를 제안했습니다.';
+    return '방금 선택을 반영해서 남은 후보를 더 좁히기 위한 다음 선택지를 제안했습니다.';
 }
 
 function appendDetailTracking(
@@ -225,7 +264,14 @@ export async function POST(
 
         if (!body.sessionState) {
             return NextResponse.json(
-                { error: '?紐꾨??怨밴묶揶쎛 ?袁⑹뒄??몃빍??' },
+                { error: '세션 상태가 필요합니다.' },
+                { status: 400 }
+            );
+        }
+
+        if (hasInvalidSelectionDirection(body.sessionState, body.selectedDirection)) {
+            return NextResponse.json(
+                { error: '현재 질문의 유효한 선택지가 아닙니다.' },
                 { status: 400 }
             );
         }
@@ -262,11 +308,23 @@ export async function POST(
                     primaryBranch: updatedState.primaryBranch,
                     secondaryBranch: updatedState.secondaryBranch ?? null,
                     reasoning: updatedState.reasoning || '',
+                    intentInterpretation: updatedState.intentInterpretation,
+                    uncertainAspects: updatedState.uncertainAspects,
                 };
             } else if (updatedState.primaryBranch) {
                 followUp = await withTimeout(generateDetailQuestion(updatedState));
             } else {
                 followUp = await withTimeout(generateFollowUp(updatedState));
+            }
+
+            if (updatedState.primaryBranch && !followUp.converged) {
+                if (hasInvalidFollowUpDirections(followUp, followUp.candidates, true)) {
+                    throw new Error('Detail follow-up contained invalid option directions');
+                }
+            } else if (!updatedState.primaryBranch && !followUp.converged) {
+                if (hasInvalidFollowUpDirections(followUp, followUp.candidates, false)) {
+                    throw new Error('Follow-up contained invalid option directions');
+                }
             }
 
             console.info('[LLM] session/answer succeeded', {
@@ -315,12 +373,14 @@ export async function POST(
                         eliminatedNow: postAnswerState.eliminated.filter(
                             (id) => !updatedState.eliminated.includes(id)
                         ),
-                        eliminationReason: '?類ㅼ읅 筌욌뜄揆 ?遺우춭 野껉퀗???낅빍??',
+                        eliminationReason: '정적 질문 엔진 기준으로 충분히 후보가 좁혀졌습니다.',
                         candidates: postAnswerState.remainingCandidates,
                         converged: true,
                         primaryBranch: result.primaryBranch || postAnswerState.remainingCandidates[0],
                         secondaryBranch: result.secondaryBranch,
-                        reasoning: '?類ㅼ읅 筌욌뜄揆 ?遺우춭??곗쨮 野껉퀗?든몴??類ㅼ젟??됰뮸??덈뼄.',
+                        reasoning: '정적 질문 엔진의 누적 선택을 바탕으로 가장 가까운 방향을 정리했습니다.',
+                        intentInterpretation: updatedState.intentInterpretation,
+                        uncertainAspects: updatedState.uncertainAspects,
                     };
                 } else {
                     followUp = {
@@ -330,6 +390,8 @@ export async function POST(
                         eliminationReason: '',
                         candidates: postAnswerState.remainingCandidates,
                         converged: false,
+                        intentInterpretation: updatedState.intentInterpretation,
+                        uncertainAspects: updatedState.uncertainAspects,
                         ...createQuestionPayload(nextQuestion),
                     };
                 }
@@ -338,6 +400,8 @@ export async function POST(
 
         let finalState: SessionState = {
             ...updatedState,
+            intentInterpretation: followUp.intentInterpretation ?? updatedState.intentInterpretation,
+            uncertainAspects: followUp.uncertainAspects ?? updatedState.uncertainAspects,
             candidates: followUp.candidates,
             eliminated: [
                 ...updatedState.eliminated,
@@ -360,6 +424,10 @@ export async function POST(
 
             try {
                 followUp = await withTimeout(generateDetailQuestion(finalState));
+
+                if (hasInvalidFollowUpDirections(followUp, followUp.candidates, true)) {
+                    throw new Error('Generated detail follow-up contained invalid option directions');
+                }
             } catch {
                 usedFallback = true;
                 followUp = createStaticDetailFollowUp(finalState);
@@ -425,7 +493,7 @@ export async function POST(
     } catch (error) {
         console.error('[API] session/answer error:', error);
         return NextResponse.json(
-            { error: '??? 筌ｌ꼶??餓???살첒揶쎛 獄쏆뮇源??됰뮸??덈뼄.' },
+            { error: '응답 처리 중 오류가 발생했습니다.' },
             { status: 500 }
         );
     }

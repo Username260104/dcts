@@ -21,12 +21,12 @@ export default function Home() {
                         onClick={() => setError(null)}
                         className="text-xs text-red-400 hover:text-red-600"
                     >
-                        닫기
+                        {'\ub2eb\uae30'}
                     </button>
                 </div>
             )}
 
-            <main className="flex flex-1 items-center justify-center px-4 py-8">
+            <main className="flex flex-1 items-center justify-center px-5 py-8 sm:px-8">
                 <StepContainer />
             </main>
 

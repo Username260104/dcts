@@ -218,7 +218,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
 
             if (!response.ok) {
                 const errorBody = await response.json();
-                throw new Error(errorBody.error || '답변 처리에 실패했습니다.');
+                throw new Error(errorBody.error || '응답 처리에 실패했습니다.');
             }
 
             const data = await response.json();

@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
 
         if (!body.feedbackText || body.feedbackText.trim().length === 0) {
             return NextResponse.json(
-                { error: '피드백 텍스트를 입력해 주세요.' },
+                { error: '피드백을 입력해 주세요.' },
                 { status: 400 }
             );
         }

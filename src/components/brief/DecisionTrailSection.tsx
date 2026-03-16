@@ -34,7 +34,7 @@ export function DecisionTrailSection({ decisionTrail }: DecisionTrailSectionProp
                     </p>
 
                     <div className="mt-3 rounded-lg bg-white p-3">
-                        <p className="text-xs font-medium text-gray-500">다음 단계가 나온 이유</p>
+                        <p className="text-xs font-medium text-gray-500">다음 단계가 이어진 이유</p>
                         <p className="mt-1 text-sm leading-relaxed text-gray-800">{step.nextReason}</p>
                     </div>
 
@@ -52,7 +52,7 @@ export function DecisionTrailSection({ decisionTrail }: DecisionTrailSectionProp
 
                     {step.nextAction === 'conclusion' && (
                         <p className="mt-3 text-xs font-medium text-emerald-700">
-                            이 선택 이후 최종 브리프로 수렴했습니다.
+                            이 선택 이후 최종 브리프로 정리되었습니다.
                         </p>
                     )}
                 </div>

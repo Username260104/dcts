@@ -81,6 +81,11 @@ export default function QuestionsStep() {
                     <p className="text-center text-lg leading-relaxed text-gray-900">
                         {currentQuestion.question}
                     </p>
+                    {sessionState?.intentInterpretation ? (
+                        <p className="mt-3 text-center text-sm leading-6 text-gray-500">
+                            {sessionState.intentInterpretation}
+                        </p>
+                    ) : null}
                 </div>
             </div>
 

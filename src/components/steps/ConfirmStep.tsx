@@ -46,8 +46,8 @@ export default function ConfirmStep() {
                 }`}
             >
                 {usedFallback
-                    ? '이 결과는 정적 fallback 엔진이 수렴시킨 결과입니다.'
-                    : '이 결과는 LLM 해석을 기반으로 수렴된 결과입니다.'}
+                    ? '이 결과는 정적 fallback 엔진을 함께 사용해 정리한 결과입니다.'
+                    : '이 결과는 LLM 해석을 기반으로 정리한 결과입니다.'}
             </div>
 
             <div className="w-full max-w-lg space-y-4">
@@ -93,7 +93,7 @@ export default function ConfirmStep() {
                 {sessionState && sessionState.answerHistory.length > 0 && (
                     <details className="group">
                         <summary className="cursor-pointer text-xs text-gray-400 hover:text-gray-600">
-                            질문-답변 이력 보기
+                            질문-응답 이력 보기
                         </summary>
                         <div className="mt-2 space-y-2 border-l-2 border-gray-200 pl-2">
                             {sessionState.answerHistory.map((answer, index) => (
@@ -116,7 +116,7 @@ export default function ConfirmStep() {
                     disabled={isLoading}
                     className="rounded-xl border border-gray-300 px-6 py-3 text-sm text-gray-600 transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:bg-gray-100"
                 >
-                    아니요, 다시 물어봐주세요
+                    아니에요, 다시 물어봐 주세요
                 </button>
                 <button
                     onClick={() => generateBrief()}

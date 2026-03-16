@@ -58,7 +58,7 @@ export default function BriefStep() {
         <div className="mx-auto max-w-2xl px-4 py-8">
             <div className="mb-8 text-center print:mb-4">
                 <h2 className="mb-1 text-xl font-bold text-gray-900">
-                    디자인 커뮤니케이션 브리프
+                    디자이너 커뮤니케이션 브리프
                 </h2>
                 <p className="text-xs text-gray-400">
                     생성일 {new Date(brief.generatedAt).toLocaleDateString('ko-KR')}
@@ -99,7 +99,7 @@ export default function BriefStep() {
 
             <div className="space-y-6 print:space-y-4" id={BRIEF_CONTENT_ID}>
                 <Section title="A. 원문 피드백">
-                    <blockquote className="border-l-4 border-gray-300 pl-4 py-2 italic text-gray-700">
+                    <blockquote className="border-l-4 border-gray-300 py-2 pl-4 italic text-gray-700">
                         &ldquo;{brief.originalFeedback}&rdquo;
                     </blockquote>
                 </Section>
@@ -159,7 +159,7 @@ export default function BriefStep() {
                     </div>
                 </Section>
 
-                <Section title="D. 디자인 조정 사인">
+                <Section title="D. 디자인 조정 힌트">
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <TokenCard label="컬러" value={brief.designTokens.colorDirection} />
                         <TokenCard label="타이포그래피" value={brief.designTokens.typographyDirection} />
@@ -215,7 +215,7 @@ export default function BriefStep() {
 
                         {brief.antiReferences.length > 0 && (
                             <div>
-                                <p className="mb-1 text-xs text-gray-500">안티 레퍼런스</p>
+                                <p className="mb-1 text-xs text-gray-500">피해야 할 레퍼런스</p>
                                 <div className="flex flex-wrap gap-2">
                                     {brief.antiReferences.map((reference, index) => (
                                         <span

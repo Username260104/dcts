@@ -20,6 +20,7 @@ import {
 
 const branchData = branches as Branch[];
 const ctxData = contextData as ContextVariables;
+const NEITHER_LABEL = '잘 모르겠어요';
 
 export function getBranchById(id: string): Branch | undefined {
     return branchData.find((branch) => branch.branchId === id);
@@ -136,7 +137,7 @@ function buildQuestion(state: QuestionEngineState): Question | null {
     if (state.neitherCount >= NEITHER_TO_FREE_TEXT) {
         return {
             type: 'free_text',
-            text: '직접 설명해 주셔도 좋아요. 어떤 느낌을 원하시는지 편하게 적어 주세요.',
+            text: '직접 표현해 주셔도 좋아요. 어떤 느낌으로 바꾸고 싶은지 편하게 적어 주세요.',
             options: [],
             sourcebranchIds: state.remainingCandidates,
         };
@@ -150,7 +151,7 @@ function buildQuestion(state: QuestionEngineState): Question | null {
     if (state.neitherCount >= NEITHER_TO_IMAGE_AB) {
         return {
             type: 'image_ab',
-            text: '두 방향 중 어느 쪽이 더 가깝게 느껴지시나요?',
+            text: '두 방향 중에서 지금 시안에 더 가까운 쪽은 어느 쪽인가요?',
             options: [
                 {
                     label: branchA.descriptionClient,
@@ -163,7 +164,7 @@ function buildQuestion(state: QuestionEngineState): Question | null {
                     eliminateBranchIds: [branchA.branchId],
                 },
                 {
-                    label: '둘 다 아니에요',
+                    label: NEITHER_LABEL,
                     branchIds: [],
                     eliminateBranchIds: [],
                 },
@@ -190,7 +191,7 @@ function buildQuestion(state: QuestionEngineState): Question | null {
                 eliminateBranchIds: [branchA.branchId],
             },
             {
-                label: '둘 다 아니에요',
+                label: NEITHER_LABEL,
                 branchIds: [],
                 eliminateBranchIds: [],
             },
@@ -217,7 +218,7 @@ export function submitAnswer(
     selectedOptionIndex: number
 ): QuestionEngineState {
     const option = question.options[selectedOptionIndex];
-    const isNeither = option.label === '둘 다 아니에요';
+    const isNeither = option.label === NEITHER_LABEL;
 
     const eliminated = [...state.eliminated];
     let remaining = [...state.remainingCandidates];
@@ -298,8 +299,8 @@ export function isConverged(state: QuestionEngineState): boolean {
         const prev = state.answerHistory[state.answerHistory.length - 2];
 
         if (
-            last.answerLabel !== '둘 다 아니에요' &&
-            prev.answerLabel !== '둘 다 아니에요' &&
+            last.answerLabel !== NEITHER_LABEL &&
+            prev.answerLabel !== NEITHER_LABEL &&
             last.remainingBranches.length === prev.remainingBranches.length &&
             last.remainingBranches.every((id) => prev.remainingBranches.includes(id))
         ) {

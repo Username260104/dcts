@@ -110,6 +110,8 @@ export async function POST(
         return NextResponse.json({
             sessionState: {
                 ...baseState,
+                intentInterpretation: followUp.intentInterpretation ?? baseState.intentInterpretation,
+                uncertainAspects: followUp.uncertainAspects ?? baseState.uncertainAspects,
                 candidates: followUp.candidates,
                 eliminated: [
                     ...baseState.eliminated,

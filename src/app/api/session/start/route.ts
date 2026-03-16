@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
         if (!body.feedbackText || body.feedbackText.trim().length === 0) {
             return NextResponse.json(
-                { error: '피드백 텍스트를 입력해 주세요.' },
+                { error: '피드백을 입력해 주세요.' },
                 { status: 400 }
             );
         }
@@ -54,12 +54,18 @@ export async function POST(request: NextRequest) {
             analysis = {
                 feedbackType: triggerResult.trigger?.type ?? 'ambiguous',
                 axis: triggerResult.trigger?.axis ?? '미정',
+                intentInterpretation: triggerResult.trigger
+                    ? `클라이언트는 "${body.feedbackText}"라는 표현으로 ${triggerResult.trigger.axis} 축의 방향 차이를 더 분명히 하려고 합니다.`
+                    : `클라이언트는 "${body.feedbackText}"라는 표현으로 현재 시안의 방향을 더 분명하게 설명하려고 합니다.`,
+                uncertainAspects: [
+                    triggerResult.trigger?.axis || '어떤 방향 차이가 가장 중요한지',
+                ],
                 candidates: staticState.remainingCandidates,
                 eliminated: [],
                 question:
                     firstQuestion?.text ??
                     triggerResult.trigger?.entryQuestion ??
-                    '어떤 방향으로 수정하고 싶으신가요?',
+                    '어떤 방향으로 조정하면 좋을지 조금만 더 설명해 주세요.',
                 options:
                     firstQuestion?.options.map((option) => ({
                         label: option.label,
@@ -72,6 +78,8 @@ export async function POST(request: NextRequest) {
             sessionId,
             originalFeedback: body.feedbackText,
             feedbackType: analysis.feedbackType,
+            intentInterpretation: analysis.intentInterpretation,
+            uncertainAspects: analysis.uncertainAspects,
             userContext: body.context,
             candidates: analysis.candidates,
             eliminated: analysis.eliminated,

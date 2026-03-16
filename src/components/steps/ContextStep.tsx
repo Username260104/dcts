@@ -21,12 +21,12 @@ const contextSections = [
     },
     {
         key: 'projectStage' as const,
-        description: '몇 차 수정인가요?',
+        description: '어떤 작업 단계인가요?',
         options: Object.keys(ctxData.projectStage),
     },
     {
         key: 'targetAge' as const,
-        description: '주요 타깃 연령은 어떻게 되나요?',
+        description: '주요 타깃 연령대는 어떻게 되나요?',
         options: Object.keys(ctxData.targetAge),
     },
 ];

@@ -135,6 +135,8 @@ export interface LLMQuestionOption {
 export interface LLMInitialAnalysis {
     feedbackType: TriggerType;
     axis: string;
+    intentInterpretation: string;
+    uncertainAspects: string[];
     candidates: string[];
     eliminated: string[];
     question: string;
@@ -146,6 +148,8 @@ export interface LLMFollowUpResponse {
     eliminationReason: string;
     candidates: string[];
     converged: boolean;
+    intentInterpretation?: string;
+    uncertainAspects?: string[];
     question?: string;
     options?: LLMQuestionOption[];
     type?: QuestionType;
@@ -167,6 +171,8 @@ export interface SessionState {
     sessionId: string;
     originalFeedback: string;
     feedbackType?: TriggerType;
+    intentInterpretation?: string;
+    uncertainAspects?: string[];
     userContext: UserContext;
     candidates: string[];
     eliminated: string[];

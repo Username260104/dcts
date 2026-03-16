@@ -41,10 +41,10 @@ function generateFallbackSummary(
     return {
         clientSummary: `말씀하신 방향은 ${primaryBranch.descriptionClient}에 더 가깝습니다.`,
         clientAntiSummary: clientAntiSummary
-            ? `${clientAntiSummary} 쪽으로 가는 것은 아닌 것으로 해석했습니다.`
+            ? `${clientAntiSummary} 쪽으로 가자는 뜻은 아닌 것으로 해석했습니다.`
             : '',
         designerSummary: `${primaryBranch.branchLabel}(${primaryBranch.branchId}) 기준으로 해석했습니다. ${primaryBranch.descriptionDesigner}`,
-        adjustmentNotes: '온톨로지 토큰과 현재 맥락을 기준으로 브리프를 생성했습니다.',
+        adjustmentNotes: '선택된 방향과 현재 맥락을 기준으로 브리프를 생성했습니다.',
         confusionWarnings,
     };
 }
@@ -58,7 +58,7 @@ function buildDecisionTrail(sessionState: GenerateBriefRequest['sessionState']):
         nextPrompt: answer.nextQuestion,
         nextOptions: answer.nextOptions?.map((option) => option.label),
         nextReason:
-            answer.nextReason?.trim() || '이 선택을 반영해 다음 분기 또는 최종 해석이 이어졌습니다.',
+            answer.nextReason?.trim() || '선택을 반영해 다음 분기 또는 최종 해석으로 이어졌습니다.',
     }));
 }
 
@@ -124,7 +124,7 @@ export async function POST(
             .map((branchId) => findBranch(branchId))
             .filter((branch): branch is Branch => branch !== undefined)
             .flatMap((branch) =>
-                branch.references.map((reference) => `${reference} (${branch.branchLabel} 혼동 주의)`)
+                branch.references.map((reference) => `${reference} (${branch.branchLabel}와 혼동 주의)`)
             )
             .filter((reference, index, self) => self.indexOf(reference) === index)
             .slice(0, 4);
