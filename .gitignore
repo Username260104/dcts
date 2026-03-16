@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+/.runtime/briefs/
 
 # debug
 npm-debug.log*
