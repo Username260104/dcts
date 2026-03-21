@@ -117,7 +117,7 @@ export async function POST(
 
         const neverDoList = [
             ...primaryToken.neverDo.split(/[.,]/).map((item) => item.trim()).filter(Boolean),
-            ...primaryBranch.excludedTokens,
+            ...(primaryBranch.excludedTokens ?? []),
         ];
 
         const antiReferences = primaryBranch.confusableBranches
@@ -148,7 +148,15 @@ export async function POST(
             decisionTrail: buildDecisionTrail(sessionState),
         };
 
-        await saveBrief(sessionId, brief, llmSummary);
+        try {
+            await saveBrief(sessionId, brief, llmSummary);
+        } catch (error) {
+            // Vercel serverless deployments may not support app-local persistence.
+            console.warn('[API] brief/generate save skipped', {
+                sessionId,
+                reason: error instanceof Error ? error.message : String(error),
+            });
+        }
 
         const response: GenerateBriefResponse = {
             brief,
