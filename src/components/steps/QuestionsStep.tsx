@@ -3,13 +3,11 @@
 import { useState } from 'react';
 import ReturnToStartButton from '@/components/ReturnToStartButton';
 import { MAX_QUESTIONS } from '@/lib/constants';
-import { getDebugBanner } from '@/lib/debugSource';
 import { useSessionStore } from '@/store/sessionStore';
 
 export default function QuestionsStep() {
     const currentQuestion = useSessionStore((state) => state.currentQuestion);
     const sessionState = useSessionStore((state) => state.sessionState);
-    const debugState = useSessionStore((state) => state.debugState);
     const submitAnswer = useSessionStore((state) => state.submitAnswer);
     const resetToContext = useSessionStore((state) => state.resetToContext);
     const isLoading = useSessionStore((state) => state.isLoading);
@@ -24,7 +22,6 @@ export default function QuestionsStep() {
     const summaryText = isStrategyLane
         ? sessionState?.strategyState?.summary
         : sessionState?.intentInterpretation;
-    const debugBanner = getDebugBanner('question', debugState.questionSource);
 
     const handleSelect = async (label: string, direction: string) => {
         await submitAnswer(label, direction);
@@ -61,12 +58,6 @@ export default function QuestionsStep() {
             </div>
 
             <div className="mb-8 w-full max-w-lg">
-                {debugBanner && (
-                    <div className={`mb-3 rounded-xl px-3 py-2 text-xs ${debugBanner.className}`}>
-                        {debugBanner.message}
-                    </div>
-                )}
-
                 <div className="mb-2 flex items-center justify-between">
                     <span className="text-xs text-gray-400">
                         질문 {Math.min(questionCount + 1, MAX_QUESTIONS)} / {MAX_QUESTIONS}

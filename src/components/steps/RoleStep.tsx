@@ -3,6 +3,28 @@
 import { useSessionStore } from '@/store/sessionStore';
 import type { InputRole } from '@/types/ontology';
 
+const roleOptions = [
+    {
+        role: 'client' as const,
+        label: 'Original Feedback',
+        title: '클라이언트 피드백 해석',
+        description:
+            '클라이언트의 메일, 회의 메모, 메신저 대화처럼 아직 정리되지 않은 표현을 기준으로 시작합니다. 모호한 표현을 질문으로 좁혀 디자이너가 바로 판단할 수 있는 방향 언어로 연결합니다.',
+    },
+    {
+        role: 'strategist' as const,
+        label: 'Strategic Intent',
+        title: '전략 문장 정리',
+        description:
+            '브랜드 방향, 포지셔닝 문장, 전달하고 싶은 인상처럼 상위 의도가 먼저 잡혀 있을 때 적합합니다. 전략 언어를 실제 디자인 의사결정에 쓸 수 있는 브리프 구조로 정리합니다.',
+    },
+] satisfies Array<{
+    role: InputRole;
+    label: string;
+    title: string;
+    description: string;
+}>;
+
 export default function RoleStep() {
     const setInputRole = useSessionStore((state) => state.setInputRole);
     const setJobType = useSessionStore((state) => state.setJobType);
@@ -19,50 +41,80 @@ export default function RoleStep() {
     };
 
     return (
-        <div className="flex w-full max-w-lg flex-col items-center px-4 py-8">
-            <div className="mb-8 text-center">
-                <h2 className="mb-2 text-xl font-bold text-gray-900">
-                    어떤 기준으로 시작할까요?
-                </h2>
-                <p className="max-w-md text-sm leading-6 text-gray-500">
-                    출발점에 따라 해석 방식과 질문 흐름이 달라집니다.
-                    지금 가지고 있는 정보에 가장 가까운 경로를 선택해 주세요.
+        <div className="w-full max-w-5xl px-4 py-12 sm:px-6 md:py-16">
+            <section className="mx-auto max-w-3xl text-center">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
+                    Design Communication Translation System
                 </p>
-            </div>
-
-            <div className="w-full space-y-3">
-                <button
-                    onClick={() => handleSelect('client')}
-                    className="w-full rounded-2xl border border-gray-200 bg-white p-6 text-left transition-all hover:border-gray-400 hover:shadow-md"
+                <h1
+                    className="mt-6 text-[clamp(3rem,8vw,5.5rem)] font-bold tracking-[-0.04em] text-gray-900 leading-none"
+                    style={{ fontFamily: 'Pretendard, Arial, Helvetica, sans-serif' }}
                 >
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-400">
-                        Original Feedback
-                    </p>
-                    <p className="text-base font-medium text-gray-900">
-                        클라이언트 피드백 해석
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-gray-500">
-                        클라이언트가 남긴 원문, 회의 메모, 메신저 피드백을 기준으로 시작합니다.
-                        모호한 표현을 질문으로 풀어가며 디자인 의도를 해석 브리프로 정리합니다.
-                    </p>
-                </button>
+                    Lens
+                </h1>
+                <p className="mx-auto mt-6 max-w-2xl break-keep text-[15px] leading-relaxed text-gray-600 sm:text-base">
+                    클라이언트의 피드백과 전략 문장을 디자이너가 바로 판단할 수 있는 방향 언어로
+                    정리해주는 도구입니다.
+                </p>
 
-                <button
-                    onClick={() => handleSelect('strategist')}
-                    className="w-full rounded-2xl border border-gray-200 bg-white p-6 text-left transition-all hover:border-gray-400 hover:shadow-md"
-                >
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-400">
-                        Strategic Intent
+                <div className="mx-auto mt-10 max-w-2xl rounded-[2.5rem] border border-gray-100 bg-gray-50 px-8 py-7 text-left shadow-[0_8px_30px_rgba(15,23,42,0.04)] sm:px-10">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400">
+                        What It Does
                     </p>
-                    <p className="text-base font-medium text-gray-900">
-                        전략 방향 정리
+                    <p className="mt-3 break-keep text-[15px] leading-[1.8] text-gray-600">
+                        모호한 표현을 그대로 받더라도 필요한 질문을 거쳐 의미를 좁히고, 최종적으로는
+                        해석 근거와 함께 브리프 형태의 결과로 정리합니다.
                     </p>
-                    <p className="mt-2 text-sm leading-6 text-gray-500">
-                        브랜드 포지셔닝, 경쟁 맥락, 원하는 인상처럼 내부에서 정리한 판단을 기준으로 시작합니다.
-                        추상적인 전략 언어를 실제 시안 조정 기준으로 구체화할 때 적합합니다.
+                </div>
+            </section>
+
+            <section className="mx-auto mt-20 max-w-4xl">
+                <div className="text-center">
+                    <h2 className="text-2xl font-semibold tracking-[-0.03em] text-gray-900 sm:text-3xl">
+                        어떤 기준으로 시작할까요?
+                    </h2>
+                    <p className="mx-auto mt-4 max-w-2xl break-keep text-[15px] leading-relaxed text-gray-500">
+                        지금 손에 들고 있는 정보에 가장 가까운 방식으로 시작하면, 이후 질문과 결과
+                        구성이 자연스럽게 이어집니다.
                     </p>
-                </button>
-            </div>
+                </div>
+
+                <div className="mt-10 grid gap-5 md:grid-cols-2">
+                    {roleOptions.map((option) => (
+                        <button
+                            key={option.role}
+                            type="button"
+                            onClick={() => handleSelect(option.role)}
+                            className="group relative flex h-full w-full flex-col items-start justify-start rounded-[2rem] border border-gray-200 bg-white p-8 text-left transition-all duration-300 hover:-translate-y-1 hover:border-gray-300 hover:shadow-[0_20px_40px_rgba(15,23,42,0.08)]"
+                        >
+                            <div className="flex w-full items-center justify-between">
+                                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400">
+                                    {option.label}
+                                </p>
+                                <svg
+                                    className="h-5 w-5 text-gray-300 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-gray-500"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                    />
+                                </svg>
+                            </div>
+                            <p className="mt-5 text-xl font-semibold tracking-[-0.02em] text-gray-900">
+                                {option.title}
+                            </p>
+                            <p className="mt-3 break-keep text-[15px] leading-relaxed text-gray-600">
+                                {option.description}
+                            </p>
+                        </button>
+                    ))}
+                </div>
+            </section>
         </div>
     );
 }

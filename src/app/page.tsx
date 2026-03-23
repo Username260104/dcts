@@ -1,5 +1,6 @@
 'use client';
 
+import DebugStatusBanner from '@/components/DebugStatusBanner';
 import ProgressBar from '@/components/ProgressBar';
 import StepContainer from '@/components/StepContainer';
 import { useSessionStore } from '@/store/sessionStore';
@@ -13,6 +14,8 @@ export default function Home() {
             <header className="sticky top-0 z-10 border-b border-gray-100 bg-white/80 backdrop-blur-sm">
                 <ProgressBar />
             </header>
+
+            <DebugStatusBanner />
 
             {error && (
                 <div className="fixed left-1/2 top-16 z-50 flex max-w-md -translate-x-1/2 items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 shadow-lg">
@@ -31,7 +34,7 @@ export default function Home() {
             </main>
 
             <footer className="py-4 text-center text-xs text-gray-300 print:hidden">
-                DCTS v0.1 MVP
+                Lens (DCTS) v0.1 MVP
             </footer>
         </div>
     );

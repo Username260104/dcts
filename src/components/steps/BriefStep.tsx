@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { BriefDocument } from '@/components/brief/BriefDocument';
 import ReturnToStartButton from '@/components/ReturnToStartButton';
 import { exportBriefToPdf } from '@/lib/briefExport';
-import { getDebugBanner } from '@/lib/debugSource';
 import { useSessionStore } from '@/store/sessionStore';
 
 const BRIEF_CONTENT_ID = 'brief-content';
@@ -25,12 +24,9 @@ export default function BriefStep() {
     const brief = useSessionStore((state) => state.brief);
     const llmSummary = useSessionStore((state) => state.llmSummary);
     const sessionState = useSessionStore((state) => state.sessionState);
-    const debugState = useSessionStore((state) => state.debugState);
     const reset = useSessionStore((state) => state.reset);
     const [shareMessage, setShareMessage] = useState<string | null>(null);
     const [isExporting, setIsExporting] = useState(false);
-
-    const debugBanner = getDebugBanner('brief', debugState.briefSource);
 
     if (!brief || !sessionState) {
         return (
@@ -84,12 +80,6 @@ export default function BriefStep() {
                     생성일 {new Date(brief.generatedAt).toLocaleDateString('ko-KR')}
                 </p>
             </div>
-
-            {debugBanner && (
-                <div className={`mb-4 rounded-2xl p-4 text-sm print:hidden ${debugBanner.className}`}>
-                    {debugBanner.message}
-                </div>
-            )}
 
             <div className="mb-4 rounded-2xl border border-gray-200 bg-gray-50 p-4 print:hidden">
                 <p className="mb-2 text-xs font-medium text-gray-500">공유 링크</p>

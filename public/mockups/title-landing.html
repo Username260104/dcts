@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DCTS Title Landing Mockup</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f9fafb;
+      --border: #e5e7eb;
+      --border-strong: #9ca3af;
+      --text: #111827;
+      --text-soft: #6b7280;
+      --text-faint: #9ca3af;
+      --accent: #111827;
+      --shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+      --shadow-strong: 0 12px 36px rgba(15, 23, 42, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Pretendard", Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .progress-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid #f3f4f6;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(8px);
+    }
+
+    .progress {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .progress-item {
+      display: flex;
+      flex: 1;
+      align-items: center;
+    }
+
+    .progress-item:last-child {
+      flex: 0;
+    }
+
+    .progress-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 500;
+      background: #111827;
+      color: #ffffff;
+      box-shadow: 0 0 0 2px #9ca3af, 0 0 0 6px #ffffff;
+    }
+
+    .progress-label {
+      margin-left: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .progress-line {
+      flex: 1;
+      height: 1px;
+      margin: 0 12px;
+      background: var(--border);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px 48px;
+    }
+
+    .frame {
+      width: 100%;
+      max-width: 760px;
+    }
+
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 24px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin-bottom: 14px;
+      color: var(--text-faint);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      padding: 0 6px;
+      font-size: clamp(2.1rem, 7vw, 3.5rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      color: #374151;
+    }
+
+    .signal-dot {
+      display: inline-block;
+      margin-left: 0.08em;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      margin: 16px auto 0;
+      max-width: 620px;
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text-soft);
+    }
+
+    .intro-card {
+      margin: 12px auto 0;
+      width: 100%;
+      max-width: 640px;
+      border: 1px solid #f3f4f6;
+      border-radius: 24px;
+      background: var(--surface);
+      padding: 18px 20px;
+    }
+
+    .intro-title {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+    }
+
+    .intro-body {
+      margin: 10px 0 0;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #4b5563;
+    }
+
+    .choice-title {
+      margin: 32px 0 10px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .choice-copy {
+      margin: 0 auto 20px;
+      max-width: 560px;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text-soft);
+    }
+
+    .card-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .option-card {
+      display: block;
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: #ffffff;
+      padding: 24px;
+      text-align: left;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+    }
+
+    .option-card:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+
+    .option-card small {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+    }
+
+    .option-card strong {
+      display: block;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .option-card p {
+      margin: 10px 0 0;
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text-soft);
+    }
+
+    .helper-card {
+      margin-top: 14px;
+      border: 1px solid #f3f4f6;
+      border-radius: 24px;
+      background: var(--surface);
+      padding: 18px 20px;
+    }
+
+    .helper-card p {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+    }
+
+    .helper-card ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+      color: #4b5563;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    footer {
+      padding: 16px 20px 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #d1d5db;
+    }
+
+    @media (max-width: 640px) {
+      .progress {
+        padding: 12px 14px;
+      }
+
+      .progress-label {
+        display: none;
+      }
+
+      .progress-line {
+        margin: 0 8px;
+      }
+
+      main {
+        padding: 20px 16px 36px;
+      }
+
+      .hero {
+        padding: 24px 4px 18px;
+      }
+
+      .option-card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-wrap">
+    <div class="progress">
+      <div class="progress-item">
+        <div class="progress-dot">1</div>
+        <span class="progress-label">시작</span>
+        <div class="progress-line"></div>
+      </div>
+      <div class="progress-item">
+        <div class="progress-dot" style="background:#e5e7eb; color:#9ca3af; box-shadow:none;">2</div>
+        <span class="progress-label" style="color:#9ca3af;">입력</span>
+        <div class="progress-line"></div>
+      </div>
+      <div class="progress-item">
+        <div class="progress-dot" style="background:#e5e7eb; color:#9ca3af; box-shadow:none;">3</div>
+        <span class="progress-label" style="color:#9ca3af;">맥락</span>
+        <div class="progress-line"></div>
+      </div>
+      <div class="progress-item">
+        <div class="progress-dot" style="background:#e5e7eb; color:#9ca3af; box-shadow:none;">4</div>
+        <span class="progress-label" style="color:#9ca3af;">질문</span>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <div class="frame">
+      <section class="hero">
+        <div class="eyebrow">Design Communication Translation System</div>
+        <h1>DCTS<span class="signal-dot">.</span></h1>
+        <p class="subtitle">
+          클라이언트의 피드백과 전략 문장을 디자이너가 바로 판단할 수 있는 방향 언어로 정리해주는 도구입니다.
+        </p>
+
+        <div class="intro-card">
+          <p class="intro-title">What It Does</p>
+          <p class="intro-body">
+            모호한 표현을 그대로 받더라도 필요한 질문을 거쳐 의미를 좁히고,
+            최종적으로는 해석 근거와 함께 브리프 형태의 결과로 정리합니다.
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="choice-title">어떤 기준으로 시작할까요?</h2>
+        <p class="choice-copy">
+          지금 손에 들고 있는 정보에 가장 가까운 방식으로 시작하면,
+          이후 질문과 결과 구성이 자연스럽게 이어집니다.
+        </p>
+
+        <div class="card-stack">
+          <a class="option-card" href="#">
+            <small>Original Feedback</small>
+            <strong>클라이언트 피드백 해석</strong>
+            <p>
+              이메일, 메신저, 회의 메모처럼 아직 정리되지 않은 표현을 기준으로 시작합니다.
+              모호한 감각 언어를 질문으로 풀어 디자인 방향과 브리프로 연결합니다.
+            </p>
+          </a>
+
+          <a class="option-card" href="#">
+            <small>Strategic Intent</small>
+            <strong>전략 방향 정리</strong>
+            <p>
+              브랜드 성격, 포지셔닝, 경쟁 구도, 전달하고 싶은 인상처럼 상위 의도에서 시작합니다.
+              추상적인 전략 언어를 실제 제안 판단 기준으로 구체화합니다.
+            </p>
+          </a>
+        </div>
+
+        <div class="helper-card">
+          <p>이 화면에서 보여주면 좋은 정보</p>
+          <ul>
+            <li>프로그램 이름과 한 줄 설명</li>
+            <li>무엇을 입력받고 어떤 결과를 주는지에 대한 짧은 안내</li>
+            <li>바로 시작할 수 있는 두 개의 진입 선택지</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>DCTS v0.1 MVP</footer>
+</body>
+</html>

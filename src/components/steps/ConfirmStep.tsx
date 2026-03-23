@@ -1,7 +1,6 @@
 'use client';
 
 import ReturnToStartButton from '@/components/ReturnToStartButton';
-import { getDebugBanner } from '@/lib/debugSource';
 import { getBranchById } from '@/lib/questionEngine';
 import {
     STRATEGY_ARTIFACT_LABELS,
@@ -108,12 +107,9 @@ function InfoCard({ title, children }: { title: string; children: React.ReactNod
 export default function ConfirmStep() {
     const convergenceResult = useSessionStore((state) => state.convergenceResult);
     const sessionState = useSessionStore((state) => state.sessionState);
-    const debugState = useSessionStore((state) => state.debugState);
     const generateBrief = useSessionStore((state) => state.generateBrief);
     const refineSession = useSessionStore((state) => state.refineSession);
     const isLoading = useSessionStore((state) => state.isLoading);
-
-    const debugBanner = getDebugBanner('result', debugState.resultSource);
 
     if (!convergenceResult) {
         return (
@@ -142,12 +138,6 @@ export default function ConfirmStep() {
                     <h2 className="mb-1 text-xl font-bold text-gray-900">이렇게 이해했어요</h2>
                     <p className="text-sm text-gray-500">맞는지 확인해 주세요.</p>
                 </div>
-
-                {debugBanner && (
-                    <div className={`mb-6 w-full max-w-lg rounded-xl px-4 py-3 text-sm ${debugBanner.className}`}>
-                        {debugBanner.message}
-                    </div>
-                )}
 
                 <div className="w-full max-w-lg space-y-4">
                     {primaryBranch && (
@@ -274,12 +264,6 @@ export default function ConfirmStep() {
                         : '비어 있는 항목, 추상적인 표현, 충돌 요소를 먼저 점검해 주세요.'}
                 </p>
             </div>
-
-            {debugBanner && (
-                <div className={`mb-6 w-full max-w-3xl rounded-xl px-4 py-3 text-sm ${debugBanner.className}`}>
-                    {debugBanner.message}
-                </div>
-            )}
 
             <div className="w-full max-w-3xl space-y-4">
                 <div className="rounded-2xl bg-gray-50 p-6">
