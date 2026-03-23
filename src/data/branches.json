@@ -30,7 +30,10 @@
       "Hermès",
       "Rolls-Royce",
       "Patek Philippe"
-    ]
+    ],
+    "descriptionStrategy": "헤리티지와 전통에 기반한 프리미엄 포지셔닝. 브랜드의 역사와 정통성이 핵심 자산일 때 유효. 시간이 증명한 가치로 신뢰를 구축하는 전략",
+    "positioningContext": "럭셔리 브랜드 중 정통파 포지셔닝. 4050 이상 고자산층 또는 클래식 가치를 추구하는 소비자에게 효과적",
+    "competitiveImplication": "경쟁사가 트렌드를 쫓을 때 '변하지 않는 가치'로 차별화. Hermès, Patek Philippe 계열 포지셔닝"
   },
   {
     "adjective": "고급스러운",
@@ -63,7 +66,10 @@
       "Celine",
       "Aesop",
       "Bottega Veneta"
-    ]
+    ],
+    "descriptionStrategy": "절제를 통한 프리미엄 포지셔닝. 타깃이 과시보다 자기만족형 소비를 선호하는 세그먼트일 때 유효. 정보를 줄여 perceived value를 높이는 전략",
+    "positioningContext": "프리미엄~럭셔리 브랜드 중 'quiet luxury' 트렌드에 부합. 2030 고소득층, 4050 자기보상 소비층에 효과적",
+    "competitiveImplication": "경쟁사가 정보 과잉 또는 장식 과잉일 때 여백으로 차별화. Celine, Aesop 계열 포지셔닝과 유사"
   },
   {
     "adjective": "고급스러운",
@@ -95,7 +101,10 @@
       "Apple",
       "Bang & Olufsen",
       "Tesla"
-    ]
+    ],
+    "descriptionStrategy": "기술력과 혁신을 프리미엄의 근거로 제시하는 포지셔닝. R&D 투자나 기술적 우위가 브랜드 스토리의 핵심일 때 적합",
+    "positioningContext": "테크 기업, 가전, 자동차 등 기술 기반 프리미엄 브랜드에 효과적. 얼리어답터와 테크 감성 소비자 타깃",
+    "competitiveImplication": "전통적 럭셔리와 다른 축으로 프리미엄을 정의. Apple, Tesla처럼 '미래'를 프리미엄의 근거로 삼음"
   },
   {
     "adjective": "고급스러운",
@@ -126,7 +135,10 @@
       "Versace",
       "Dolce & Gabbana",
       "Balmain"
-    ]
+    ],
+    "descriptionStrategy": "풍요와 화려함을 통한 감성 극대화 포지셔닝. 소비 자체의 즐거움과 과시를 긍정하는 브랜드 스토리에 적합",
+    "positioningContext": "럭셔리 브랜드 중 표현적 과시 포지셔닝. 이벤트, 엔터테인먼트, 패션 브랜드에 효과적. 2030 과시적 소비층 타깃",
+    "competitiveImplication": "미니멀 트렌드와 정반대로 차별화. 절제 피로감을 느끼는 시장에서 오히려 시선을 끌 수 있음"
   },
   {
     "adjective": "모던한",
@@ -158,7 +170,10 @@
       "Stripe",
       "Figma",
       "Linear"
-    ]
+    ],
+    "descriptionStrategy": "디지털 네이티브 세대에게 익숙한 시각 문법으로 실용적 신뢰를 구축하는 포지셔닝. SaaS, 핀테크 등 서비스 브랜드에 최적",
+    "positioningContext": "테크/SaaS, 핀테크, 디지털 서비스 브랜드의 기본 문법. 2030 디지털 네이티브 타깃에 자연스러움",
+    "competitiveImplication": "전통 산업 대비 '우리는 디지털 기반'이라는 차별점을 시각적으로 표현. Stripe, Figma 계열"
   },
   {
     "adjective": "모던한",
@@ -189,7 +204,10 @@
     "references": [
       "Kinfolk",
       "Cereal Magazine"
-    ]
+    ],
+    "descriptionStrategy": "문화적 깊이와 예술적 감각을 브랜드 자산으로 전환하는 포지셔닝. 취향 기반 타깃에게 '이 브랜드는 감각이 있다'는 인식을 심어줌",
+    "positioningContext": "에디토리얼, 문화 콘텐츠, 라이프스타일 브랜드에 효과적. 문화 소비자, 크리에이티브 전문직 타깃",
+    "competitiveImplication": "대중적 깔끔함과 다른 '감각적 깊이'로 차별화. Kinfolk, Cereal Magazine 계열 포지셔닝"
   },
   {
     "adjective": "모던한",
@@ -217,7 +235,10 @@
     "references": [
       "Glossier",
       "Gentle Monster"
-    ]
+    ],
+    "descriptionStrategy": "과거의 감성 자산을 현대적으로 재해석하여 차별화하는 포지셔닝. 향수와 신선함을 동시에 제공해 폭넓은 세대 공감을 이끌어냄",
+    "positioningContext": "리브랜딩, 헤리티지 리뉴얼 프로젝트에 적합. 1020 뉴트로 세대와 4050 향수 세대 동시 타깃 가능",
+    "competitiveImplication": "모든 경쟁사가 '새것'을 추구할 때 '익숙한 새로움'으로 차별화. Glossier, Gentle Monster 계열"
   },
   {
     "adjective": "깔끔한",
@@ -249,7 +270,10 @@
       "Braun",
       "Muji",
       "Dieter Rams 계열"
-    ]
+    ],
+    "descriptionStrategy": "기능주의 원칙으로 정보 전달 효율을 극대화하는 포지셔닝. 복잡한 서비스를 명쾌하게 보여줘야 할 때 가장 효과적",
+    "positioningContext": "정보 밀도가 높은 서비스, 교육, 공공 분야에서 신뢰감 있는 정돈. 전연령 범용성 높음",
+    "competitiveImplication": "경쟁사가 장식적이거나 트렌디할 때 '본질에 집중'으로 차별화. Braun, Muji 계열 포지셔닝"
   },
   {
     "adjective": "깔끔한",
@@ -281,7 +305,10 @@
       "Notion",
       "Headspace",
       "Calm"
-    ]
+    ],
+    "descriptionStrategy": "친근함과 정돈을 동시에 달성하는 포지셔닝. 사용자가 부담 없이 접근하면서도 체계적이라는 인상을 줘야 할 때 적합",
+    "positioningContext": "헬스케어, 교육, 생산성 앱 등 '돌봄+체계' 이미지가 필요한 서비스. 전연령, 특히 디지털 초심자에게 유효",
+    "competitiveImplication": "날카로운 미니멀(CLN-A, CLN-C)과 달리 접근성으로 차별화. Notion, Headspace 계열"
   },
   {
     "adjective": "깔끔한",
@@ -313,7 +340,10 @@
       "Bloomberg",
       "Porsche",
       "Leica"
-    ]
+    ],
+    "descriptionStrategy": "정밀함과 전문성을 시각적으로 증명하는 포지셔닝. 엔지니어링 품질이나 데이터 정확도가 브랜드 가치인 경우 최적",
+    "positioningContext": "금융 데이터, 자동차, 정밀 기기, B2B 솔루션 브랜드에 효과적. 전문가 타깃에 신뢰감 부여",
+    "competitiveImplication": "소프트한 경쟁사 대비 '정밀함'으로 차별화. Bloomberg, Porsche, Leica 계열 포지셔닝"
   },
   {
     "adjective": "따뜻한",
@@ -344,7 +374,10 @@
     "references": [
       "Le Labo",
       "무인양품 라이프스타일"
-    ]
+    ],
+    "descriptionStrategy": "자연 소재의 촉감과 온기로 진정성을 전달하는 포지셔닝. 대량생산 이미지를 벗고 '정직한 브랜드'로 인식시킬 때 유효",
+    "positioningContext": "F&B, 리빙, 소규모 로컬 브랜드에 적합. 소박한 가치를 추구하는 3040 라이프스타일 소비자 타깃",
+    "competitiveImplication": "세련된 도시 감성 브랜드들 사이에서 '소박한 진정성'으로 차별화. Le Labo, 무인양품 라이프스타일 계열"
   },
   {
     "adjective": "따뜻한",
@@ -375,7 +408,10 @@
       "Airbnb",
       "Mailchimp",
       "Slack"
-    ]
+    ],
+    "descriptionStrategy": "사람과 커뮤니티 중심의 브랜드 스토리로 정서적 유대를 만드는 포지셔닝. 서비스의 '인간적 면모'를 강조할 때 적합",
+    "positioningContext": "커뮤니티 서비스, 소셜 플랫폼, HR/팀 협업 도구에 효과적. 다양성과 포용을 중시하는 2030 타깃",
+    "competitiveImplication": "기능 중심 경쟁사 대비 '사람이 보이는 브랜드'로 차별화. Airbnb, Slack 계열 포지셔닝"
   },
   {
     "adjective": "따뜻한",
@@ -404,7 +440,10 @@
     "references": [
       "Wes Anderson 무드",
       "빈티지 카페 브랜딩"
-    ]
+    ],
+    "descriptionStrategy": "향수와 감성적 기억을 브랜드 자산으로 활용하는 포지셔닝. 과거의 좋은 기억을 소환해 정서적 안정감을 제공",
+    "positioningContext": "카페, 독립 서점, 문화 공간 등 경험 중심 브랜드에 적합. 감성 소비를 즐기는 2030 타깃",
+    "competitiveImplication": "현대적 깔끔함 일색인 시장에서 '정서적 깊이'로 차별화. Wes Anderson 무드, 빈티지 카페 계열"
   },
   {
     "adjective": "트렌디한",
@@ -435,7 +474,10 @@
       "Supreme",
       "Off-White",
       "Nike SNKRS"
-    ]
+    ],
+    "descriptionStrategy": "희소성과 문화적 코드로 FOMO를 유발하는 포지셔닝. 한정판, 드롭, 콜라보 등 희소 가치가 브랜드 전략의 핵심일 때",
+    "positioningContext": "스트릿 패션, 스니커즈, 한정판 F&B 등 희소성 기반 브랜드. 1020 하이프 세대와 스트릿컬처 마니아 타깃",
+    "competitiveImplication": "대중적 접근성으로 승부하는 경쟁사 대비 '아무나 못 가지는 것'으로 차별화. Supreme, Off-White 계열"
   },
   {
     "adjective": "트렌디한",
@@ -466,7 +508,10 @@
       "Nothing",
       "Midjourney",
       "Vercel"
-    ]
+    ],
+    "descriptionStrategy": "AI, 3D, 제너러티브 등 최신 기술 트렌드를 시각적으로 전유하는 포지셔닝. '기술의 최전선에 있다'는 인식을 심어줌",
+    "positioningContext": "AI 서비스, Web3, 크리에이티브 툴 등 기술 혁신 브랜드에 적합. 얼리어답터, 테크 크리에이터 타깃",
+    "competitiveImplication": "전통적 테크감(MOD-A)과 다르게 '지금 이 순간의 기술 트렌드'를 반영. Nothing, Midjourney 계열"
   },
   {
     "adjective": "트렌디한",
@@ -498,7 +543,10 @@
       "무신사",
       "29CM",
       "배달의민족"
-    ]
+    ],
+    "descriptionStrategy": "MZ세대의 문화 코드와 위트를 브랜드 언어로 활용하는 포지셔닝. SNS 바이럴과 자발적 공유가 중요한 브랜드에 최적",
+    "positioningContext": "커머스, F&B, 라이프스타일 브랜드에서 영타깃 공략 시 효과적. 밈 문화에 익숙한 1020~3030 타깃",
+    "competitiveImplication": "격식 있는 경쟁사 대비 '브랜드가 놀 줄 안다'는 인식으로 차별화. 배달의민족, 29CM 계열"
   },
   {
     "adjective": "신뢰감 있는",
@@ -529,7 +577,10 @@
       "삼성",
       "Goldman Sachs",
       "McKinsey"
-    ]
+    ],
+    "descriptionStrategy": "제도적 권위와 격식으로 무조건적 신뢰를 구축하는 포지셔닝. 고객이 '안전하다'고 느끼는 것이 최우선인 브랜드에 적합",
+    "positioningContext": "금융, 법률, 공공기관, 대기업 그룹사에 기본 문법. 안정성을 중시하는 4050 의사결정자 타깃",
+    "competitiveImplication": "친근한 브랜드 대비 '격이 다른 안정감'으로 차별화. 삼성, Goldman Sachs, McKinsey 계열"
   },
   {
     "adjective": "신뢰감 있는",
@@ -561,7 +612,10 @@
       "Salesforce",
       "AWS",
       "Toss"
-    ]
+    ],
+    "descriptionStrategy": "데이터와 투명성으로 합리적 신뢰를 구축하는 포지셔닝. '숫자로 증명한다'는 스토리가 브랜드 핵심 가치일 때",
+    "positioningContext": "핀테크, SaaS, B2B 솔루션 등 데이터 기반 서비스에 적합. 합리적 의사결정자, 테크 리더 타깃",
+    "competitiveImplication": "감성적 접근의 경쟁사 대비 '로직과 데이터'로 차별화. Toss, Salesforce, AWS 계열"
   },
   {
     "adjective": "신뢰감 있는",
@@ -592,7 +646,10 @@
     "references": [
       "병원/클리닉 브랜딩",
       "교육 기관"
-    ]
+    ],
+    "descriptionStrategy": "전문성과 따뜻함을 결합하여 접근 가능한 신뢰를 만드는 포지셔닝. '실력 있으면서도 친절한' 이미지가 필요할 때",
+    "positioningContext": "의료, 교육, 상담, 케어 서비스 브랜드에 최적. 서비스 이용에 불안감이 있는 고객층 타깃",
+    "competitiveImplication": "차가운 전문성(TRS-A, TRS-B) 대비 '사람이 있는 전문성'으로 차별화"
   },
   {
     "adjective": "발랄한/활기찬",
@@ -624,7 +681,10 @@
       "Fanta",
       "LEGO",
       "Nintendo"
-    ]
+    ],
+    "descriptionStrategy": "밝고 유쾌한 에너지로 접근 장벽을 낮추는 포지셔닝. 폭넓은 대중에게 '즐겁다'는 첫인상을 줘야 할 때 효과적",
+    "positioningContext": "엔터테인먼트, 키즈, 대중 F&B, 이벤트 브랜드에 적합. 전연령 대중 타깃, 특히 가족 단위",
+    "competitiveImplication": "진지하고 격식 있는 경쟁사 대비 '즐거움'이라는 감정으로 차별화. LEGO, Nintendo, Fanta 계열"
   },
   {
     "adjective": "발랄한/활기찬",
@@ -656,7 +716,10 @@
       "Nike",
       "Red Bull",
       "Gatorade"
-    ]
+    ],
+    "descriptionStrategy": "역동성과 퍼포먼스로 에너지를 시각화하는 포지셔닝. 활동적 라이프스타일과 성취를 브랜드 스토리로 삼을 때 적합",
+    "positioningContext": "스포츠, 아웃도어, 피트니스, 에너지 드링크 브랜드에 최적. 1030 활동적 라이프스타일 타깃",
+    "competitiveImplication": "정적인 경쟁사 대비 '움직임과 속도'로 차별화. Nike, Red Bull, Gatorade 계열"
   },
   {
     "adjective": "발랄한/활기찬",
@@ -687,7 +750,10 @@
       "Pororo",
       "레고듀플로",
       "캐릭터 브랜드"
-    ]
+    ],
+    "descriptionStrategy": "순수한 놀이와 상상력을 브랜드 가치로 전환하는 포지셔닝. 아이의 시선에서 '재미있다'가 최우선인 브랜드에 적합",
+    "positioningContext": "키즈 브랜드, 교육완구, 아동 콘텐츠에 최적. 아이와 부모 동시 타깃",
+    "competitiveImplication": "성인 감각의 세련된 키즈 브랜드 대비 '진짜 아이 눈높이'로 차별화"
   },
   {
     "adjective": "자연친화적인",
@@ -717,7 +783,10 @@
     "references": [
       "Aesop",
       "Aveda"
-    ]
+    ],
+    "descriptionStrategy": "자연을 프리미엄의 근거로 활용하는 포지셔닝. 클린뷰티, 유기농 등 '자연=고급'이라는 등식이 브랜드 핵심일 때",
+    "positioningContext": "뷰티, 스킨케어, 프리미엄 F&B, 웰니스 브랜드에 효과적. 건강과 가치 소비를 중시하는 3040 여성 타깃",
+    "competitiveImplication": "합성/테크 기반 경쟁사 대비 '자연 유래의 진정성'으로 차별화. Aesop, Aveda 계열"
   },
   {
     "adjective": "자연친화적인",
@@ -746,7 +815,10 @@
     "references": [
       "Patagonia",
       "Greenpeace"
-    ]
+    ],
+    "descriptionStrategy": "환경 보호라는 가치를 브랜드 정체성의 핵심에 놓는 포지셔닝. 지속가능성이 마케팅이 아니라 존재 이유인 브랜드에 적합",
+    "positioningContext": "환경 기업, 지속가능 패션, 공공 캠페인에 효과적. 가치 소비에 민감한 2030 타깃",
+    "competitiveImplication": "그린워싱으로 비판받는 경쟁사 대비 '진짜 행동하는 브랜드'로 차별화. Patagonia 계열"
   },
   {
     "adjective": "자연친화적인",
@@ -777,7 +849,10 @@
     "references": [
       "보태니컬 카페",
       "가든 브랜드"
-    ]
+    ],
+    "descriptionStrategy": "자연 속 힐링과 회복을 브랜드 경험으로 제공하는 포지셔닝. 도시 생활의 피로를 해소하는 '쉼'이 브랜드 가치일 때",
+    "positioningContext": "카페, 플라워샵, 힐링 공간, 리조트 브랜드에 적합. 도시 거주 3040 여성 타깃, 힐링 소비층",
+    "competitiveImplication": "도시적이고 세련된 경쟁사 대비 '자연 속 쉼'이라는 감성으로 차별화"
   },
   {
     "adjective": "강렬한/임팩트 있는",
@@ -809,7 +884,10 @@
       "Balenciaga",
       "DC Comics",
       "Matrix"
-    ]
+    ],
+    "descriptionStrategy": "어둠과 힘으로 압도적 존재감을 만드는 포지셔닝. 강한 브랜드 아이덴티티로 '이 브랜드는 만만하지 않다'는 인식이 필요할 때",
+    "positioningContext": "하이패션, 게임, 엔터테인먼트, 프리미엄 주류 브랜드에 효과적. 강한 개성을 추구하는 1030 타깃",
+    "competitiveImplication": "밝고 친근한 경쟁사 대비 '어둡고 강한 카리스마'로 차별화. Balenciaga, DC Comics 계열"
   },
   {
     "adjective": "강렬한/임팩트 있는",
@@ -841,7 +919,10 @@
       "Spotify Wrapped",
       "MTV",
       "페스티벌"
-    ]
+    ],
+    "descriptionStrategy": "시각적 자극의 극대화로 즉각적 주목을 끌어내는 포지셔닝. 짧은 시간에 강한 인상을 남겨야 하는 캠페인에 최적",
+    "positioningContext": "페스티벌, 이벤트, 엔터테인먼트, 캠페인 중심 브랜드에 효과적. 10대 후반~20대 초반 타깃",
+    "competitiveImplication": "절제된 경쟁사 대비 '시각적 볼륨'으로 차별화. Spotify Wrapped, MTV 계열"
   },
   {
     "adjective": "강렬한/임팩트 있는",
@@ -872,7 +953,10 @@
     "references": [
       "Comme des Garçons",
       "무인양품 광고"
-    ]
+    ],
+    "descriptionStrategy": "극단적 절제로 긴장감을 만들어 주목시키는 포지셔닝. '비움'이 오히려 메시지가 되는 고급 커뮤니케이션 전략",
+    "positioningContext": "하이패션, 갤러리, 아트 디렉션이 중요한 브랜드에 적합. 시각적 리터러시가 높은 크리에이티브 타깃",
+    "competitiveImplication": "화려한 경쟁사 대비 '아무것도 안 했는데 눈이 간다'는 역설로 차별화. Comme des Garçons 계열"
   },
   {
     "adjective": "세련된",
@@ -904,7 +988,10 @@
       "Chanel",
       "Dior",
       "Prada"
-    ]
+    ],
+    "descriptionStrategy": "유럽 패션/문화의 우아함을 브랜드 자산으로 전유하는 포지셔닝. '감각적 수준이 다르다'는 인식을 줘야 할 때 효과적",
+    "positioningContext": "패션, 뷰티, 라이프스타일 브랜드의 프리미엄 라인에 적합. 유럽 문화에 친숙한 3040 여성 타깃",
+    "competitiveImplication": "한국적 세련미(SOP-B)와 다른 '유럽적 정통 감각'으로 차별화. Chanel, Dior, Prada 계열"
   },
   {
     "adjective": "세련된",
@@ -933,7 +1020,10 @@
       "Sulwhasoo",
       "젠틀몬스터",
       "탬버린즈"
-    ]
+    ],
+    "descriptionStrategy": "K-디자인의 독자적 감각을 브랜드 정체성으로 삼는 포지셔닝. 동양적 절제와 서양적 실험의 교차점에서 '한국적인 것이 가장 세계적'이라는 스토리",
+    "positioningContext": "K-뷰티, K-패션, 한국 프리미엄 브랜드의 글로벌 확장에 효과적. 한국 문화에 관심 있는 글로벌 2030 타깃",
+    "competitiveImplication": "유럽 레퍼런스를 답습하는 경쟁사 대비 '한국 고유의 감각'으로 차별화. 설화수, 젠틀몬스터, 탬버린즈 계열"
   },
   {
     "adjective": "세련된",
@@ -965,7 +1055,10 @@
       "Linear",
       "Vercel",
       "Raycast"
-    ]
+    ],
+    "descriptionStrategy": "디자인 시스템의 정교함으로 '이 브랜드는 디테일이 다르다'는 인식을 만드는 포지셔닝. 제품/서비스 품질을 시각적 품질로 보증",
+    "positioningContext": "디자인 툴, 개발자 도구, B2B SaaS 등 전문가 대상 서비스에 최적. 디자이너/개발자 등 시각 전문가 타깃",
+    "competitiveImplication": "일반적인 깔끔함(MOD-A)과 다르게 '전문가가 알아보는 정교함'으로 차별화. Linear, Vercel, Raycast 계열"
   },
   {
     "adjective": "편안한/친근한",
@@ -997,7 +1090,10 @@
       "IKEA",
       "무인양품",
       "오설록"
-    ]
+    ],
+    "descriptionStrategy": "일상의 안락함과 익숙함으로 심리적 안전감을 주는 포지셔닝. '집처럼 편한 브랜드'라는 인식이 핵심 가치일 때",
+    "positioningContext": "리빙, 인테리어, 홈카페, 일상용품 브랜드에 적합. 안정과 편안함을 추구하는 3050 가정 중심 소비자 타깃",
+    "competitiveImplication": "세련되거나 트렌디한 경쟁사 대비 '부담 없는 편안함'으로 차별화. IKEA, 무인양품, 오설록 계열"
   },
   {
     "adjective": "편안한/친근한",
@@ -1028,7 +1124,10 @@
       "배달의민족",
       "Slack",
       "Mailchimp"
-    ]
+    ],
+    "descriptionStrategy": "유쾌한 대화 톤으로 브랜드 접근성을 극대화하는 포지셔닝. 고객이 '이 브랜드는 나와 같은 눈높이'라고 느끼게 만드는 전략",
+    "positioningContext": "커머스, 배달, SNS 기반 서비스 등 일상 밀착형 브랜드에 효과적. 전연령 대중 타깃, 특히 2030",
+    "competitiveImplication": "격식 있는 경쟁사 대비 '말 걸기 쉬운 브랜드'로 차별화. 배달의민족, Slack, Mailchimp 계열"
   },
   {
     "adjective": "편안한/친근한",
@@ -1059,7 +1158,10 @@
     "references": [
       "존슨앤존슨",
       "아이 전문 브랜드"
-    ]
+    ],
+    "descriptionStrategy": "돌봄과 안심을 브랜드 경험의 핵심으로 삼는 포지셔닝. 고객이 불안하거나 취약한 상태에 있을 때 '보호받고 있다'는 느낌을 줘야 할 때",
+    "positioningContext": "의료, 보험, 아동용품, 시니어 케어 브랜드에 최적. 돌봄이 필요한 고객과 그 가족 타깃",
+    "competitiveImplication": "기능적 신뢰(TRS-B) 대비 '감정적 안심'으로 차별화. 존슨앤존슨, 아이 전문 브랜드 계열"
   },
   {
     "adjective": "독특한/개성 있는",
@@ -1089,7 +1191,10 @@
     "references": [
       "Comme des Garçons",
       "Rick Owens"
-    ]
+    ],
+    "descriptionStrategy": "규칙 파괴와 실험성을 브랜드 정체성 자체로 삼는 포지셔닝. '이해보다 충격'이 목적이며 대중성을 의도적으로 포기하는 전략",
+    "positioningContext": "하이패션, 현대미술, 실험적 문화 브랜드에 적합. 시각적 리터러시가 높은 크리에이티브 전문가 타깃",
+    "competitiveImplication": "모든 경쟁사의 안전한 선택과 대비되는 '파격' 자체가 차별점. Comme des Garçons, Rick Owens 계열"
   },
   {
     "adjective": "독특한/개성 있는",
@@ -1118,7 +1223,10 @@
     "references": [
       "소규모 공방",
       "로컬 로스터리"
-    ]
+    ],
+    "descriptionStrategy": "장인 정신과 수공예 가치를 브랜드의 핵심 스토리로 삼는 포지셔닝. 대량생산 시대에 '유일무이한 것'의 가치를 역설",
+    "positioningContext": "수제 식품, 독립 브랜드, 공방, 로컬 비즈니스에 적합. 가치 소비와 스토리를 중시하는 3040 타깃",
+    "competitiveImplication": "대량생산 브랜드 대비 '손의 흔적'이라는 비 대체적 가치로 차별화. 소규모 공방, 로컬 로스터리 계열"
   },
   {
     "adjective": "독특한/개성 있는",
@@ -1148,6 +1256,9 @@
     "references": [
       "언더그라운드 레이블",
       "독립 잡지"
-    ]
+    ],
+    "descriptionStrategy": "의도적 배타성으로 핵심 팬덤을 구축하는 포지셔닝. '모두를 위한' 대신 '아는 사람만을 위한' 전략으로 로열티를 극대화",
+    "positioningContext": "독립 레이블, 마니아 커뮤니티, 한정판 아트 프로젝트에 적합. 서브컬처 커뮤니티 내부 타깃",
+    "competitiveImplication": "대중적 힙함(TRD-A)과 반대로 '대중을 배제함으로써 가치가 올라가는' 전략. 언더그라운드 레이블 계열"
   }
 ]

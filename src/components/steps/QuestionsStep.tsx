@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import ReturnToStartButton from '@/components/ReturnToStartButton';
 import { MAX_QUESTIONS } from '@/lib/constants';
+import { getDebugBanner } from '@/lib/debugSource';
 import { useSessionStore } from '@/store/sessionStore';
 
 export default function QuestionsStep() {
     const currentQuestion = useSessionStore((state) => state.currentQuestion);
     const sessionState = useSessionStore((state) => state.sessionState);
-    const usedFallback = useSessionStore((state) => state.usedFallback);
+    const debugState = useSessionStore((state) => state.debugState);
     const submitAnswer = useSessionStore((state) => state.submitAnswer);
     const resetToContext = useSessionStore((state) => state.resetToContext);
     const isLoading = useSessionStore((state) => state.isLoading);
@@ -17,6 +19,12 @@ export default function QuestionsStep() {
 
     const questionCount = sessionState?.questionCount ?? 0;
     const questionType = currentQuestion?.type ?? 'text_choice';
+    const isStrategyLane = sessionState?.jobType === 'strategy_to_design_translation';
+    const missingCount = sessionState?.strategyState?.missingFields.length ?? 0;
+    const summaryText = isStrategyLane
+        ? sessionState?.strategyState?.summary
+        : sessionState?.intentInterpretation;
+    const debugBanner = getDebugBanner('question', debugState.questionSource);
 
     const handleSelect = async (label: string, direction: string) => {
         await submitAnswer(label, direction);
@@ -30,7 +38,7 @@ export default function QuestionsStep() {
 
     const handleBack = () => {
         const confirmed = window.confirm(
-            '맥락 설정으로 돌아가면 현재 질문 진행은 초기화됩니다. 돌아가시겠어요?'
+            '맥락 설정으로 돌아가면 현재 질문 진행이 초기화됩니다. 돌아가시겠어요?'
         );
 
         if (confirmed) {
@@ -48,24 +56,25 @@ export default function QuestionsStep() {
 
     return (
         <div className="flex flex-col items-center px-4 py-8">
+            <div className="mb-2 w-full max-w-lg">
+                <ReturnToStartButton confirmMessage="초기 화면으로 돌아가면 현재 질문 진행 결과가 초기화됩니다. 돌아가시겠어요?" />
+            </div>
+
             <div className="mb-8 w-full max-w-lg">
-                <div
-                    className={`mb-3 rounded-xl px-3 py-2 text-xs ${
-                        usedFallback
-                            ? 'border border-amber-200 bg-amber-50 text-amber-700'
-                            : 'border border-emerald-200 bg-emerald-50 text-emerald-700'
-                    }`}
-                >
-                    {usedFallback
-                        ? '현재 질문은 정적 fallback 엔진으로 생성되고 있습니다.'
-                        : '현재 질문은 LLM이 생성하고 있습니다.'}
-                </div>
+                {debugBanner && (
+                    <div className={`mb-3 rounded-xl px-3 py-2 text-xs ${debugBanner.className}`}>
+                        {debugBanner.message}
+                    </div>
+                )}
+
                 <div className="mb-2 flex items-center justify-between">
                     <span className="text-xs text-gray-400">
                         질문 {Math.min(questionCount + 1, MAX_QUESTIONS)} / {MAX_QUESTIONS}
                     </span>
                     <span className="text-xs text-gray-400">
-                        후보 {sessionState?.candidates.length ?? 0}개
+                        {isStrategyLane
+                            ? `남은 기준 ${missingCount}개`
+                            : `후보 ${sessionState?.candidates.length ?? 0}개`}
                     </span>
                 </div>
                 <div className="h-1.5 w-full rounded-full bg-gray-200">
@@ -81,9 +90,9 @@ export default function QuestionsStep() {
                     <p className="text-center text-lg leading-relaxed text-gray-900">
                         {currentQuestion.question}
                     </p>
-                    {sessionState?.intentInterpretation ? (
+                    {summaryText ? (
                         <p className="mt-3 text-center text-sm leading-6 text-gray-500">
-                            {sessionState.intentInterpretation}
+                            {summaryText}
                         </p>
                     ) : null}
                 </div>
@@ -95,7 +104,9 @@ export default function QuestionsStep() {
                         <textarea
                             value={freeText}
                             onChange={(event) => setFreeText(event.target.value)}
-                            placeholder="원하시는 방향을 편하게 적어 주세요."
+                            placeholder={isStrategyLane
+                                ? '디자인 판단 기준이 되도록 한 문장으로 적어 주세요.'
+                                : '원하시는 방향을 편하게 적어 주세요.'}
                             className="h-28 w-full resize-none rounded-xl border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder-gray-400 transition-all focus:outline-none focus:ring-2 focus:ring-gray-900"
                         />
                         <button
@@ -103,7 +114,7 @@ export default function QuestionsStep() {
                             disabled={isLoading || freeText.trim().length === 0}
                             className="w-full rounded-xl bg-gray-900 px-6 py-3 font-medium text-white transition-all hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-300"
                         >
-                            {isLoading ? '분석 중...' : '제출'}
+                            {isLoading ? '정리 중..' : '제출'}
                         </button>
                     </div>
                 ) : questionType === 'image_ab' ? (
@@ -144,7 +155,7 @@ export default function QuestionsStep() {
                 ) : (
                     <div className="space-y-3">
                         {currentQuestion.options.map((option, index) => {
-                            const isNeither = option.direction === '';
+                            const isNeutral = option.direction === '';
 
                             return (
                                 <button
@@ -152,7 +163,7 @@ export default function QuestionsStep() {
                                     onClick={() => handleSelect(option.label, option.direction)}
                                     disabled={isLoading}
                                     className={`w-full rounded-xl px-6 py-4 text-left transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
-                                        isNeither
+                                        isNeutral
                                             ? 'border border-dashed border-gray-300 text-gray-500 hover:border-gray-400 hover:bg-gray-50'
                                             : 'border border-gray-300 text-gray-900 hover:border-gray-900 hover:bg-gray-50'
                                     }`}

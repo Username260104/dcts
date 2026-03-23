@@ -1,24 +1,26 @@
 import { create } from 'zustand';
 import type {
     BriefOutput,
+    ImportedFileMeta,
+    InputRole,
+    JobType,
     LLMBriefResponse,
     LLMInitialAnalysis,
-    LLMQuestionOption,
-    QuestionType,
     RefineFeedbackResponse,
     RefineSessionResponse,
     SessionState,
     SessionStep,
     UserContext,
+    WorkflowConvergenceResult,
+    WorkflowDebugState,
+    WorkflowQuestion,
 } from '@/types/ontology';
 
-interface CurrentQuestion {
-    question: string;
-    options: LLMQuestionOption[];
-    type?: QuestionType;
-}
-
 interface SessionStore {
+    inputRole: InputRole;
+    setInputRole: (role: InputRole) => void;
+    jobType: JobType;
+    setJobType: (jobType: JobType) => void;
     step: SessionStep;
     setStep: (step: SessionStep) => void;
     feedbackText: string;
@@ -26,14 +28,16 @@ interface SessionStore {
     refinedFeedbackText: string | null;
     refineChoice: 'original' | 'refined' | null;
     setRefineChoice: (choice: 'original' | 'refined') => void;
+    importedFile: ImportedFileMeta | null;
+    setImportedFile: (file: ImportedFileMeta | null) => void;
     userContext: UserContext;
     setUserContext: (ctx: Partial<UserContext>) => void;
     sessionState: SessionState | null;
     setSessionState: (state: SessionState) => void;
     initialAnalysis: LLMInitialAnalysis | null;
     setInitialAnalysis: (analysis: LLMInitialAnalysis) => void;
-    currentQuestion: CurrentQuestion | null;
-    setCurrentQuestion: (question: CurrentQuestion | null) => void;
+    currentQuestion: WorkflowQuestion | null;
+    setCurrentQuestion: (question: WorkflowQuestion | null) => void;
     isLoading: boolean;
     setIsLoading: (loading: boolean) => void;
     isRefiningFeedback: boolean;
@@ -41,17 +45,11 @@ interface SessionStore {
     setError: (error: string | null) => void;
     usedFallback: boolean;
     setUsedFallback: (used: boolean) => void;
+    debugState: WorkflowDebugState;
+    setDebugState: (debugState: WorkflowDebugState) => void;
     converged: boolean;
-    convergenceResult: {
-        primaryBranch: string;
-        secondaryBranch: string | null;
-        reasoning: string;
-    } | null;
-    setConvergenceResult: (result: {
-        primaryBranch: string;
-        secondaryBranch: string | null;
-        reasoning: string;
-    }) => void;
+    convergenceResult: WorkflowConvergenceResult | null;
+    setConvergenceResult: (result: WorkflowConvergenceResult) => void;
     brief: BriefOutput | null;
     llmSummary: LLMBriefResponse | null;
     setBrief: (brief: BriefOutput, llmSummary: LLMBriefResponse) => void;
@@ -62,6 +60,7 @@ interface SessionStore {
     generateBrief: () => Promise<void>;
     reset: () => void;
     resetToContext: () => void;
+    returnToStart: () => void;
 }
 
 const initialUserContext: UserContext = {
@@ -71,20 +70,16 @@ const initialUserContext: UserContext = {
     targetAge: '',
 };
 
-function resolveQuestionType(
-    type: QuestionType | undefined,
-    options: LLMQuestionOption[]
-): QuestionType {
-    if (type) return type;
-    if (options.length === 0) return 'free_text';
-    return 'text_choice';
-}
-
 export const useSessionStore = create<SessionStore>((set, get) => ({
-    step: 'entry',
+    inputRole: 'client' as InputRole,
+    setInputRole: (inputRole) => set({ inputRole }),
+    jobType: 'client_feedback_interpretation' as JobType,
+    setJobType: (jobType) => set({ jobType }),
+    step: 'role' as SessionStep,
     feedbackText: '',
     refinedFeedbackText: null,
     refineChoice: null,
+    importedFile: null,
     userContext: { ...initialUserContext },
     sessionState: null,
     initialAnalysis: null,
@@ -93,6 +88,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     isRefiningFeedback: false,
     error: null,
     usedFallback: false,
+    debugState: {},
     converged: false,
     convergenceResult: null,
     brief: null,
@@ -103,9 +99,11 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
         feedbackText,
         refinedFeedbackText: null,
         refineChoice: null,
+        importedFile: feedbackText.trim().length === 0 ? null : get().importedFile,
         error: null,
     }),
     setRefineChoice: (refineChoice) => set({ refineChoice }),
+    setImportedFile: (importedFile) => set({ importedFile }),
     setUserContext: (ctx) => set((state) => ({
         userContext: { ...state.userContext, ...ctx },
     })),
@@ -115,6 +113,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     setIsLoading: (isLoading) => set({ isLoading }),
     setError: (error) => set({ error }),
     setUsedFallback: (usedFallback) => set({ usedFallback }),
+    setDebugState: (debugState) => set({ debugState }),
     setConvergenceResult: (result) => set({
         converged: true,
         convergenceResult: result,
@@ -155,7 +154,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     },
 
     startSession: async () => {
-        const { feedbackText, refinedFeedbackText, refineChoice, userContext } = get();
+        const { feedbackText, refinedFeedbackText, refineChoice, userContext, inputRole, jobType } = get();
         const selectedFeedbackText =
             refineChoice === 'refined' && refinedFeedbackText
                 ? refinedFeedbackText
@@ -167,7 +166,12 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
             const response = await fetch('/api/session/start', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ feedbackText: selectedFeedbackText, context: userContext }),
+                body: JSON.stringify({
+                    feedbackText: selectedFeedbackText,
+                    context: userContext,
+                    inputRole,
+                    jobType,
+                }),
             });
 
             if (!response.ok) {
@@ -179,14 +183,13 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
 
             set({
                 sessionState: data.sessionState,
-                initialAnalysis: data.initialAnalysis,
+                initialAnalysis: data.initialAnalysis ?? null,
                 usedFallback: data.usedFallback ?? false,
-                currentQuestion: {
-                    question: data.initialAnalysis.question,
-                    options: data.initialAnalysis.options,
-                    type: resolveQuestionType(undefined, data.initialAnalysis.options),
-                },
-                step: 'questions',
+                debugState: data.debugState ?? {},
+                currentQuestion: data.nextQuestion ?? null,
+                converged: Boolean(data.converged),
+                convergenceResult: data.result ?? null,
+                step: data.converged ? 'confirm' : 'questions',
                 isLoading: false,
             });
         } catch (error) {
@@ -213,6 +216,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
                     sessionState,
                     currentQuestion: currentQuestion?.question ?? '',
                     currentOptions: currentQuestion?.options ?? [],
+                    currentQuestionMeta: currentQuestion?.meta,
                 }),
             });
 
@@ -226,6 +230,10 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
             set({
                 sessionState: data.sessionState,
                 usedFallback: data.usedFallback ?? get().usedFallback,
+                debugState: {
+                    ...get().debugState,
+                    ...(data.debugState ?? {}),
+                },
                 isLoading: false,
             });
 
@@ -241,11 +249,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
 
             if (data.nextQuestion) {
                 set({
-                    currentQuestion: {
-                        question: data.nextQuestion.question,
-                        options: data.nextQuestion.options,
-                        type: resolveQuestionType(data.nextQuestion.type, data.nextQuestion.options),
-                    },
+                    currentQuestion: data.nextQuestion,
                     step: 'questions',
                 });
             }
@@ -280,16 +284,14 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
             set({
                 sessionState: data.sessionState,
                 usedFallback: data.usedFallback ?? get().usedFallback,
-                currentQuestion: data.nextQuestion
-                    ? {
-                        question: data.nextQuestion.question,
-                        options: data.nextQuestion.options,
-                        type: resolveQuestionType(data.nextQuestion.type, data.nextQuestion.options),
-                    }
-                    : null,
-                converged: false,
-                convergenceResult: null,
-                step: 'questions',
+                debugState: {
+                    ...get().debugState,
+                    ...(data.debugState ?? {}),
+                },
+                currentQuestion: data.nextQuestion ?? null,
+                converged: Boolean(data.converged),
+                convergenceResult: data.result ?? null,
+                step: data.converged ? 'confirm' : 'questions',
                 isLoading: false,
             });
         } catch (error) {
@@ -323,6 +325,10 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
             set({
                 brief: data.brief,
                 llmSummary: data.llmSummary,
+                debugState: {
+                    ...get().debugState,
+                    ...(data.debugState ?? {}),
+                },
                 step: 'brief',
                 isLoading: false,
             });
@@ -335,10 +341,13 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     },
 
     reset: () => set({
-        step: 'entry',
+        inputRole: 'client' as InputRole,
+        jobType: 'client_feedback_interpretation' as JobType,
+        step: 'role' as SessionStep,
         feedbackText: '',
         refinedFeedbackText: null,
         refineChoice: null,
+        importedFile: null,
         userContext: { ...initialUserContext },
         sessionState: null,
         initialAnalysis: null,
@@ -347,6 +356,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
         isRefiningFeedback: false,
         error: null,
         usedFallback: false,
+        debugState: {},
         converged: false,
         convergenceResult: null,
         brief: null,
@@ -362,6 +372,25 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
         isRefiningFeedback: false,
         error: null,
         usedFallback: false,
+        debugState: {},
+        converged: false,
+        convergenceResult: null,
+        brief: null,
+        llmSummary: null,
+    }),
+
+    returnToStart: () => set({
+        inputRole: 'client' as InputRole,
+        jobType: 'client_feedback_interpretation' as JobType,
+        step: 'role',
+        sessionState: null,
+        initialAnalysis: null,
+        currentQuestion: null,
+        isLoading: false,
+        isRefiningFeedback: false,
+        error: null,
+        usedFallback: false,
+        debugState: {},
         converged: false,
         convergenceResult: null,
         brief: null,

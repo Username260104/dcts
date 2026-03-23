@@ -4,9 +4,9 @@ import type {
     AnswerRecord,
     Branch,
     ContextVariables,
-    ConvergenceResult,
     Question,
     QuestionEngineState,
+    StaticConvergenceResult,
     UserContext,
 } from '@/types/ontology';
 import {
@@ -311,7 +311,7 @@ export function isConverged(state: QuestionEngineState): boolean {
     return false;
 }
 
-export function getResult(state: QuestionEngineState): ConvergenceResult {
+export function getResult(state: QuestionEngineState): StaticConvergenceResult {
     return {
         primaryBranch: state.remainingCandidates[0] || '',
         secondaryBranch: state.remainingCandidates.length > 1 ? state.remainingCandidates[1] : null,

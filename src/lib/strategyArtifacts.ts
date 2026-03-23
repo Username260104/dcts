@@ -1,0 +1,206 @@
+import type { StrategyArtifactType, StrategyFieldKey } from '@/types/ontology';
+
+export const STRATEGY_FIELD_LABELS: Record<StrategyFieldKey, string> = {
+    businessChallenge: '이번 차수의 핵심 과제',
+    audienceContext: '타깃과 사용 맥락',
+    frameOfReference: '비교되는 시장 프레임',
+    pointsOfParity: '카테고리 공통 기대값',
+    pointsOfDifference: '차별화 포인트',
+    valueProposition: '핵심 가치 제안',
+    reasonsToBelieve: '신뢰 근거',
+    brandPromise: '브랜드 약속',
+    personality: '브랜드 성격',
+    principles: '디자인 원칙',
+    equitiesToProtect: '지켜야 할 브랜드 자산',
+    mustAmplify: '더 강하게 보여야 할 인상',
+    mustAvoid: '피해야 할 방향',
+    decisionPriority: '우선순위 기준',
+    tradeOffs: '트레이드오프',
+    mandatories: '필수 반영 요소',
+    noGo: '금지 요소',
+    scope: '전체 범위',
+    scopeNow: '이번 차수 범위',
+    reviewCriteria: '디자인 평가 기준',
+    openRisks: '열린 리스크',
+    openQuestionsForDesign: '디자이너와 확인할 질문',
+};
+
+export const STRATEGY_ARTIFACT_LABELS: Record<StrategyArtifactType, string> = {
+    positioning: '포지셔닝 정리',
+    brand_platform: '브랜드 플랫폼',
+    brand_architecture: '브랜드 아키텍처',
+    experience_principles: '경험 원칙',
+    campaign_or_creative_brief_seed: '캠페인/크리에이티브 브리프 씨드',
+    identity_refresh_scope: '아이덴티티 리프레시 범위',
+};
+
+type StrategyArtifactRule = {
+    requiredFields: StrategyFieldKey[];
+    preferredQuestionOrder: Array<StrategyFieldKey | 'artifactType'>;
+};
+
+export const STRATEGY_ARTIFACT_RULES: Record<StrategyArtifactType, StrategyArtifactRule> = {
+    positioning: {
+        requiredFields: [
+            'businessChallenge',
+            'audienceContext',
+            'frameOfReference',
+            'pointsOfDifference',
+            'valueProposition',
+            'mustAmplify',
+            'mustAvoid',
+            'reviewCriteria',
+        ],
+        preferredQuestionOrder: [
+            'artifactType',
+            'businessChallenge',
+            'audienceContext',
+            'frameOfReference',
+            'pointsOfDifference',
+            'pointsOfParity',
+            'valueProposition',
+            'mustAmplify',
+            'mustAvoid',
+            'decisionPriority',
+            'tradeOffs',
+            'reviewCriteria',
+            'openQuestionsForDesign',
+        ],
+    },
+    brand_platform: {
+        requiredFields: [
+            'businessChallenge',
+            'audienceContext',
+            'valueProposition',
+            'brandPromise',
+            'principles',
+            'reasonsToBelieve',
+            'mustAmplify',
+            'reviewCriteria',
+        ],
+        preferredQuestionOrder: [
+            'artifactType',
+            'businessChallenge',
+            'audienceContext',
+            'valueProposition',
+            'brandPromise',
+            'principles',
+            'reasonsToBelieve',
+            'mustAmplify',
+            'mustAvoid',
+            'decisionPriority',
+            'tradeOffs',
+            'reviewCriteria',
+            'openQuestionsForDesign',
+        ],
+    },
+    brand_architecture: {
+        requiredFields: [
+            'businessChallenge',
+            'frameOfReference',
+            'equitiesToProtect',
+            'decisionPriority',
+            'scopeNow',
+            'mandatories',
+            'reviewCriteria',
+        ],
+        preferredQuestionOrder: [
+            'artifactType',
+            'businessChallenge',
+            'frameOfReference',
+            'equitiesToProtect',
+            'decisionPriority',
+            'tradeOffs',
+            'scopeNow',
+            'mandatories',
+            'mustAvoid',
+            'reviewCriteria',
+            'openQuestionsForDesign',
+            'openRisks',
+        ],
+    },
+    experience_principles: {
+        requiredFields: [
+            'businessChallenge',
+            'audienceContext',
+            'brandPromise',
+            'principles',
+            'mustAmplify',
+            'reviewCriteria',
+        ],
+        preferredQuestionOrder: [
+            'artifactType',
+            'businessChallenge',
+            'audienceContext',
+            'brandPromise',
+            'principles',
+            'mustAmplify',
+            'mustAvoid',
+            'decisionPriority',
+            'reviewCriteria',
+            'openQuestionsForDesign',
+            'openRisks',
+        ],
+    },
+    campaign_or_creative_brief_seed: {
+        requiredFields: [
+            'businessChallenge',
+            'audienceContext',
+            'valueProposition',
+            'reasonsToBelieve',
+            'mustAmplify',
+            'mustAvoid',
+            'mandatories',
+            'reviewCriteria',
+        ],
+        preferredQuestionOrder: [
+            'artifactType',
+            'businessChallenge',
+            'audienceContext',
+            'valueProposition',
+            'reasonsToBelieve',
+            'mustAmplify',
+            'mustAvoid',
+            'mandatories',
+            'decisionPriority',
+            'reviewCriteria',
+            'openQuestionsForDesign',
+            'openRisks',
+        ],
+    },
+    identity_refresh_scope: {
+        requiredFields: [
+            'businessChallenge',
+            'equitiesToProtect',
+            'mustAmplify',
+            'mustAvoid',
+            'scopeNow',
+            'noGo',
+            'reviewCriteria',
+        ],
+        preferredQuestionOrder: [
+            'artifactType',
+            'businessChallenge',
+            'equitiesToProtect',
+            'mustAmplify',
+            'mustAvoid',
+            'decisionPriority',
+            'tradeOffs',
+            'scopeNow',
+            'mandatories',
+            'noGo',
+            'reviewCriteria',
+            'openQuestionsForDesign',
+            'openRisks',
+        ],
+    },
+};
+
+export function getStrategyRule(artifactType?: StrategyArtifactType): StrategyArtifactRule {
+    return artifactType
+        ? STRATEGY_ARTIFACT_RULES[artifactType]
+        : {
+            requiredFields: [],
+            preferredQuestionOrder: ['artifactType'],
+        };
+}

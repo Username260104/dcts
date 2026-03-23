@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { analyzeInitialFeedback } from '@/lib/llmOrchestrator';
+import {
+    analyzeClientFeedback,
+    extractStrategySchema,
+    generateStrategyGapQuestion,
+} from '@/lib/llmOrchestrator';
 import { matchTrigger } from '@/lib/triggerMatcher';
 import { createInitialState, getNextQuestion } from '@/lib/questionEngine';
 import type {
+    InputRole,
+    JobType,
     LLMInitialAnalysis,
     SessionState,
     StartSessionRequest,
     StartSessionResponse,
+    StrategyGapResult,
+    StrategyReadyResult,
+    UserContext,
+    WorkflowQuestion,
 } from '@/types/ontology';
 
 function generateSessionId(): string {
@@ -14,6 +24,36 @@ function generateSessionId(): string {
 }
 
 const LLM_TIMEOUT_MS = Number(process.env.LLM_TIMEOUT_MS ?? '15000');
+
+function buildStrategistInput(feedbackText: string, context: UserContext): string {
+    const parts = [feedbackText];
+    if (context.brandDescription) parts.push(`브랜드: ${context.brandDescription}`);
+    if (context.positioningNote) parts.push(`포지셔닝: ${context.positioningNote}`);
+    if (context.additionalContext) parts.push(`추가 맥락: ${context.additionalContext}`);
+    return parts.join('\n');
+}
+
+function resolveJobType(inputRole: InputRole, requestedJobType?: JobType): JobType {
+    if (requestedJobType) {
+        return requestedJobType;
+    }
+
+    return inputRole === 'strategist'
+        ? 'strategy_to_design_translation'
+        : 'client_feedback_interpretation';
+}
+
+function buildClientQuestion(analysis: LLMInitialAnalysis): WorkflowQuestion {
+    return {
+        question: analysis.question,
+        options: analysis.options,
+        type: analysis.options.length === 0 ? 'free_text' : 'text_choice',
+        meta: {
+            lane: 'client_feedback_interpretation',
+            questionKind: 'interpretation',
+        },
+    };
+}
 
 export async function POST(request: NextRequest) {
     try {
@@ -27,12 +67,69 @@ export async function POST(request: NextRequest) {
         }
 
         const sessionId = generateSessionId();
+        const inputRole: InputRole = body.inputRole ?? 'client';
+        const jobType = resolveJobType(inputRole, body.jobType);
+
+        if (jobType === 'strategy_to_design_translation') {
+            const strategyState = await extractStrategySchema(body.feedbackText, body.context);
+            const nextQuestion = strategyState.readinessStatus === 'ready'
+                ? null
+                : generateStrategyGapQuestion(strategyState);
+
+            const sessionState: SessionState = {
+                sessionId,
+                jobType,
+                originalFeedback: body.feedbackText,
+                userContext: body.context,
+                strategyArtifactType: strategyState.artifactType,
+                strategyState,
+                candidates: [],
+                eliminated: [],
+                answerHistory: [],
+                questionCount: 0,
+                converged: !nextQuestion,
+                detailQuestionCount: 0,
+                detailFocusHistory: [],
+                pendingRefinement: false,
+                inputRole,
+            };
+
+            const response: StartSessionResponse = {
+                sessionId,
+                sessionState,
+                nextQuestion: nextQuestion ?? undefined,
+                converged: !nextQuestion,
+                result: nextQuestion
+                    ? undefined
+                    : strategyState.readinessStatus === 'ready'
+                        ? {
+                            kind: 'strategy_ready',
+                            summary: strategyState.summary ?? '',
+                            strategyState,
+                        } satisfies StrategyReadyResult
+                        : {
+                            kind: 'strategy_gap',
+                            summary: strategyState.summary ?? '',
+                            strategyState,
+                        } satisfies StrategyGapResult,
+                debugState: nextQuestion
+                    ? { questionSource: 'deterministic' }
+                    : { resultSource: 'hybrid' },
+                usedFallback: false,
+            };
+
+            return NextResponse.json(response);
+        }
+
+        const feedbackForAnalysis = inputRole === 'strategist'
+            ? buildStrategistInput(body.feedbackText, body.context)
+            : body.feedbackText;
 
         let analysis: LLMInitialAnalysis;
         let usedFallback = false;
 
         try {
-            const llmPromise = analyzeInitialFeedback(body.feedbackText, body.context);
+            const llmPromise = analyzeClientFeedback(feedbackForAnalysis, body.context, inputRole);
             const timeoutPromise = new Promise<never>((_, reject) =>
                 setTimeout(() => reject(new Error('LLM_TIMEOUT')), LLM_TIMEOUT_MS)
             );
@@ -55,8 +152,8 @@ export async function POST(request: NextRequest) {
                 feedbackType: triggerResult.trigger?.type ?? 'ambiguous',
                 axis: triggerResult.trigger?.axis ?? '미정',
                 intentInterpretation: triggerResult.trigger
-                    ? `클라이언트는 "${body.feedbackText}"라는 표현으로 ${triggerResult.trigger.axis} 축의 방향 차이를 더 분명히 하려고 합니다.`
-                    : `클라이언트는 "${body.feedbackText}"라는 표현으로 현재 시안의 방향을 더 분명하게 설명하려고 합니다.`,
+                    ? `클라이언트는 "${body.feedbackText}"라는 표현으로 ${triggerResult.trigger.axis} 축의 방향 차이를 더 분명하게 설명하려고 합니다.`
+                    : `클라이언트는 "${body.feedbackText}"라는 표현으로 현재 시안의 방향성을 더 분명하게 설명하려고 합니다.`,
                 uncertainAspects: [
                     triggerResult.trigger?.axis || '어떤 방향 차이가 가장 중요한지',
                 ],
@@ -76,6 +173,7 @@ export async function POST(request: NextRequest) {
 
         const sessionState: SessionState = {
             sessionId,
+            jobType,
             originalFeedback: body.feedbackText,
             feedbackType: analysis.feedbackType,
             intentInterpretation: analysis.intentInterpretation,
@@ -89,12 +187,18 @@ export async function POST(request: NextRequest) {
             detailQuestionCount: 0,
             detailFocusHistory: [],
             pendingRefinement: false,
+            inputRole,
         };
 
-        const response: StartSessionResponse & { usedFallback: boolean } = {
+        const response: StartSessionResponse = {
             sessionId,
             initialAnalysis: analysis,
             sessionState,
+            nextQuestion: buildClientQuestion(analysis),
+            converged: false,
+            debugState: {
+                questionSource: usedFallback ? 'fallback' : 'language_model',
+            },
             usedFallback,
         };
 

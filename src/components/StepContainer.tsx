@@ -1,6 +1,7 @@
 'use client';
 
 import { useSessionStore } from '@/store/sessionStore';
+import RoleStep from './steps/RoleStep';
 import EntryStep from './steps/EntryStep';
 import ContextStep from './steps/ContextStep';
 import QuestionsStep from './steps/QuestionsStep';
@@ -11,6 +12,8 @@ export default function StepContainer() {
     const step = useSessionStore((s) => s.step);
 
     switch (step) {
+        case 'role':
+            return <RoleStep />;
         case 'entry':
             return <EntryStep />;
         case 'context':
@@ -22,6 +25,6 @@ export default function StepContainer() {
         case 'brief':
             return <BriefStep />;
         default:
-            return <EntryStep />;
+            return <RoleStep />;
     }
 }

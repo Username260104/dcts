@@ -4,6 +4,7 @@ import { useSessionStore } from '@/store/sessionStore';
 import type { SessionStep } from '@/types/ontology';
 
 const steps: { key: SessionStep; label: string }[] = [
+    { key: 'role', label: '시작' },
     { key: 'entry', label: '피드백' },
     { key: 'context', label: '맥락' },
     { key: 'questions', label: '질문' },

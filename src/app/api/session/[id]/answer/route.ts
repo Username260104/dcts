@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { DETAIL_QUESTION_TARGET } from '@/lib/constants';
-import { generateDetailQuestion, generateFollowUp } from '@/lib/llmOrchestrator';
+import { DETAIL_QUESTION_TARGET, MAX_QUESTIONS } from '@/lib/constants';
+import {
+    generateClientDetailQuestion,
+    generateClientFollowUp,
+    generateStrategyGapQuestion,
+    mergeStrategyAnswerIntoState,
+} from '@/lib/llmOrchestrator';
 import { createQuestionPayload, reconstructQuestionState } from '@/lib/sessionFlow';
 import {
     getBranchById,
@@ -10,11 +15,16 @@ import {
     submitAnswer as submitStaticAnswer,
 } from '@/lib/questionEngine';
 import type {
+    ClientConvergenceResult,
     LLMAnswerRecord,
     LLMFollowUpResponse,
     SessionState,
+    StrategyGapResult,
+    StrategyReadyResult,
     SubmitAnswerRequest,
     SubmitAnswerResponse,
+    WorkflowQuestion,
+    WorkflowQuestionMeta,
 } from '@/types/ontology';
 
 const LLM_TIMEOUT_MS = Number(process.env.LLM_TIMEOUT_MS ?? '15000');
@@ -106,10 +116,10 @@ function createStaticDetailFollowUp(sessionState: SessionState): LLMFollowUpResp
             converged: false,
             type: 'text_choice',
             detailFocus: 'color',
-            question: '지금 방향을 유지한다면 색감은 어떤 쪽이 더 맞을까요?',
+            question: '지금 방향에서 색감은 어느 쪽이 더 잘 맞을까요?',
             options: [
                 { label: '채도를 조금 누르고 차분하게 가면 좋겠어요.', direction: 'detail:color-restrained' },
-                { label: '대비를 조금 더 살려서 인상이 또렷하면 좋겠어요.', direction: 'detail:color-contrast' },
+                { label: '대비를 조금 더 올려서 인상이 또렷하면 좋겠어요.', direction: 'detail:color-contrast' },
                 { label: '잘 모르겠어요', direction: 'detail:unclear' },
             ],
             primaryBranch: sessionState.primaryBranch,
@@ -126,10 +136,10 @@ function createStaticDetailFollowUp(sessionState: SessionState): LLMFollowUpResp
             converged: false,
             type: 'text_choice',
             detailFocus: 'typography',
-            question: '문구가 보이는 방식은 어떤 쪽이 더 어울릴까요?',
+            question: '문구가 보이는 방식은 어느 쪽이 더 어울릴까요?',
             options: [
-                { label: '차분하고 정돈된 글자 느낌이 좋아요.', direction: 'detail:type-refined' },
-                { label: '조금 더 존재감 있고 인상이 남는 글자 느낌이 좋아요.', direction: 'detail:type-expressive' },
+                { label: '차분하고 정돈된 글자 톤이 좋겠어요.', direction: 'detail:type-refined' },
+                { label: '조금 더 존재감 있고 인상이 남는 글자 톤이 좋겠어요.', direction: 'detail:type-expressive' },
                 { label: '잘 모르겠어요', direction: 'detail:unclear' },
             ],
             primaryBranch: sessionState.primaryBranch,
@@ -146,7 +156,7 @@ function createStaticDetailFollowUp(sessionState: SessionState): LLMFollowUpResp
             converged: false,
             type: 'text_choice',
             detailFocus: 'layout',
-            question: '화면 구성은 어떤 쪽이 더 맞을까요?',
+            question: '화면 구성은 어느 쪽이 더 맞을까요?',
             options: [
                 { label: '여백이 조금 더 있고 숨 쉬는 느낌이면 좋겠어요.', direction: 'detail:layout-airy' },
                 { label: '정보가 조금 더 촘촘하게 모여 있으면 좋겠어요.', direction: 'detail:layout-structured' },
@@ -166,10 +176,10 @@ function createStaticDetailFollowUp(sessionState: SessionState): LLMFollowUpResp
             converged: false,
             type: 'text_choice',
             detailFocus: 'imagery',
-            question: '사진이나 그래픽 분위기는 어떤 쪽이 더 가깝나요?',
+            question: '사진이나 그래픽 분위기는 어느 쪽이 더 가까울까요?',
             options: [
-                { label: '조용하고 절제된 분위기가 좋아요.', direction: 'detail:image-calm' },
-                { label: '조금 더 생생하고 존재감 있는 분위기가 좋아요.', direction: 'detail:image-vivid' },
+                { label: '조용하고 절제된 분위기가 좋겠어요.', direction: 'detail:image-calm' },
+                { label: '조금 더 생생하고 존재감 있는 분위기가 좋겠어요.', direction: 'detail:image-vivid' },
                 { label: '잘 모르겠어요', direction: 'detail:unclear' },
             ],
             primaryBranch: sessionState.primaryBranch,
@@ -185,10 +195,10 @@ function createStaticDetailFollowUp(sessionState: SessionState): LLMFollowUpResp
         converged: false,
         type: 'text_choice',
         detailFocus: 'texture',
-        question: `${primaryBranch.branchLabel} 방향에서 마감감은 어떤 쪽이 더 어울릴까요?`,
+        question: `${primaryBranch.branchLabel} 방향에서 마감감은 어느 쪽이 더 어울릴까요?`,
         options: [
-            { label: '매끈하고 정제된 마감이 좋아요.', direction: 'detail:texture-clean' },
-            { label: '조금 더 촉감이나 질감이 느껴져도 좋아요.', direction: 'detail:texture-tactile' },
+            { label: '매끈하고 정제된 마감이면 좋겠어요.', direction: 'detail:texture-clean' },
+            { label: '조금 더 촉감이나 질감이 느껴져도 좋겠어요.', direction: 'detail:texture-tactile' },
             { label: '잘 모르겠어요', direction: 'detail:unclear' },
         ],
         primaryBranch: sessionState.primaryBranch,
@@ -212,10 +222,10 @@ function buildNextStepReason(
             : null;
 
         if (primaryBranch) {
-            return `${primaryBranch.branchLabel} 방향은 유지하고 ${focusLabel} 디테일을 더 구체화하기 위해 다음 선택지를 제안했습니다.`;
+            return `${primaryBranch.branchLabel} 방향을 유지하고 ${focusLabel} 디테일을 더 구체화하기 위해 다음 선택지를 제안했습니다.`;
         }
 
-        return `${focusLabel} 기준으로 느낌 차이를 더 분명하게 가르기 위해 다음 선택지를 제안했습니다.`;
+        return `${focusLabel} 기준으로 미묘한 차이를 더 분명하게 가르기 위해 다음 선택지를 제안했습니다.`;
     }
 
     if (followUp.eliminationReason?.trim()) {
@@ -254,6 +264,399 @@ function appendDetailTracking(
     };
 }
 
+function buildClientQuestionMeta(isDetail: boolean): WorkflowQuestionMeta {
+    return {
+        lane: 'client_feedback_interpretation',
+        questionKind: isDetail ? 'detail' : 'interpretation',
+    };
+}
+
+function buildClientQuestion(
+    followUp: LLMFollowUpResponse,
+    isDetail: boolean
+): WorkflowQuestion | undefined {
+    if (followUp.converged || !followUp.question || !followUp.options) {
+        return undefined;
+    }
+
+    return {
+        question: followUp.question,
+        options: followUp.options,
+        type: followUp.options.length === 0 ? 'free_text' : followUp.type,
+        meta: buildClientQuestionMeta(isDetail),
+    };
+}
+
+function buildStrategyResult(sessionState: SessionState): StrategyReadyResult | StrategyGapResult {
+    const strategyState = sessionState.strategyState;
+
+    if (!strategyState) {
+        throw new Error('Strategy state is required');
+    }
+
+    if (strategyState.readinessStatus === 'ready') {
+        return {
+            kind: 'strategy_ready',
+            summary: strategyState.summary ?? '',
+            strategyState,
+        };
+    }
+
+    return {
+        kind: 'strategy_gap',
+        summary: strategyState.summary ?? '',
+        strategyState,
+    };
+}
+
+function buildStrategyNextReason(
+    sessionState: SessionState,
+    nextQuestion?: WorkflowQuestion
+): string {
+    if (!nextQuestion) {
+        return sessionState.strategyState?.readinessStatus === 'ready'
+            ? '핵심 전략 기준이 충분히 고정되어 브리프 생성 단계로 이동했습니다.'
+            : '누락된 판단 기준 또는 충돌 때문에 바로 디자인 브리프로 넘기지 않고 정리 결과를 먼저 확인합니다.';
+    }
+
+    const targetField = nextQuestion.meta?.targetField;
+    if (targetField === 'artifactType') {
+        return '전략 산출물 종류를 먼저 고정해야 이후 질문과 결과 포맷을 정확히 맞출 수 있습니다.';
+    }
+
+    if (nextQuestion.meta?.questionKind === 'strategy_contradiction') {
+        return '상충하는 요구의 우선순위를 정해야 디자인 판단 기준을 고정할 수 있습니다.';
+    }
+
+    if (nextQuestion.meta?.questionKind === 'strategy_quality') {
+        return '핵심 기준은 있지만 아직 추상적이어서, 디자이너가 바로 쓸 수 있는 문장으로 더 구체화합니다.';
+    }
+
+    return 'handoff 위험도가 높은 항목부터 보강해 디자인 판단 기준을 더 분명하게 고정합니다.';
+}
+
+function updateLatestAnswerHistory(
+    sessionState: SessionState,
+    nextQuestion?: WorkflowQuestion
+): SessionState {
+    const answerHistory = [...sessionState.answerHistory];
+    const latestIndex = answerHistory.length - 1;
+
+    if (latestIndex < 0) {
+        return sessionState;
+    }
+
+    answerHistory[latestIndex] = {
+        ...answerHistory[latestIndex],
+        nextAction: nextQuestion ? 'question' : 'conclusion',
+        nextQuestion: nextQuestion?.question,
+        nextOptions: nextQuestion?.options,
+        nextQuestionMeta: nextQuestion?.meta,
+        nextReason: sessionState.jobType === 'strategy_to_design_translation'
+            ? buildStrategyNextReason(sessionState, nextQuestion)
+            : undefined,
+    };
+
+    return {
+        ...sessionState,
+        answerHistory,
+    };
+}
+
+async function handleStrategyAnswer(
+    sessionId: string,
+    body: SubmitAnswerRequest & { sessionState: SessionState }
+): Promise<SubmitAnswerResponse & { usedFallback: boolean }> {
+    const strategyState = body.sessionState.strategyState;
+
+    if (!strategyState) {
+        throw new Error('Strategy state is missing');
+    }
+
+    const newRecord: LLMAnswerRecord = {
+        question: body.currentQuestion ?? '',
+        options: body.currentOptions ?? [],
+        questionMeta: body.currentQuestionMeta,
+        selectedLabel: body.selectedLabel,
+        selectedDirection: body.selectedDirection,
+    };
+
+    const mergedStrategyState = mergeStrategyAnswerIntoState(
+        strategyState,
+        body.currentQuestionMeta,
+        body.selectedLabel,
+        body.selectedDirection,
+        body.sessionState.userContext
+    );
+
+    const updatedState: SessionState = {
+        ...body.sessionState,
+        strategyArtifactType: mergedStrategyState.artifactType,
+        strategyState: mergedStrategyState,
+        answerHistory: [...body.sessionState.answerHistory, newRecord],
+        questionCount: body.sessionState.questionCount + 1,
+        pendingRefinement: false,
+        converged: false,
+    };
+
+    const nextQuestion = updatedState.questionCount >= MAX_QUESTIONS
+        ? null
+        : generateStrategyGapQuestion(mergedStrategyState);
+
+    const shouldConverge = mergedStrategyState.readinessStatus === 'ready' || !nextQuestion;
+    const finalState = updateLatestAnswerHistory({
+        ...updatedState,
+        converged: shouldConverge,
+    }, nextQuestion ?? undefined);
+
+    console.info('[Strategy] session/answer processed', {
+        sessionId,
+        readinessStatus: mergedStrategyState.readinessStatus,
+        questionCount: finalState.questionCount,
+    });
+
+    return {
+        sessionState: finalState,
+        nextQuestion: shouldConverge ? undefined : nextQuestion ?? undefined,
+        converged: shouldConverge,
+        result: shouldConverge ? buildStrategyResult(finalState) : undefined,
+        debugState: shouldConverge
+            ? { resultSource: 'hybrid' }
+            : { questionSource: 'deterministic' },
+        usedFallback: false,
+    };
+}
+
+async function handleClientAnswer(
+    sessionId: string,
+    body: SubmitAnswerRequest & { sessionState: SessionState }
+): Promise<SubmitAnswerResponse & { usedFallback: boolean }> {
+    if (hasInvalidSelectionDirection(body.sessionState, body.selectedDirection)) {
+        return {
+            sessionState: body.sessionState,
+            converged: false,
+            debugState: {},
+            usedFallback: false,
+        };
+    }
+
+    const newRecord: LLMAnswerRecord = {
+        question: body.currentQuestion ?? '',
+        options: body.currentOptions ?? [],
+        questionMeta: body.currentQuestionMeta,
+        selectedLabel: body.selectedLabel,
+        selectedDirection: body.selectedDirection,
+    };
+
+    const updatedState: SessionState = {
+        ...body.sessionState,
+        answerHistory: [...body.sessionState.answerHistory, newRecord],
+        questionCount: body.sessionState.questionCount + 1,
+        detailQuestionCount: body.sessionState.detailQuestionCount ?? 0,
+        detailFocusHistory: body.sessionState.detailFocusHistory ?? [],
+        pendingRefinement: false,
+    };
+
+    let followUp: LLMFollowUpResponse;
+    let usedFallback = false;
+
+    try {
+        if (
+            updatedState.primaryBranch &&
+            (updatedState.detailQuestionCount ?? 0) >= DETAIL_QUESTION_TARGET
+        ) {
+            followUp = {
+                eliminatedNow: [],
+                eliminationReason: 'detail refinement complete',
+                candidates: updatedState.candidates,
+                converged: true,
+                primaryBranch: updatedState.primaryBranch,
+                secondaryBranch: updatedState.secondaryBranch ?? null,
+                reasoning: updatedState.reasoning || '',
+                intentInterpretation: updatedState.intentInterpretation,
+                uncertainAspects: updatedState.uncertainAspects,
+            };
+        } else if (updatedState.primaryBranch) {
+            followUp = await withTimeout(generateClientDetailQuestion(updatedState));
+        } else {
+            followUp = await withTimeout(generateClientFollowUp(updatedState));
+        }
+
+        if (updatedState.primaryBranch && !followUp.converged) {
+            if (hasInvalidFollowUpDirections(followUp, followUp.candidates, true)) {
+                throw new Error('Detail follow-up contained invalid option directions');
+            }
+        } else if (!updatedState.primaryBranch && !followUp.converged) {
+            if (hasInvalidFollowUpDirections(followUp, followUp.candidates, false)) {
+                throw new Error('Follow-up contained invalid option directions');
+            }
+        }
+
+        console.info('[LLM] session/answer succeeded', {
+            sessionId,
+            timeoutMs: LLM_TIMEOUT_MS,
+            questionCount: updatedState.questionCount,
+        });
+    } catch (error) {
+        usedFallback = true;
+        console.warn('[LLM] session/answer fallback', {
+            sessionId,
+            timeoutMs: LLM_TIMEOUT_MS,
+            questionCount: updatedState.questionCount,
+            reason: error instanceof Error ? error.message : String(error),
+        });
+
+        if (
+            updatedState.primaryBranch &&
+            (updatedState.detailQuestionCount ?? 0) < DETAIL_QUESTION_TARGET
+        ) {
+            followUp = createStaticDetailFollowUp(updatedState);
+        } else {
+            const reconstructed = reconstructQuestionState(updatedState);
+            const currentQuestion = getNextQuestion({
+                ...reconstructed,
+                questionCount: Math.max(reconstructed.questionCount - 1, 0),
+            });
+
+            let postAnswerState = reconstructed;
+
+            if (currentQuestion) {
+                const selectedIndex = currentQuestion.options.findIndex(
+                    (option) => option.label === body.selectedLabel
+                );
+
+                if (selectedIndex >= 0) {
+                    postAnswerState = submitStaticAnswer(reconstructed, currentQuestion, selectedIndex);
+                }
+            }
+
+            const nextQuestion = getNextQuestion(postAnswerState);
+
+            if (!nextQuestion || isConverged(postAnswerState)) {
+                const result = getResult(postAnswerState);
+                followUp = {
+                    eliminatedNow: postAnswerState.eliminated.filter(
+                        (id) => !updatedState.eliminated.includes(id)
+                    ),
+                    eliminationReason: '정적 질문 엔진 기준으로 후보가 충분히 좁혀졌습니다.',
+                    candidates: postAnswerState.remainingCandidates,
+                    converged: true,
+                    primaryBranch: result.primaryBranch || postAnswerState.remainingCandidates[0],
+                    secondaryBranch: result.secondaryBranch,
+                    reasoning: '정적 질문 엔진의 누적 선택을 바탕으로 가장 가까운 방향을 정리했습니다.',
+                    intentInterpretation: updatedState.intentInterpretation,
+                    uncertainAspects: updatedState.uncertainAspects,
+                };
+            } else {
+                followUp = {
+                    eliminatedNow: postAnswerState.eliminated.filter(
+                        (id) => !updatedState.eliminated.includes(id)
+                    ),
+                    eliminationReason: '',
+                    candidates: postAnswerState.remainingCandidates,
+                    converged: false,
+                    intentInterpretation: updatedState.intentInterpretation,
+                    uncertainAspects: updatedState.uncertainAspects,
+                    ...createQuestionPayload(nextQuestion),
+                };
+            }
+        }
+    }
+
+    let finalState: SessionState = {
+        ...updatedState,
+        intentInterpretation: followUp.intentInterpretation ?? updatedState.intentInterpretation,
+        uncertainAspects: followUp.uncertainAspects ?? updatedState.uncertainAspects,
+        candidates: followUp.candidates,
+        eliminated: [
+            ...updatedState.eliminated,
+            ...followUp.eliminatedNow.filter((id) => !updatedState.eliminated.includes(id)),
+        ],
+        converged: followUp.converged,
+        primaryBranch: followUp.primaryBranch ?? updatedState.primaryBranch,
+        secondaryBranch: followUp.secondaryBranch ?? updatedState.secondaryBranch,
+        reasoning: followUp.reasoning ?? updatedState.reasoning,
+    };
+
+    if (shouldAskDetailQuestion(finalState, followUp)) {
+        finalState = {
+            ...finalState,
+            converged: false,
+            primaryBranch: followUp.primaryBranch,
+            secondaryBranch: followUp.secondaryBranch,
+            reasoning: followUp.reasoning,
+        };
+
+        try {
+            followUp = await withTimeout(generateClientDetailQuestion(finalState));
+
+            if (hasInvalidFollowUpDirections(followUp, followUp.candidates, true)) {
+                throw new Error('Generated detail follow-up contained invalid option directions');
+            }
+        } catch {
+            usedFallback = true;
+            followUp = createStaticDetailFollowUp(finalState);
+        }
+
+        finalState = appendDetailTracking(
+            {
+                ...finalState,
+                converged: false,
+            },
+            followUp,
+            finalState.detailQuestionCount ?? 0
+        );
+    } else {
+        finalState = appendDetailTracking(
+            finalState,
+            followUp,
+            updatedState.detailQuestionCount ?? 0
+        );
+    }
+
+    const nextQuestion = buildClientQuestion(
+        followUp,
+        Boolean(finalState.primaryBranch || followUp.detailFocus)
+    );
+
+    const enrichedAnswerHistory = [...finalState.answerHistory];
+    const latestAnswerIndex = enrichedAnswerHistory.length - 1;
+
+    if (latestAnswerIndex >= 0) {
+        enrichedAnswerHistory[latestAnswerIndex] = {
+            ...enrichedAnswerHistory[latestAnswerIndex],
+            nextAction: followUp.converged ? 'conclusion' : 'question',
+            nextQuestion: nextQuestion?.question,
+            nextOptions: nextQuestion?.options,
+            nextQuestionMeta: nextQuestion?.meta,
+            nextReason: buildNextStepReason(finalState, followUp),
+        };
+
+        finalState = {
+            ...finalState,
+            answerHistory: enrichedAnswerHistory,
+        };
+    }
+
+    return {
+        sessionState: finalState,
+        nextQuestion,
+        converged: followUp.converged,
+        result: followUp.converged
+            ? {
+                kind: 'client_interpretation',
+                primaryBranch: followUp.primaryBranch || finalState.candidates[0] || '',
+                secondaryBranch: followUp.secondaryBranch ?? null,
+                reasoning: followUp.reasoning || '',
+            } satisfies ClientConvergenceResult
+            : undefined,
+        debugState: followUp.converged
+            ? { resultSource: usedFallback ? 'fallback' : 'language_model' }
+            : { questionSource: usedFallback ? 'fallback' : 'language_model' },
+        usedFallback,
+    };
+}
+
 export async function POST(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
@@ -269,225 +672,19 @@ export async function POST(
             );
         }
 
-        if (hasInvalidSelectionDirection(body.sessionState, body.selectedDirection)) {
+        if (
+            body.sessionState.jobType === 'client_feedback_interpretation' &&
+            hasInvalidSelectionDirection(body.sessionState, body.selectedDirection)
+        ) {
             return NextResponse.json(
-                { error: '현재 질문의 유효한 선택지가 아닙니다.' },
+                { error: '현재 질문에 유효한 선택지가 아닙니다.' },
                 { status: 400 }
             );
         }
 
-        const newRecord: LLMAnswerRecord = {
-            question: body.currentQuestion ?? '',
-            options: body.currentOptions ?? [],
-            selectedLabel: body.selectedLabel,
-            selectedDirection: body.selectedDirection,
-        };
-
-        const updatedState: SessionState = {
-            ...body.sessionState,
-            answerHistory: [...body.sessionState.answerHistory, newRecord],
-            questionCount: body.sessionState.questionCount + 1,
-            detailQuestionCount: body.sessionState.detailQuestionCount ?? 0,
-            detailFocusHistory: body.sessionState.detailFocusHistory ?? [],
-            pendingRefinement: false,
-        };
-
-        let followUp: LLMFollowUpResponse;
-        let usedFallback = false;
-
-        try {
-            if (
-                updatedState.primaryBranch &&
-                (updatedState.detailQuestionCount ?? 0) >= DETAIL_QUESTION_TARGET
-            ) {
-                followUp = {
-                    eliminatedNow: [],
-                    eliminationReason: 'detail refinement complete',
-                    candidates: updatedState.candidates,
-                    converged: true,
-                    primaryBranch: updatedState.primaryBranch,
-                    secondaryBranch: updatedState.secondaryBranch ?? null,
-                    reasoning: updatedState.reasoning || '',
-                    intentInterpretation: updatedState.intentInterpretation,
-                    uncertainAspects: updatedState.uncertainAspects,
-                };
-            } else if (updatedState.primaryBranch) {
-                followUp = await withTimeout(generateDetailQuestion(updatedState));
-            } else {
-                followUp = await withTimeout(generateFollowUp(updatedState));
-            }
-
-            if (updatedState.primaryBranch && !followUp.converged) {
-                if (hasInvalidFollowUpDirections(followUp, followUp.candidates, true)) {
-                    throw new Error('Detail follow-up contained invalid option directions');
-                }
-            } else if (!updatedState.primaryBranch && !followUp.converged) {
-                if (hasInvalidFollowUpDirections(followUp, followUp.candidates, false)) {
-                    throw new Error('Follow-up contained invalid option directions');
-                }
-            }
-
-            console.info('[LLM] session/answer succeeded', {
-                sessionId,
-                timeoutMs: LLM_TIMEOUT_MS,
-                questionCount: updatedState.questionCount,
-            });
-        } catch (error) {
-            usedFallback = true;
-            console.warn('[LLM] session/answer fallback', {
-                sessionId,
-                timeoutMs: LLM_TIMEOUT_MS,
-                questionCount: updatedState.questionCount,
-                reason: error instanceof Error ? error.message : String(error),
-            });
-
-            if (
-                updatedState.primaryBranch &&
-                (updatedState.detailQuestionCount ?? 0) < DETAIL_QUESTION_TARGET
-            ) {
-                followUp = createStaticDetailFollowUp(updatedState);
-            } else {
-                const reconstructed = reconstructQuestionState(updatedState);
-                const currentQuestion = getNextQuestion({
-                    ...reconstructed,
-                    questionCount: Math.max(reconstructed.questionCount - 1, 0),
-                });
-
-                let postAnswerState = reconstructed;
-
-                if (currentQuestion) {
-                    const selectedIndex = currentQuestion.options.findIndex(
-                        (option) => option.label === body.selectedLabel
-                    );
-
-                    if (selectedIndex >= 0) {
-                        postAnswerState = submitStaticAnswer(reconstructed, currentQuestion, selectedIndex);
-                    }
-                }
-
-                const nextQuestion = getNextQuestion(postAnswerState);
-
-                if (!nextQuestion || isConverged(postAnswerState)) {
-                    const result = getResult(postAnswerState);
-                    followUp = {
-                        eliminatedNow: postAnswerState.eliminated.filter(
-                            (id) => !updatedState.eliminated.includes(id)
-                        ),
-                        eliminationReason: '정적 질문 엔진 기준으로 충분히 후보가 좁혀졌습니다.',
-                        candidates: postAnswerState.remainingCandidates,
-                        converged: true,
-                        primaryBranch: result.primaryBranch || postAnswerState.remainingCandidates[0],
-                        secondaryBranch: result.secondaryBranch,
-                        reasoning: '정적 질문 엔진의 누적 선택을 바탕으로 가장 가까운 방향을 정리했습니다.',
-                        intentInterpretation: updatedState.intentInterpretation,
-                        uncertainAspects: updatedState.uncertainAspects,
-                    };
-                } else {
-                    followUp = {
-                        eliminatedNow: postAnswerState.eliminated.filter(
-                            (id) => !updatedState.eliminated.includes(id)
-                        ),
-                        eliminationReason: '',
-                        candidates: postAnswerState.remainingCandidates,
-                        converged: false,
-                        intentInterpretation: updatedState.intentInterpretation,
-                        uncertainAspects: updatedState.uncertainAspects,
-                        ...createQuestionPayload(nextQuestion),
-                    };
-                }
-            }
-        }
-
-        let finalState: SessionState = {
-            ...updatedState,
-            intentInterpretation: followUp.intentInterpretation ?? updatedState.intentInterpretation,
-            uncertainAspects: followUp.uncertainAspects ?? updatedState.uncertainAspects,
-            candidates: followUp.candidates,
-            eliminated: [
-                ...updatedState.eliminated,
-                ...followUp.eliminatedNow.filter((id) => !updatedState.eliminated.includes(id)),
-            ],
-            converged: followUp.converged,
-            primaryBranch: followUp.primaryBranch ?? updatedState.primaryBranch,
-            secondaryBranch: followUp.secondaryBranch ?? updatedState.secondaryBranch,
-            reasoning: followUp.reasoning ?? updatedState.reasoning,
-        };
-
-        if (shouldAskDetailQuestion(finalState, followUp)) {
-            finalState = {
-                ...finalState,
-                converged: false,
-                primaryBranch: followUp.primaryBranch,
-                secondaryBranch: followUp.secondaryBranch,
-                reasoning: followUp.reasoning,
-            };
-
-            try {
-                followUp = await withTimeout(generateDetailQuestion(finalState));
-
-                if (hasInvalidFollowUpDirections(followUp, followUp.candidates, true)) {
-                    throw new Error('Generated detail follow-up contained invalid option directions');
-                }
-            } catch {
-                usedFallback = true;
-                followUp = createStaticDetailFollowUp(finalState);
-            }
-
-            finalState = appendDetailTracking(
-                {
-                    ...finalState,
-                    converged: false,
-                },
-                followUp,
-                finalState.detailQuestionCount ?? 0
-            );
-        } else {
-            finalState = appendDetailTracking(
-                finalState,
-                followUp,
-                updatedState.detailQuestionCount ?? 0
-            );
-        }
-
-        const enrichedAnswerHistory = [...finalState.answerHistory];
-        const latestAnswerIndex = enrichedAnswerHistory.length - 1;
-
-        if (latestAnswerIndex >= 0) {
-            enrichedAnswerHistory[latestAnswerIndex] = {
-                ...enrichedAnswerHistory[latestAnswerIndex],
-                nextAction: followUp.converged ? 'conclusion' : 'question',
-                nextQuestion: followUp.converged ? undefined : followUp.question,
-                nextOptions: followUp.converged ? undefined : followUp.options,
-                nextReason: buildNextStepReason(finalState, followUp),
-            };
-
-            finalState = {
-                ...finalState,
-                answerHistory: enrichedAnswerHistory,
-            };
-        }
-
-        const response: SubmitAnswerResponse & { usedFallback: boolean } = {
-            sessionState: finalState,
-            converged: followUp.converged,
-            usedFallback,
-        };
-
-        if (!followUp.converged && followUp.question && followUp.options) {
-            response.nextQuestion = {
-                question: followUp.question,
-                options: followUp.options,
-                type: followUp.options.length === 0 ? 'free_text' : followUp.type,
-            };
-        }
-
-        if (followUp.converged) {
-            response.result = {
-                primaryBranch: followUp.primaryBranch || finalState.candidates[0] || '',
-                secondaryBranch: followUp.secondaryBranch ?? null,
-                reasoning: followUp.reasoning || '',
-            };
-        }
+        const response = body.sessionState.jobType === 'strategy_to_design_translation'
+            ? await handleStrategyAnswer(sessionId, body)
+            : await handleClientAnswer(sessionId, body);
 
         return NextResponse.json(response);
     } catch (error) {
