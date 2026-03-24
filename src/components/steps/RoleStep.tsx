@@ -43,11 +43,8 @@ export default function RoleStep() {
     return (
         <div className="w-full max-w-5xl px-4 py-12 sm:px-6 md:py-16">
             <section className="mx-auto max-w-3xl text-center">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
-                    Design Communication Translation System
-                </p>
                 <h1
-                    className="mt-6 text-[clamp(3rem,8vw,5.5rem)] font-bold tracking-[-0.04em] text-gray-900 leading-none"
+                    className="text-[clamp(3rem,8vw,5.5rem)] font-bold tracking-[-0.04em] text-gray-900 leading-none"
                     style={{ fontFamily: 'Pretendard, Arial, Helvetica, sans-serif' }}
                 >
                     Lens
