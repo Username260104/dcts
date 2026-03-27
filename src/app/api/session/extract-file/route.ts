@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import mammoth from 'mammoth';
-import { PDFParse } from 'pdf-parse';
 import path from 'node:path';
 import type { ExtractFileResponse } from '@/types/ontology';
 
@@ -20,6 +19,7 @@ function normalizeExtractedText(text: string): string {
 }
 
 async function extractTextFromPdf(buffer: Buffer): Promise<string> {
+    const { PDFParse } = await import('pdf-parse');
     const parser = new PDFParse({ data: buffer });
 
     try {

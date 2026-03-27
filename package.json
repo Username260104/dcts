@@ -10,6 +10,7 @@
     "strategy:fixtures": "tsx ai/runStrategyFixtures.ts"
   },
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.80",
     "@anthropic-ai/sdk": "^0.78.0",
     "jspdf": "^4.2.1",
     "mammoth": "^1.12.0",
