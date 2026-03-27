@@ -18,7 +18,35 @@ function normalizeExtractedText(text: string): string {
         .trim();
 }
 
+async function ensurePdfRuntimePolyfills() {
+    const canvasModule = await import('@napi-rs/canvas');
+    const canvas = 'default' in canvasModule ? canvasModule.default : canvasModule;
+    const workerModule = await import('pdfjs-dist/legacy/build/pdf.worker.mjs');
+    const pdfJsGlobal = globalThis as typeof globalThis & {
+        pdfjsWorker?: {
+            WorkerMessageHandler?: unknown;
+        };
+    };
+
+    if (!globalThis.DOMMatrix && canvas.DOMMatrix) {
+        globalThis.DOMMatrix = canvas.DOMMatrix as unknown as typeof globalThis.DOMMatrix;
+    }
+
+    if (!globalThis.ImageData && canvas.ImageData) {
+        globalThis.ImageData = canvas.ImageData as unknown as typeof globalThis.ImageData;
+    }
+
+    if (!globalThis.Path2D && canvas.Path2D) {
+        globalThis.Path2D = canvas.Path2D as unknown as typeof globalThis.Path2D;
+    }
+
+    if (!pdfJsGlobal.pdfjsWorker) {
+        pdfJsGlobal.pdfjsWorker = workerModule;
+    }
+}
+
 async function extractTextFromPdf(buffer: Buffer): Promise<string> {
+    await ensurePdfRuntimePolyfills();
     const { PDFParse } = await import('pdf-parse');
     const parser = new PDFParse({ data: buffer });
 
