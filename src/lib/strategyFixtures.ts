@@ -19,6 +19,18 @@ export interface StrategyFixtureExpectations {
     confirmedInputsInclude?: string[];
     priorityGapsInclude?: string[];
     designerChecklistInclude?: string[];
+    translationDisplayIncludes?: string[];
+    gapDisplayIncludes?: string[];
+    questionFlow?: {
+        expectNoQuestion?: boolean;
+        initialTargetField?: StrategyFieldKey | 'artifactType';
+        initialQuestionKind?: string;
+        initialQuestionIncludes?: string[];
+        initialOptionIncludes?: string[];
+        nextTargetFieldAfterFirstChoice?: StrategyFieldKey | 'artifactType';
+        nextQuestionKindAfterFirstChoice?: string;
+        nextQuestionIncludesAfterFirstChoice?: string[];
+    };
 }
 
 export interface StrategyFixture {
@@ -74,6 +86,9 @@ export const strategyFixtures: StrategyFixture[] = [
             surfaceImplicationsInclude: ['패키지 전면', '상세페이지'],
             confirmedInputsInclude: ['원문 입력', '산출물 유형'],
             designerChecklistInclude: ['세련된 자신감', '브랜드를 알아보는가'],
+            questionFlow: {
+                expectNoQuestion: true,
+            },
         },
     },
     {
@@ -101,6 +116,16 @@ export const strategyFixtures: StrategyFixture[] = [
             missingFields: ['frameOfReference', 'pointsOfDifference', 'mustAvoid', 'reviewCriteria'],
             weakFields: ['businessChallenge', 'valueProposition', 'mustAmplify', 'scopeNow'],
             priorityGapsInclude: ['피해야 할 방향', '디자인 평가 기준'],
+            gapDisplayIncludes: ['먼저 고정할 기준', '피해야 할 방향 누락', '디자인 평가 기준 누락'],
+            questionFlow: {
+                initialTargetField: 'mustAvoid',
+                initialQuestionKind: 'strategy_choice',
+                initialQuestionIncludes: ['어떤 인상으로 읽히면 가장 곤란한가요'],
+                initialOptionIncludes: ['과장된 광고 인상', '차갑고 거리감 있는 인상'],
+                nextTargetFieldAfterFirstChoice: 'mustAmplify',
+                nextQuestionKindAfterFirstChoice: 'strategy_choice',
+                nextQuestionIncludesAfterFirstChoice: ['가장 먼저 더 강하게 보여줘야 하는 인상'],
+            },
         },
     },
     {
@@ -131,6 +156,15 @@ export const strategyFixtures: StrategyFixture[] = [
             readinessStatus: 'blocked',
             contradictionsAtLeast: 1,
             priorityGapsInclude: ['충돌 정리 필요'],
+            questionFlow: {
+                initialTargetField: 'decisionPriority',
+                initialQuestionKind: 'strategy_contradiction',
+                initialQuestionIncludes: ['우선순위 충돌이 보입니다', '무엇을 먼저 지켜야 하나요'],
+                initialOptionIncludes: ['마스터브랜드 신뢰 유지', '라인업 이해 용이성 확보'],
+                nextTargetFieldAfterFirstChoice: 'decisionPriority',
+                nextQuestionKindAfterFirstChoice: 'strategy_fill',
+                nextQuestionIncludesAfterFirstChoice: ['우선순위 충돌을 해소하려면'],
+            },
         },
     },
     {
@@ -169,6 +203,79 @@ export const strategyFixtures: StrategyFixture[] = [
             surfaceImplicationsInclude: ['캠페인 메시지', '첫 화면'],
             creativeImplicationsInclude: ['경쟁 대비'],
             designerChecklistInclude: ['생활 해방감', '제품력 신뢰'],
+            questionFlow: {
+                expectNoQuestion: true,
+            },
+        },
+    },
+    {
+        id: 'positioning_nogo_only_still_needs_mustavoid',
+        label: '운영 no-go만 있어도 mustAvoid 질문은 계속 나와야 하는 케이스',
+        originalFeedback: '금융 앱 첫 화면은 손보되 로고는 바꾸지 말아 주세요.',
+        artifactType: 'positioning',
+        userContext: {
+            industry: 'finance',
+            pricePosition: 'mid',
+            projectStage: 'refresh',
+            targetAge: '20s_30s',
+            brandDescription: '송금과 소비 관리 기능을 제공하는 금융 앱',
+            additionalContext: '앱 첫 화면과 랜딩 페이지를 중심으로 방향을 잡는다',
+        },
+        schema: {
+            businessChallenge: '기존 금융 앱보다 더 믿을 만하고 명확하게 느껴지게 만든다.',
+            audienceContext: '금융 앱을 처음 비교하는 20-30대 사용자가 첫 화면에서 신뢰와 이해 용이성을 함께 느껴야 한다.',
+            frameOfReference: '간편 금융 앱 시장의 첫 진입 경험',
+            pointsOfDifference: ['쉽게 이해되는 첫 화면 구조', '불필요한 과장을 걷어낸 안정감'],
+            valueProposition: '복잡하지 않게 믿고 시작할 수 있는 금융 앱',
+            mustAmplify: ['브랜드 신뢰감', '이해하기 쉬운 명료함'],
+            noGo: ['로고 전면 교체'],
+            scopeNow: '앱 첫 화면과 랜딩 첫 화면',
+            reviewCriteria: ['첫 인상에서 금융 서비스다운 안정감이 읽히는가', '첫 화면 구조가 과하게 복잡해 보이지 않는가'],
+        },
+        expectations: {
+            readinessStatus: 'needs_clarification',
+            missingFields: ['mustAvoid'],
+            questionFlow: {
+                initialTargetField: 'mustAvoid',
+                initialQuestionKind: 'strategy_choice',
+                initialQuestionIncludes: ['어떤 인상으로 읽히면 가장 곤란한가요'],
+                initialOptionIncludes: ['과장된 광고 인상', '차갑고 거리감 있는 인상'],
+            },
+            gapDisplayIncludes: ['먼저 고정할 기준', '피해야 할 방향 누락'],
+        },
+    },
+    {
+        id: 'brand_platform_strategic_nogo_ready',
+        label: '비운영성 no-go가 전략 선으로 보여야 하는 ready 케이스',
+        originalFeedback: '브랜드 플랫폼을 다듬되 완전히 다른 카테고리로 넘어간 것처럼 보이면 안 됩니다.',
+        artifactType: 'brand_platform',
+        userContext: {
+            industry: 'wellness',
+            pricePosition: 'premium',
+            projectStage: 'refresh',
+            targetAge: '30s_40s',
+            brandDescription: '라이프스타일 웰니스 브랜드',
+            additionalContext: '브랜드 소개 화면과 핵심 메시지 구조에 우선 적용',
+        },
+        schema: {
+            businessChallenge: '브랜드 약속이 공허한 선언이 아니라 실제로 믿을 만한 기준처럼 읽히게 만든다.',
+            audienceContext: '브랜드를 처음 접하는 30-40대 고객이 소개 화면에서 태도와 신뢰 근거를 함께 이해해야 한다.',
+            valueProposition: '웰니스 루틴을 더 현실적으로 지속하게 만드는 브랜드',
+            brandPromise: '좋아 보이는 말보다 지속 가능한 생활 기준을 제안한다.',
+            principles: ['좋은 말보다 실행 기준을 먼저 보여준다.', '한 줄 메시지와 화면 판단이 직접 연결되어야 한다.'],
+            reasonsToBelieve: ['실제 사용자 루틴 데이터', '전문가 자문 기반 콘텐츠 구조', '지속 사용자를 위한 운영 프로그램'],
+            mustAmplify: ['브랜드 약속의 선명함', '실행 가능한 현실감'],
+            mustAvoid: ['실행과 동떨어진 선언적 톤'],
+            noGo: ['브랜드 포지셔닝 자체를 새 카테고리로 이동시키는 전환'],
+            scopeNow: '브랜드 소개 첫 화면과 핵심 메시지 구조',
+            reviewCriteria: ['브랜드 약속이 한 줄로 바로 읽히는가', '근거가 선언처럼 붕 뜨지 않는가', '기존 브랜드 축이 사라졌다는 느낌이 들지 않는가'],
+        },
+        expectations: {
+            readinessStatus: 'ready',
+            translationDisplayIncludes: ['넘으면 안 되는 전략 선', '브랜드 포지셔닝 자체를 새 카테고리로 이동시키는 전환'],
+            questionFlow: {
+                expectNoQuestion: true,
+            },
         },
     },
 ];

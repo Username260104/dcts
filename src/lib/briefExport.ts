@@ -1,4 +1,11 @@
 import type jsPDF from 'jspdf';
+import {
+    buildStrategyGapDisplayModel,
+    buildStrategyTranslationDisplayModel,
+    type StrategyDisplayEntry,
+    type StrategyDisplaySection,
+    type StrategyDisplayTone,
+} from '@/lib/strategyBriefPresenter';
 import type { BriefOutput, LLMBriefResponse } from '@/types/ontology';
 
 // --- Font cache ---
@@ -167,7 +174,7 @@ function addBlockquote(state: LayoutState, text: string): void {
     state.y += PARAGRAPH_GAP;
 }
 
-function addLabel(state: LayoutState, label: string): void {
+function addLabel(state: LayoutState, label: string, color?: [number, number, number]): void {
     const { pdf } = state;
     const lh = getLineHeight(FONT_SIZE_LABEL);
 
@@ -175,14 +182,19 @@ function addLabel(state: LayoutState, label: string): void {
 
     pdf.setFont('NotoSansKR', 'bold');
     pdf.setFontSize(FONT_SIZE_LABEL);
-    pdf.setTextColor(107, 114, 128); // gray-500
+    pdf.setTextColor(...(color ?? [107, 114, 128])); // gray-500
     pdf.text(label, MARGIN_LEFT, state.y);
     state.y += lh + 1;
 }
 
-function addLabeledBlock(state: LayoutState, label: string, value?: string): void {
+function addLabeledBlock(
+    state: LayoutState,
+    label: string,
+    value?: string,
+    color?: [number, number, number]
+): void {
     if (!value) return;
-    addLabel(state, label);
+    addLabel(state, label, color);
     addParagraph(state, value);
 }
 
@@ -259,10 +271,17 @@ function addBulletList(state: LayoutState, items: string[], options?: {
     state.y += PARAGRAPH_GAP;
 }
 
-function addLabeledList(state: LayoutState, label: string, values?: string[]): void {
+function addLabeledList(
+    state: LayoutState,
+    label: string,
+    values?: string[],
+    color?: [number, number, number]
+): void {
     if (!values || values.length === 0) return;
-    addLabel(state, label);
-    addBulletList(state, values);
+    addLabel(state, label, color);
+    addBulletList(state, values, {
+        color: color ?? [31, 41, 55],
+    });
 }
 
 function addTokenGrid(state: LayoutState, tokens: Array<{ label: string; value: string }>): void {
@@ -411,6 +430,68 @@ function addDecisionTrail(state: LayoutState, trail: NonNullable<BriefOutput['de
             });
         }
     }
+}
+
+function formatSectionTitle(index: number, title: string): string {
+    return `${String.fromCharCode(65 + index)}. ${title}`;
+}
+
+function getToneColors(tone: StrategyDisplayTone = 'default'): {
+    label: [number, number, number];
+    body: [number, number, number];
+} {
+    switch (tone) {
+        case 'success':
+            return {
+                label: [4, 120, 87],
+                body: [6, 95, 70],
+            };
+        case 'warning':
+            return {
+                label: [180, 83, 9],
+                body: [146, 64, 14],
+            };
+        case 'danger':
+            return {
+                label: [185, 28, 28],
+                body: [127, 29, 29],
+            };
+        case 'muted':
+            return {
+                label: [100, 116, 139],
+                body: [71, 85, 105],
+            };
+        default:
+            return {
+                label: [107, 114, 128],
+                body: [31, 41, 55],
+            };
+    }
+}
+
+function addStrategyDisplayEntry(state: LayoutState, entry: StrategyDisplayEntry): void {
+    const colors = getToneColors(entry.tone);
+
+    if (entry.kind === 'text') {
+        addLabeledBlock(state, entry.label, entry.value, colors.label);
+        return;
+    }
+
+    addLabeledList(state, entry.label, entry.values, colors.label);
+}
+
+function addStrategyDisplaySection(state: LayoutState, title: string, section: StrategyDisplaySection): void {
+    addSectionTitle(state, title);
+
+    if (section.description) {
+        addParagraph(state, section.description);
+    }
+
+    for (const entry of section.entries) {
+        addStrategyDisplayEntry(state, entry);
+    }
+
+    state.y += SECTION_GAP;
 }
 
 // --- Brief type renderers ---
@@ -564,129 +645,47 @@ function renderInterpretationBrief(state: LayoutState, brief: BriefOutput, llmSu
 }
 
 function renderStrategyTranslationBrief(state: LayoutState, brief: BriefOutput): void {
-    const t = brief.strategyTranslation;
-    if (!t) return;
+    const model = buildStrategyTranslationDisplayModel(brief);
+    if (!model) return;
 
     // A. Strategy Input
     addSectionTitle(state, 'A. \uC804\uB7B5 \uC785\uB825 \uC6D0\uBB38');
     addBlockquote(state, brief.originalFeedback);
     state.y += SECTION_GAP;
 
-    // B. Shared Handoff
-    addSectionTitle(state, 'B. Shared Handoff');
-    addLabeledBlock(state, '\uC774\uBC88 \uCC28\uC218 \uD55C \uC904 \uACFC\uC81C', t.strategicPremise);
-    addLabeledBlock(state, '\uD575\uC2EC \uAE34\uC7A5', t.coreTension);
-    addLabeledBlock(state, 'Audience + Context', t.audienceAndContext);
-    addLabeledBlock(state, '\uC774\uBC88 \uCC28\uC218 \uBC94\uC704', t.scopeNow);
-    addLabeledList(state, '\uC785\uB825\uC5D0\uC11C \uC9C1\uC811 \uD655\uC778\uB41C \uB0B4\uC6A9', t.confirmedInputs);
-    addLabeledList(state, '\uD604\uC7AC \uC791\uC5C5 \uAC00\uC815', t.workingAssumptions);
-    addLabeledList(state, '\uC9C0\uCF1C\uC57C \uD560 \uC790\uC0B0', t.equitiesToProtect);
-    addLabeledList(state, '\uB354 \uAC15\uD558\uAC8C \uBCF4\uC5EC\uC57C \uD560 \uC778\uC0C1', t.mustAmplify);
-    addLabeledList(state, '\uD53C\uD574\uC57C \uD560 \uBC29\uD5A5', t.mustAvoid);
-    addLabeledList(state, '\uD544\uC218 \uBC18\uC601 \uC694\uC18C', t.mandatories);
-    state.y += SECTION_GAP;
-
-    // C. Decision Rules
-    addSectionTitle(state, 'C. Decision Rules');
-    addLabeledList(state, '\uC6B0\uC120\uC21C\uC704 \uAE30\uC900', t.decisionPriority);
-    addLabeledList(state, '\uD2B8\uB808\uC774\uB4DC\uC624\uD504', t.tradeOffs);
-    addLabeledList(state, '\uC758\uC0AC\uACB0\uC815 \uD504\uB808\uC784', t.decisionFrame);
-    addLabeledList(state, '\uC2E4\uD589 \uD568\uC758', t.creativeImplications);
-    addLabeledList(state, '\uB514\uC790\uC778 \uD3C9\uAC00 \uAE30\uC900', t.reviewCriteria);
-    addLabeledList(state, '\uB514\uC790\uC774\uB108 \uCCB4\uD06C\uB9AC\uC2A4\uD2B8', t.designerChecklist);
-    addLabeledList(state, '\uB514\uC790\uC774\uB108\uC640 \uD655\uC778\uD560 \uC9C8\uBB38', t.openQuestionsForDesign);
-    state.y += SECTION_GAP;
-
-    // D. Strategy Rationale
-    addSectionTitle(state, 'D. Strategy Rationale');
-    addLabeledBlock(state, 'Frame of Reference', t.frameOfReference);
-    addLabeledList(state, 'Points of Parity', t.pointsOfParity);
-    addLabeledList(state, 'Points of Difference', t.pointsOfDifference);
-    addLabeledBlock(state, 'Value Proposition', t.valueProposition);
-    addLabeledList(state, 'Reasons to Believe', t.reasonsToBelieve);
-    addLabeledList(state, 'Design Principles', t.principlesForDesign);
-    state.y += SECTION_GAP;
-
-    // E. Direction Mapping
-    addSectionTitle(state, 'E. Direction Mapping');
-    addLabeledBlock(state, '\uC804\uCCB4 \uBC94\uC704', t.scope);
-    addLabeledList(state, 'No-Go', t.noGo);
-    addLabeledList(state, '\uD45C\uBA74\uBCC4 \uC801\uC6A9 \uBA54\uBAA8', t.surfaceImplications);
-    addLabeledList(state, 'Recommended Visual Directions', t.recommendedDirections);
-    addLabeledList(state, 'Avoided Directions', t.avoidedDirections);
-    if (t.mappingRationale) {
-        addLabeledBlock(state, 'Mapping Rationale', t.mappingRationale);
+    for (let i = 0; i < model.sections.length; i += 1) {
+        addStrategyDisplaySection(
+            state,
+            formatSectionTitle(i + 1, model.sections[i].title),
+            model.sections[i]
+        );
     }
-    state.y += SECTION_GAP;
 
-    // F. Open Risks
-    addSectionTitle(state, 'F. Open Risks');
-    addLabeledList(state, 'Open Risks', t.openRisks);
-    state.y += SECTION_GAP;
-
-    // G. Decision Trail
     if (brief.decisionTrail?.length) {
-        addSectionTitle(state, 'G. Decision Trail');
+        addSectionTitle(state, formatSectionTitle(model.sections.length + 1, '\uC120\uD0DD \uD750\uB984'));
         addDecisionTrail(state, brief.decisionTrail);
     }
 }
 
 function renderStrategyGapBrief(state: LayoutState, brief: BriefOutput): void {
-    const g = brief.gapMemo;
-    if (!g) return;
+    const model = buildStrategyGapDisplayModel(brief);
+    if (!model) return;
 
     // A. Strategy Input
     addSectionTitle(state, 'A. \uC804\uB7B5 \uC785\uB825 \uC6D0\uBB38');
     addBlockquote(state, brief.originalFeedback);
     state.y += SECTION_GAP;
 
-    // B. Current Understanding
-    if (brief.strategySummary) {
-        addSectionTitle(state, 'B. \uD604\uC7AC\uAE4C\uC9C0\uC758 \uC804\uB7B5 \uC774\uD574');
-        addParagraph(state, brief.strategySummary);
-        addLabeledList(state, 'Current Understanding', g.currentUnderstanding);
-        state.y += SECTION_GAP;
+    for (let i = 0; i < model.sections.length; i += 1) {
+        addStrategyDisplaySection(
+            state,
+            formatSectionTitle(i + 1, model.sections[i].title),
+            model.sections[i]
+        );
     }
 
-    // C. Missing Criteria
-    addSectionTitle(state, 'C. \uC544\uC9C1 \uBE44\uC5B4 \uC788\uB294 \uAE30\uC900');
-    addLabeledList(state, 'Missing Criteria', g.missingCriteria);
-    state.y += SECTION_GAP;
-
-    // D. Weak Criteria
-    if (g.weakCriteria?.length) {
-        addSectionTitle(state, 'D. \uB354 \uAD6C\uCCB4\uD654\uAC00 \uD544\uC694\uD55C \uAE30\uC900');
-        addLabeledList(state, 'Weak Criteria', g.weakCriteria);
-        state.y += SECTION_GAP;
-    }
-
-    // E. Priority Gaps
-    if (g.priorityGaps?.length) {
-        addSectionTitle(state, 'E. \uC6B0\uC120 \uBCF4\uAC15\uD574\uC57C \uD560 \uC21C\uC11C');
-        addLabeledList(state, 'Priority Gaps', g.priorityGaps);
-        state.y += SECTION_GAP;
-    }
-
-    // F. Contradictions
-    if (g.contradictions?.length) {
-        addSectionTitle(state, 'F. \uCDA9\uB3CC\uD558\uB294 \uC9C0\uC2DC');
-        addLabeledList(state, 'Contradictions', g.contradictions);
-        state.y += SECTION_GAP;
-    }
-
-    // G. Blocking Reason
-    addSectionTitle(state, 'G. \uC65C \uBC14\uB85C handoff \uD558\uAE30 \uC5B4\uB824\uC6B4\uAC00');
-    addParagraph(state, g.blockingReason);
-    state.y += SECTION_GAP;
-
-    // H. Next Questions
-    addSectionTitle(state, 'H. \uB2E4\uC74C\uC5D0 \uD655\uC778\uD560 \uC9C8\uBB38');
-    addLabeledList(state, 'Next Questions', g.nextQuestions);
-    state.y += SECTION_GAP;
-
-    // I. Decision Trail
     if (brief.decisionTrail?.length) {
-        addSectionTitle(state, 'I. Decision Trail');
+        addSectionTitle(state, formatSectionTitle(model.sections.length + 1, '\uC120\uD0DD \uD750\uB984'));
         addDecisionTrail(state, brief.decisionTrail);
     }
 }

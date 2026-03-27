@@ -72,6 +72,64 @@ function stripTrailingPunctuation(value: string): string {
     return value.trim().replace(/[.!?。．]+$/u, '');
 }
 
+function normalizeFragment(value: string): string {
+    return stripTrailingPunctuation(value).replace(/\s+/g, ' ').trim();
+}
+
+function hasFinalConsonant(text: string): boolean {
+    const normalized = normalizeFragment(text);
+    const lastChar = [...normalized].reverse().find((char) => /[가-힣A-Za-z0-9]/.test(char));
+
+    if (!lastChar) {
+        return false;
+    }
+
+    if (/[가-힣]/.test(lastChar)) {
+        const code = lastChar.charCodeAt(0) - 0xac00;
+        return code % 28 !== 0;
+    }
+
+    return /[0-9bcdfghjklmnpqrstvwxyz]/i.test(lastChar);
+}
+
+function getParticle(text: string, kind: 'subject' | 'and'): string {
+    const hasBatchim = hasFinalConsonant(text);
+
+    if (kind === 'and') {
+        return hasBatchim ? '과' : '와';
+    }
+
+    return hasBatchim ? '이' : '가';
+}
+
+function joinReadableItems(values: string[] | undefined, limit = 2): string {
+    const items = takeMeaningful(values, limit).map(normalizeFragment);
+
+    if (items.length === 0) {
+        return '';
+    }
+
+    if (items.length === 1) {
+        return items[0];
+    }
+
+    if (items.length === 2) {
+        return `${items[0]}${getParticle(items[0], 'and')} ${items[1]}`;
+    }
+
+    return `${items.slice(0, -1).join(', ')}, ${items.at(-1)}`;
+}
+
+function supplementList(base: string[] | undefined, fallback: string[], minLength = 2): string[] {
+    const cleanedBase = uniqueNonEmpty(base ?? []);
+
+    if (cleanedBase.length >= minLength) {
+        return cleanedBase;
+    }
+
+    return uniqueNonEmpty([...cleanedBase, ...fallback]);
+}
+
 function buildAudienceFallback(userContext?: UserContext): string {
     const parts = [
         userContext?.targetAge ? `${userContext.targetAge} 중심 타깃` : '',
@@ -87,13 +145,13 @@ function buildAudienceFallback(userContext?: UserContext): string {
 function buildReviewFallback(schema: StrategyTranslationSchema): string[] {
     const derived = uniqueNonEmpty([
         takeMeaningful(schema.mustAmplify, 1)[0]
-            ? `${takeMeaningful(schema.mustAmplify, 1)[0]}가 첫 인상에서 바로 읽히는가`
+            ? `${normalizeFragment(takeMeaningful(schema.mustAmplify, 1)[0])}${getParticle(takeMeaningful(schema.mustAmplify, 1)[0], 'subject')} 첫 인상에서 바로 읽히는가`
             : null,
         takeMeaningful(schema.pointsOfDifference, 1)[0]
-            ? `${takeMeaningful(schema.pointsOfDifference, 1)[0]} 차별점이 분명히 드러나는가`
+            ? `${normalizeFragment(takeMeaningful(schema.pointsOfDifference, 1)[0])} 차별점이 분명히 드러나는가`
             : null,
         takeMeaningful(schema.equitiesToProtect, 1)[0]
-            ? `${takeMeaningful(schema.equitiesToProtect, 1)[0]} 자산이 지워지지 않았는가`
+            ? `${normalizeFragment(takeMeaningful(schema.equitiesToProtect, 1)[0])} 자산이 지워지지 않았는가`
             : null,
     ]);
 
@@ -149,8 +207,8 @@ function buildCoreTension(schema: StrategyTranslationSchema): string {
 
     if (tradeOff) {
         return avoid
-            ? `${tradeOff} 동시에 ${avoid}처럼 읽히면 안 됩니다.`
-            : tradeOff;
+            ? `${normalizeFragment(tradeOff)}. 동시에 ${normalizeFragment(avoid)}처럼 읽히면 안 됩니다.`
+            : normalizeFragment(tradeOff);
     }
 
     const amplify = takeMeaningful(schema.mustAmplify, 1)[0];
@@ -174,38 +232,47 @@ function buildCoreTension(schema: StrategyTranslationSchema): string {
 }
 
 function buildDecisionFrame(schema: StrategyTranslationSchema): string[] {
+    const reviewChecks = takeMeaningful(schema.reviewCriteria, 2).map(normalizeFragment);
+    const avoids = takeMeaningful(schema.mustAvoid ?? schema.noGo, 2).map(normalizeFragment);
+
     return uniqueNonEmpty([
         buildPrioritySentence(schema.decisionPriority),
-        takeMeaningful(schema.reviewCriteria, 2).length > 0
-            ? `리뷰는 ${takeMeaningful(schema.reviewCriteria, 2).join(', ')}가 실제로 읽히는지로 판단합니다.`
+        reviewChecks.length > 0
+            ? `리뷰에서는 다음을 먼저 확인합니다: ${reviewChecks.join(' / ')}.`
             : buildReviewFallback(schema)[0],
         schema.scopeNow?.trim()
-            ? `이번 차수 범위는 ${schema.scopeNow.trim()}에 한정합니다.`
+            ? `이번 차수에서 먼저 맞출 범위는 다음입니다: ${normalizeFragment(schema.scopeNow)}.`
             : schema.scope?.trim()
-                ? `현재 판단은 ${schema.scope.trim()} 범위를 기준으로 합니다.`
+                ? `현재 판단은 ${normalizeFragment(schema.scope)} 범위를 기준으로 합니다.`
                 : '이번 차수 범위를 먼저 고정해야 합니다.',
-        takeMeaningful(schema.mustAvoid ?? schema.noGo, 2).length > 0
-            ? `${takeMeaningful(schema.mustAvoid ?? schema.noGo, 2).join(', ')}처럼 해석되는 안은 제외합니다.`
+        avoids.length > 0
+            ? `다음처럼 읽히는 안은 제외합니다: ${avoids.join(' / ')}.`
             : null,
     ]);
 }
 
 function buildCreativeImplications(schema: StrategyTranslationSchema): string[] {
+    const amplify = joinReadableItems(schema.mustAmplify, 2);
+    const difference = joinReadableItems(schema.pointsOfDifference, 2);
+    const equities = joinReadableItems(schema.equitiesToProtect, 2);
+    const mandatories = takeMeaningful(schema.mandatories, 2).map(normalizeFragment);
+    const principles = takeMeaningful(schema.principles, 2).map(normalizeFragment);
+
     return uniqueNonEmpty([
-        takeMeaningful(schema.mustAmplify, 2).length > 0
-            ? `첫 인상과 대표 화면에서 ${takeMeaningful(schema.mustAmplify, 2).join(', ')}가 즉시 읽혀야 합니다.`
+        amplify
+            ? `첫 인상과 대표 화면에서 ${amplify}${getParticle(amplify, 'subject')} 즉시 읽혀야 합니다.`
             : null,
-        takeMeaningful(schema.pointsOfDifference, 2).length > 0
-            ? `경쟁 대비 ${takeMeaningful(schema.pointsOfDifference, 2).join(', ')} 차이가 시각적으로 드러나야 합니다.`
+        difference
+            ? `경쟁 대비 ${difference} 차이가 시각적으로 드러나야 합니다.`
             : null,
-        takeMeaningful(schema.equitiesToProtect, 2).length > 0
-            ? `기존 ${takeMeaningful(schema.equitiesToProtect, 2).join(', ')} 자산은 지워지지 않아야 합니다.`
+        equities
+            ? `기존 ${equities} 자산은 지워지지 않아야 합니다.`
             : null,
-        takeMeaningful(schema.mandatories, 2).length > 0
-            ? `${takeMeaningful(schema.mandatories, 2).join(', ')}는 실행 단계에서 빠지면 안 됩니다.`
+        mandatories.length > 0
+            ? `실행 단계에서는 다음 요소를 빠뜨리면 안 됩니다: ${mandatories.join(' / ')}.`
             : null,
-        takeMeaningful(schema.principles, 2).length > 0
-            ? `디자인 판단은 ${takeMeaningful(schema.principles, 2).join(', ')} 원칙을 따라야 합니다.`
+        principles.length > 0
+            ? `디자인 판단은 다음 원칙을 따라야 합니다: ${principles.join(' / ')}.`
             : null,
     ]);
 }
@@ -238,10 +305,10 @@ function buildSurfaceImplications(
     userContext?: UserContext
 ): string[] {
     const targets = detectSurfaceTargets(schema, userContext);
-    const amplify = takeMeaningful(schema.mustAmplify, 2).join(', ');
-    const reasons = takeMeaningful(schema.reasonsToBelieve, 2).join(', ');
-    const equities = takeMeaningful(schema.equitiesToProtect, 2).join(', ');
-    const value = schema.valueProposition?.trim();
+    const amplify = joinReadableItems(schema.mustAmplify, 2);
+    const reasons = joinReadableItems(schema.reasonsToBelieve, 2);
+    const equities = joinReadableItems(schema.equitiesToProtect, 2);
+    const value = schema.valueProposition?.trim() ? normalizeFragment(schema.valueProposition) : '';
     const implications: string[] = [];
 
     if (targets.includes('packaging')) {
@@ -392,21 +459,25 @@ function buildDesignerChecklist(
     workingAssumptions: string[]
 ): string[] {
     const schema = strategyState.schema;
+    const amplify = joinReadableItems(schema.mustAmplify, 2);
+    const avoids = joinReadableItems(schema.mustAvoid, 2);
+    const equities = joinReadableItems(schema.equitiesToProtect, 2);
+    const reviewCriteria = takeMeaningful(schema.reviewCriteria, 2).map(normalizeFragment);
     const checklist = uniqueNonEmpty([
-        takeMeaningful(schema.mustAmplify, 2).length > 0
-            ? `${takeMeaningful(schema.mustAmplify, 2).join(', ')} 인상이 첫 인상에서 읽히는가`
+        amplify
+            ? `${amplify}${getParticle(amplify, 'subject')} 첫 인상에서 읽히는가`
             : null,
-        takeMeaningful(schema.mustAvoid ?? schema.noGo, 2).length > 0
-            ? `${takeMeaningful(schema.mustAvoid ?? schema.noGo, 2).join(', ')}처럼 오해되지 않는가`
+        avoids
+            ? `${avoids}처럼 오해되지 않는가`
             : null,
-        takeMeaningful(schema.equitiesToProtect, 2).length > 0
-            ? `${takeMeaningful(schema.equitiesToProtect, 2).join(', ')} 자산이 유지되는가`
+        equities
+            ? `${equities} 자산이 유지되는가`
             : null,
-        takeMeaningful(schema.reviewCriteria, 2).length > 0
-            ? `${takeMeaningful(schema.reviewCriteria, 2).join(', ')} 기준을 통과하는가`
+        reviewCriteria.length > 0
+            ? `${reviewCriteria.join(' / ')} 기준을 통과하는가`
             : null,
         (schema.scopeNow ?? schema.scope)?.trim()
-            ? `이번 차수 범위(${schema.scopeNow ?? schema.scope})를 넘는 변경이 섞이지 않았는가`
+            ? `이번 차수 범위(${normalizeFragment(schema.scopeNow ?? schema.scope ?? '')})를 넘는 변경이 섞이지 않았는가`
             : null,
         workingAssumptions.length > 0
             ? `아직 가정으로 남아 있는 항목(${workingAssumptions[0]})을 사실처럼 확정하지 않았는가`
@@ -433,7 +504,7 @@ export function buildDeterministicStrategyBrief(
     const schema = strategyState.schema;
     const workingAssumptions = diagnosis.workingAssumptions;
     const confirmedInputs = buildStrategyConfirmedInputs(strategyState, userContext, originalFeedback);
-    const reviewCriteria = mergeList(schema.reviewCriteria ?? [], buildReviewFallback(schema));
+    const reviewCriteria = supplementList(schema.reviewCriteria, buildReviewFallback(schema), 2);
     const openQuestions = mergeList(
         schema.openQuestionsForDesign ?? [],
         workingAssumptions[0]
@@ -458,12 +529,12 @@ export function buildDeterministicStrategyBrief(
         reasonsToBelieve: schema.reasonsToBelieve ?? [],
         equitiesToProtect: schema.equitiesToProtect ?? [],
         mustAmplify: schema.mustAmplify ?? [],
-        mustAvoid: schema.mustAvoid ?? schema.noGo ?? [],
+        mustAvoid: schema.mustAvoid ?? [],
         decisionPriority: schema.decisionPriority ?? [],
         tradeOffs: schema.tradeOffs ?? [],
         principlesForDesign: schema.principles ?? [],
         mandatories: schema.mandatories ?? [],
-        noGo: schema.noGo ?? schema.mustAvoid ?? [],
+        noGo: schema.noGo ?? [],
         scope: schema.scope ?? '전체 변경 범위 보강이 필요합니다.',
         scopeNow: schema.scopeNow ?? schema.scope ?? '이번 차수 범위 정의가 필요합니다.',
         decisionFrame: diagnosis.decisionFrame,
@@ -486,12 +557,14 @@ export function repairStrategyTranslationBrief(
     const reviewFallback = buildReviewFallback(strategyState.schema);
     const creativeFallback = buildCreativeImplications(strategyState.schema);
     const surfaceFallback = buildSurfaceImplications(strategyState.schema);
+    const mustAvoidFallback = strategyState.schema.mustAvoid ?? [];
+    const noGoFallback = strategyState.schema.noGo ?? [];
     const workingAssumptions = mergeList(
         brief.workingAssumptions,
         strategyState.diagnosis.workingAssumptions
     );
 
-    const repairedReviewCriteria = mergeList(brief.reviewCriteria, reviewFallback);
+    const repairedReviewCriteria = supplementList(brief.reviewCriteria, reviewFallback, 2);
     const repairedCreativeImplications = mergeList(
         brief.creativeImplications,
         creativeFallback
@@ -518,8 +591,8 @@ export function repairStrategyTranslationBrief(
         ),
         workingAssumptions,
         coreTension: brief.coreTension.trim() || strategyState.diagnosis.coreTension,
-        mustAvoid: mergeList(brief.mustAvoid, brief.noGo),
-        noGo: mergeList(brief.noGo, brief.mustAvoid),
+        mustAvoid: mergeList(brief.mustAvoid, mustAvoidFallback),
+        noGo: mergeList(brief.noGo, noGoFallback),
         decisionFrame: repairedDecisionFrame,
         creativeImplications: repairedCreativeImplications,
         surfaceImplications: repairedSurfaceImplications,

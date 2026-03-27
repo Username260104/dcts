@@ -44,6 +44,7 @@ import {
     buildStrategyDiagnosis,
     rankStrategyFieldsByRisk,
 } from './strategyPipeline';
+import { hasPerceptionRiskSignal } from './strategyGuardrails';
 
 const branchData = branches as Branch[];
 const ctxData = context as ContextVariables;
@@ -852,7 +853,7 @@ function buildHandoffStrategyQuestion(field: StrategyFieldKey): string {
         case 'mustAvoid':
             return '이번 차수에서 피해야 하는 방향이나 오해받기 쉬운 인상을 적어 주세요.';
         case 'decisionPriority':
-            return '판단이 충돌할 때 무엇을 우선할지 적어 주세요. 예: 프리미엄감보다 접근성을 우선.';
+            return '판단이 충돌할 때 이번 차수에서 무엇을 먼저 지킬지 적어 주세요. 신뢰 유지, 새로운 인상 강화, 정보 전달 명확성처럼 바로 고를 수 있는 우선순위면 좋습니다.';
         case 'tradeOffs':
             return '이번 작업에서 감수할 수 있는 것과 감수할 수 없는 트레이드오프를 적어 주세요.';
         case 'mandatories':
@@ -862,9 +863,9 @@ function buildHandoffStrategyQuestion(field: StrategyFieldKey): string {
         case 'scope':
             return '전체 프로젝트 관점에서 바꿀 수 있는 범위와 바꾸지 않을 범위를 적어 주세요.';
         case 'scopeNow':
-            return '이번 차수에서 실제로 손댈 범위를 적어 주세요. 지금 안 하는 것은 무엇인지도 드러나면 좋습니다.';
+            return '이번 리뷰에서 먼저 맞춰야 하는 표면이나 구간을 적어 주세요. 패키지 전면, 첫 화면, 상세페이지 핵심 구간처럼 실제 시안 범위가 바로 떠오르면 좋습니다. 이번 차수에서 잠시 뒤로 미루는 범위가 있다면 함께 적어 주세요.';
         case 'reviewCriteria':
-            return '시안이 성공했는지 무엇으로 판단할지 적어 주세요. 단순히 예뻐 보이는지보다 어떤 인식 변화가 보여야 하는지가 중요합니다.';
+            return '리뷰 자리에서 무엇이 먼저 보이면 "됐다"라고 볼 수 있는지 적어 주세요. 예쁘다보다 첫 인상, 기존 고객 반응, 표면 간 일관성처럼 관찰 가능한 기준이면 좋습니다.';
         case 'openRisks':
             return '아직 합의되지 않았거나 리뷰 시점에 문제가 될 수 있는 리스크가 있다면 적어 주세요.';
         case 'openQuestionsForDesign':
@@ -875,7 +876,16 @@ function buildHandoffStrategyQuestion(field: StrategyFieldKey): string {
 }
 
 function buildStrategyQualityQuestion(field: StrategyFieldKey): string {
-    return `현재 정리된 ${STRATEGY_FIELD_LABELS[field]}이 다소 추상적입니다. 디자이너가 바로 판단에 쓸 수 있도록 조금 더 구체적으로 적어 주세요.\n${buildHandoffStrategyQuestion(field)}`;
+    switch (field) {
+        case 'decisionPriority':
+            return '지금 정리된 우선순위가 아직 추상적입니다. 디자이너가 충돌 상황에서 바로 고를 수 있게, 이번 차수에서 무엇을 먼저 지킬지 한 문장으로 더 선명하게 적어 주세요.';
+        case 'scopeNow':
+            return '지금 범위 표현이 아직 넓습니다. 이번 리뷰에서 먼저 맞춰야 하는 표면이나 구간이 바로 보이도록 더 구체적으로 적어 주세요.';
+        case 'reviewCriteria':
+            return '지금 리뷰 기준이 아직 추상적입니다. 리뷰 자리에서 무엇이 먼저 보이면 "됐다"라고 볼 수 있는지 관찰 가능한 표현으로 적어 주세요.';
+        default:
+            return `현재 정리된 ${STRATEGY_FIELD_LABELS[field]}이 다소 추상적입니다. 디자이너가 바로 판단에 쓸 수 있도록 조금 더 구체적으로 적어 주세요.\n${buildHandoffStrategyQuestion(field)}`;
+    }
 }
 
 async function callAnthropic(systemPrompt: string, userMessage: string): Promise<string> {
@@ -1490,8 +1500,10 @@ function needsCoreStrategyClarification(
     }
 
     if (field === 'mustAvoid') {
-        const hasAvoidSignal = (strategyState.schema.mustAvoid?.length ?? 0) > 0
-            || (strategyState.schema.noGo?.length ?? 0) > 0;
+        const hasAvoidSignal = hasPerceptionRiskSignal({
+            mustAvoid: strategyState.schema.mustAvoid,
+            noGo: strategyState.schema.noGo,
+        });
 
         if (!hasAvoidSignal) {
             return true;
@@ -1540,12 +1552,12 @@ function buildStrategyClarificationQuestionText(
             return '이번 방향이 어떤 인상으로 읽히면 가장 곤란한가요?';
         case 'decisionPriority':
             return strategyState.contradictions.length > 0
-                ? `지금 전략 문장 안에 우선순위 충돌이 보입니다.\n${strategyState.contradictions[0]}\n이번 차수에서 무엇을 먼저 지켜야 하나요?`
-                : '이번 차수에서 둘 다 가져갈 수 없다면 무엇을 먼저 지켜야 하나요?';
+                ? `지금 전략 문장 안에 우선순위 충돌이 보입니다.\n${strategyState.contradictions[0]}\n이번 시안에서 둘 다 다 가져가기 어렵다면 무엇을 먼저 지켜야 하나요?`
+                : '이번 시안에서 둘 다 다 가져가기 어렵다면 무엇을 먼저 지켜야 하나요?';
         case 'scopeNow':
-            return '이번 차수에서 실제로 디자이너가 먼저 다뤄야 하는 표면은 어디인가요?';
+            return '이번 리뷰에서 먼저 맞춰야 하는 표면은 어디인가요?';
         case 'reviewCriteria':
-            return '리뷰 때 가장 먼저 통과해야 하는 기준은 무엇인가요?';
+            return '리뷰 자리에서 무엇이 먼저 보이면 "됐다"라고 볼 수 있나요?';
         default:
             return buildHandoffStrategyQuestion(field);
     }
@@ -1606,7 +1618,7 @@ export function buildStrategyFillQuestion(
             || (field === 'scopeNow' && !strategyState.schema.scopeNow?.trim())
         : false;
     const question = field === 'decisionPriority' && strategyState?.contradictions.length
-        ? `우선순위 충돌을 해소하려면 이번 차수에서 무엇을 먼저 지키는지 한 문장으로 적어 주세요.\n${strategyState.contradictions[0]}`
+        ? `우선순위 충돌을 해소하려면 이번 시안에서 둘 다 다 가져가기 어렵더라도 무엇을 먼저 지키는지 한 문장으로 적어 주세요.\n${strategyState.contradictions[0]}`
         : needsGapPrompt
             ? buildHandoffStrategyQuestion(field)
             : buildStrategyQualityQuestion(field);

@@ -1,6 +1,12 @@
 'use client';
 
 import { DecisionTrailSection } from '@/components/brief/DecisionTrailSection';
+import {
+    buildStrategyGapDisplayModel,
+    buildStrategyTranslationDisplayModel,
+    type StrategyDisplayEntry,
+    type StrategyDisplayTone,
+} from '@/lib/strategyBriefPresenter';
 import type { BriefOutput, LLMBriefResponse } from '@/types/ontology';
 
 interface BriefDocumentProps {
@@ -210,9 +216,9 @@ function InterpretationDocument({
 }
 
 function StrategyTranslationDocument({ brief }: { brief: BriefOutput }) {
-    const translation = brief.strategyTranslation;
+    const model = buildStrategyTranslationDisplayModel(brief);
 
-    if (!translation) {
+    if (!model) {
         return null;
     }
 
@@ -224,65 +230,17 @@ function StrategyTranslationDocument({ brief }: { brief: BriefOutput }) {
                 </blockquote>
             </Section>
 
-            <Section title="B. Shared Handoff">
-                <div className="space-y-4">
-                    <Block label="이번 차수 한 줄 과제" value={translation.strategicPremise} />
-                    <Block label="핵심 긴장" value={translation.coreTension} />
-                    <Block label="Audience + Context" value={translation.audienceAndContext} />
-                    <Block label="이번 차수 범위" value={translation.scopeNow} />
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <ListBlock label="입력에서 직접 확인된 내용" values={translation.confirmedInputs} />
-                        <ListBlock label="현재 작업 가정" values={translation.workingAssumptions} />
-                        <ListBlock label="지켜야 할 자산" values={translation.equitiesToProtect} />
-                        <ListBlock label="더 강하게 보여야 할 인상" values={translation.mustAmplify} />
-                        <ListBlock label="피해야 할 방향" values={translation.mustAvoid} />
-                        <ListBlock label="필수 반영 요소" values={translation.mandatories} />
-                    </div>
-                </div>
-            </Section>
-
-            <Section title="C. Decision Rules">
-                <div className="space-y-4">
-                    <ListBlock label="우선순위 기준" values={translation.decisionPriority} />
-                    <ListBlock label="트레이드오프" values={translation.tradeOffs} />
-                    <ListBlock label="의사결정 프레임" values={translation.decisionFrame} />
-                    <ListBlock label="실행 함의" values={translation.creativeImplications} />
-                    <ListBlock label="디자인 평가 기준" values={translation.reviewCriteria} />
-                    <ListBlock label="디자이너 체크리스트" values={translation.designerChecklist} />
-                    <ListBlock label="디자이너와 확인할 질문" values={translation.openQuestionsForDesign} />
-                </div>
-            </Section>
-
-            <Section title="D. Strategy Rationale">
-                <div className="space-y-4">
-                    <Block label="Frame of Reference" value={translation.frameOfReference} />
-                    <ListBlock label="Points of Parity" values={translation.pointsOfParity} />
-                    <ListBlock label="Points of Difference" values={translation.pointsOfDifference} />
-                    <Block label="Value Proposition" value={translation.valueProposition} />
-                    <ListBlock label="Reasons to Believe" values={translation.reasonsToBelieve} />
-                    <ListBlock label="Design Principles" values={translation.principlesForDesign} />
-                </div>
-            </Section>
-
-            <Section title="E. Direction Mapping">
-                <div className="space-y-4">
-                    <Block label="전체 범위" value={translation.scope} />
-                    <ListBlock label="No-Go" values={translation.noGo} />
-                    <ListBlock label="표면별 적용 메모" values={translation.surfaceImplications} />
-                    <ListBlock label="Recommended Visual Directions" values={translation.recommendedDirections} />
-                    <ListBlock label="Avoided Directions" values={translation.avoidedDirections} />
-                    {translation.mappingRationale && (
-                        <Block label="Mapping Rationale" value={translation.mappingRationale} />
-                    )}
-                </div>
-            </Section>
-
-            <Section title="F. Open Risks">
-                <ListBlock label="Open Risks" values={translation.openRisks} />
-            </Section>
+            {model.sections.map((section, index) => (
+                <Section
+                    key={`${section.title}-${index}`}
+                    title={formatSectionTitle(index + 1, section.title)}
+                >
+                    <StrategySectionBody section={section} />
+                </Section>
+            ))}
 
             {!!brief.decisionTrail?.length && (
-                <Section title="G. Decision Trail">
+                <Section title={formatSectionTitle(model.sections.length + 1, '선택 흐름')}>
                     <DecisionTrailSection decisionTrail={brief.decisionTrail} />
                 </Section>
             )}
@@ -291,9 +249,9 @@ function StrategyTranslationDocument({ brief }: { brief: BriefOutput }) {
 }
 
 function StrategyGapDocument({ brief }: { brief: BriefOutput }) {
-    const gapMemo = brief.gapMemo;
+    const model = buildStrategyGapDisplayModel(brief);
 
-    if (!gapMemo) {
+    if (!model) {
         return null;
     }
 
@@ -305,50 +263,51 @@ function StrategyGapDocument({ brief }: { brief: BriefOutput }) {
                 </blockquote>
             </Section>
 
-            {!!brief.strategySummary && (
-                <Section title="B. 현재까지의 전략 이해">
-                    <p className="mb-3 leading-relaxed text-gray-800">{brief.strategySummary}</p>
-                    <ListBlock label="Current Understanding" values={gapMemo.currentUnderstanding} />
+            {model.sections.map((section, index) => (
+                <Section
+                    key={`${section.title}-${index}`}
+                    title={formatSectionTitle(index + 1, section.title)}
+                >
+                    <StrategySectionBody section={section} />
                 </Section>
-            )}
-
-            <Section title="C. 아직 비어 있는 기준">
-                <ListBlock label="Missing Criteria" values={gapMemo.missingCriteria} />
-            </Section>
-
-            {!!gapMemo.weakCriteria?.length && (
-                <Section title="D. 더 구체화가 필요한 기준">
-                    <ListBlock label="Weak Criteria" values={gapMemo.weakCriteria} />
-                </Section>
-            )}
-
-            {!!gapMemo.priorityGaps?.length && (
-                <Section title="E. 우선 보강해야 할 순서">
-                    <ListBlock label="Priority Gaps" values={gapMemo.priorityGaps} />
-                </Section>
-            )}
-
-            {!!gapMemo.contradictions?.length && (
-                <Section title="F. 충돌하는 지시">
-                    <ListBlock label="Contradictions" values={gapMemo.contradictions} />
-                </Section>
-            )}
-
-            <Section title="G. 왜 바로 handoff 하기 어려운가">
-                <p className="leading-relaxed text-gray-800">{gapMemo.blockingReason}</p>
-            </Section>
-
-            <Section title="H. 다음에 확인할 질문">
-                <ListBlock label="Next Questions" values={gapMemo.nextQuestions} />
-            </Section>
+            ))}
 
             {!!brief.decisionTrail?.length && (
-                <Section title="I. Decision Trail">
+                <Section title={formatSectionTitle(model.sections.length + 1, '선택 흐름')}>
                     <DecisionTrailSection decisionTrail={brief.decisionTrail} />
                 </Section>
             )}
         </div>
     );
+}
+
+function StrategySectionBody({
+    section,
+}: {
+    section: {
+        description?: string;
+        entries: StrategyDisplayEntry[];
+    };
+}) {
+    return (
+        <div className="space-y-4">
+            {section.description && (
+                <p className="leading-relaxed text-gray-800">{section.description}</p>
+            )}
+
+            {section.entries.map((entry, index) => (
+                <StrategyEntry key={`${entry.label}-${index}`} entry={entry} />
+            ))}
+        </div>
+    );
+}
+
+function StrategyEntry({ entry }: { entry: StrategyDisplayEntry }) {
+    if (entry.kind === 'text') {
+        return <Block label={entry.label} value={entry.value} tone={entry.tone} />;
+    }
+
+    return <ListBlock label={entry.label} values={entry.values} tone={entry.tone} />;
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -371,28 +330,85 @@ function TokenCard({ label, value }: { label: string; value: string }) {
     );
 }
 
-function Block({ label, value }: { label: string; value?: string }) {
+function formatSectionTitle(index: number, title: string): string {
+    return `${String.fromCharCode(65 + index)}. ${title}`;
+}
+
+function getToneStyles(tone: StrategyDisplayTone = 'default') {
+    switch (tone) {
+        case 'success':
+            return {
+                label: 'text-emerald-700',
+                value: 'text-emerald-900',
+                item: 'bg-emerald-50 text-emerald-900',
+            };
+        case 'warning':
+            return {
+                label: 'text-amber-700',
+                value: 'text-amber-900',
+                item: 'bg-amber-50 text-amber-900',
+            };
+        case 'danger':
+            return {
+                label: 'text-red-700',
+                value: 'text-red-900',
+                item: 'bg-red-50 text-red-900',
+            };
+        case 'muted':
+            return {
+                label: 'text-slate-500',
+                value: 'text-slate-700',
+                item: 'bg-slate-50 text-slate-700',
+            };
+        default:
+            return {
+                label: 'text-gray-500',
+                value: 'text-gray-800',
+                item: 'bg-gray-50 text-gray-800',
+            };
+    }
+}
+
+function Block({
+    label,
+    value,
+    tone,
+}: {
+    label: string;
+    value?: string;
+    tone?: StrategyDisplayTone;
+}) {
     if (!value) return null;
+    const styles = getToneStyles(tone);
 
     return (
         <div>
-            <p className="mb-1 text-xs font-medium text-gray-500">{label}</p>
-            <p className="text-sm leading-relaxed text-gray-800">{value}</p>
+            <p className={`mb-1 text-xs font-medium ${styles.label}`}>{label}</p>
+            <p className={`text-sm leading-relaxed ${styles.value}`}>{value}</p>
         </div>
     );
 }
 
-function ListBlock({ label, values }: { label: string; values?: string[] }) {
+function ListBlock({
+    label,
+    values,
+    tone,
+}: {
+    label: string;
+    values?: string[];
+    tone?: StrategyDisplayTone;
+}) {
     if (!values || values.length === 0) {
         return null;
     }
+    const styles = getToneStyles(tone);
 
     return (
         <div>
-            <p className="mb-2 text-xs font-medium text-gray-500">{label}</p>
-            <ul className="space-y-2 text-sm text-gray-800">
+            <p className={`mb-2 text-xs font-medium ${styles.label}`}>{label}</p>
+            <ul className="space-y-2 text-sm">
                 {values.map((value, index) => (
-                    <li key={`${value}-${index}`} className="rounded-lg bg-gray-50 px-3 py-2">
+                    <li key={`${value}-${index}`} className={`rounded-lg px-3 py-2 ${styles.item}`}>
                         {value}
                     </li>
                 ))}

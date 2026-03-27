@@ -3,12 +3,19 @@ import {
     buildStrategyStateFromSchema,
     generateDesignTranslationBrief,
     generateGapMemo,
+    generateStrategyGapQuestion,
+    mergeStrategyAnswerIntoState,
     mapStrategySchemaToBranches,
 } from '../src/lib/llmOrchestrator';
+import {
+    buildStrategyGapDisplayModel,
+    buildStrategyTranslationDisplayModel,
+} from '../src/lib/strategyBriefPresenter';
 import {
     strategyFixtures,
     type StrategyFixture,
 } from '../src/lib/strategyFixtures';
+import type { BriefOutput } from '../src/types/ontology';
 
 type FixtureFailure = {
     fixtureId: string;
@@ -57,6 +64,119 @@ function assertArrayIncludes(
     }
 }
 
+function assertQuestionFlow(
+    failures: string[],
+    fixture: StrategyFixture,
+    strategyState: ReturnType<typeof buildStrategyStateFromSchema>
+) {
+    const flow = fixture.expectations.questionFlow;
+
+    if (!flow) {
+        return;
+    }
+
+    const initialQuestion = generateStrategyGapQuestion(strategyState, fixture.userContext);
+
+    if (flow.expectNoQuestion) {
+        if (initialQuestion) {
+            failures.push(`questionFlow는 질문이 없어야 하지만 실제로는 "${initialQuestion.question}" 질문이 생성됐습니다.`);
+        }
+        return;
+    }
+
+    if (!initialQuestion) {
+        failures.push('questionFlow 기대값이 있지만 초기 질문이 생성되지 않았습니다.');
+        return;
+    }
+
+    if (flow.initialTargetField && initialQuestion.meta?.targetField !== flow.initialTargetField) {
+        failures.push(
+            `초기 질문 targetField 예상값(${flow.initialTargetField})과 실제값(${initialQuestion.meta?.targetField ?? 'none'})이 다릅니다.`
+        );
+    }
+
+    if (flow.initialQuestionKind && initialQuestion.meta?.questionKind !== flow.initialQuestionKind) {
+        failures.push(
+            `초기 질문 kind 예상값(${flow.initialQuestionKind})과 실제값(${initialQuestion.meta?.questionKind ?? 'none'})이 다릅니다.`
+        );
+    }
+
+    assertIncludes(failures, initialQuestion.question, flow.initialQuestionIncludes, 'initialQuestion');
+    assertArrayIncludes(
+        failures,
+        initialQuestion.options.map((option) => option.label),
+        flow.initialOptionIncludes,
+        'initialQuestion.options'
+    );
+
+    if (
+        !flow.nextTargetFieldAfterFirstChoice
+        && !flow.nextQuestionKindAfterFirstChoice
+        && !(flow.nextQuestionIncludesAfterFirstChoice?.length)
+    ) {
+        return;
+    }
+
+    const firstConcreteOption = initialQuestion.options.find((option) => (
+        option.direction
+        && !option.direction.startsWith('noop|')
+        && !option.direction.startsWith('fallback|')
+    ));
+
+    if (!firstConcreteOption || !initialQuestion.meta) {
+        failures.push('후속 질문 검증을 위한 유효한 첫 번째 선택지를 찾지 못했습니다.');
+        return;
+    }
+
+    const nextState = mergeStrategyAnswerIntoState(
+        strategyState,
+        initialQuestion.meta,
+        firstConcreteOption.label,
+        firstConcreteOption.direction,
+        fixture.userContext
+    );
+    const nextQuestion = generateStrategyGapQuestion(nextState, fixture.userContext);
+
+    if (!nextQuestion) {
+        failures.push('후속 질문 기대값이 있지만 첫 응답 뒤 다음 질문이 생성되지 않았습니다.');
+        return;
+    }
+
+    if (flow.nextTargetFieldAfterFirstChoice && nextQuestion.meta?.targetField !== flow.nextTargetFieldAfterFirstChoice) {
+        failures.push(
+            `후속 질문 targetField 예상값(${flow.nextTargetFieldAfterFirstChoice})과 실제값(${nextQuestion.meta?.targetField ?? 'none'})이 다릅니다.`
+        );
+    }
+
+    if (flow.nextQuestionKindAfterFirstChoice && nextQuestion.meta?.questionKind !== flow.nextQuestionKindAfterFirstChoice) {
+        failures.push(
+            `후속 질문 kind 예상값(${flow.nextQuestionKindAfterFirstChoice})과 실제값(${nextQuestion.meta?.questionKind ?? 'none'})이 다릅니다.`
+        );
+    }
+
+    assertIncludes(
+        failures,
+        nextQuestion.question,
+        flow.nextQuestionIncludesAfterFirstChoice,
+        'nextQuestion'
+    );
+}
+
+function buildStrategyFixtureBrief(
+    fixture: StrategyFixture,
+    strategySummary?: string
+): BriefOutput {
+    return {
+        briefKind: 'translation_brief',
+        jobType: 'strategy_to_design_translation',
+        originalFeedback: fixture.originalFeedback,
+        userContext: fixture.userContext,
+        generatedAt: new Date().toISOString(),
+        inputRole: 'strategist',
+        strategySummary: strategySummary ?? '',
+    };
+}
+
 function runFixture(fixture: StrategyFixture): FixtureFailure | null {
     const baseState = buildStrategyStateFromSchema(
         fixture.artifactType,
@@ -98,13 +218,20 @@ function runFixture(fixture: StrategyFixture): FixtureFailure | null {
         );
     }
 
+    assertQuestionFlow(failures, fixture, strategyState);
+
     if (strategyState.readinessStatus === 'ready') {
         const brief = generateDesignTranslationBrief(
             strategyState,
             fixture.userContext,
             fixture.originalFeedback
         );
+        const translationDisplay = buildStrategyTranslationDisplayModel({
+            ...buildStrategyFixtureBrief(fixture, strategyState.summary),
+            strategyTranslation: brief,
+        });
         const serializedBrief = flattenValue(brief);
+        const serializedDisplay = flattenValue(translationDisplay);
 
         assertIncludes(failures, brief.strategicPremise, fixture.expectations.premiseIncludes, 'strategicPremise');
         assertIncludes(failures, brief.coreTension, fixture.expectations.coreTensionIncludes, 'coreTension');
@@ -113,12 +240,20 @@ function runFixture(fixture: StrategyFixture): FixtureFailure | null {
         assertIncludes(failures, serializedBrief, fixture.expectations.surfaceImplicationsInclude, 'surfaceImplications');
         assertIncludes(failures, serializedBrief, fixture.expectations.confirmedInputsInclude, 'confirmedInputs');
         assertIncludes(failures, serializedBrief, fixture.expectations.designerChecklistInclude, 'designerChecklist');
+        assertIncludes(failures, serializedDisplay, fixture.expectations.translationDisplayIncludes, 'translationDisplay');
     } else {
         const gapMemo = generateGapMemo(strategyState);
+        const gapDisplay = buildStrategyGapDisplayModel({
+            ...buildStrategyFixtureBrief(fixture, strategyState.summary),
+            briefKind: 'gap_memo',
+            gapMemo,
+        });
         const serializedGapMemo = flattenValue(gapMemo);
+        const serializedGapDisplay = flattenValue(gapDisplay);
 
         assertIncludes(failures, serializedGapMemo, fixture.expectations.priorityGapsInclude, 'priorityGaps');
         assertIncludes(failures, serializedGapMemo, fixture.expectations.premiseIncludes, 'gapMemo');
+        assertIncludes(failures, serializedGapDisplay, fixture.expectations.gapDisplayIncludes, 'gapDisplay');
     }
 
     if (failures.length === 0) {
