@@ -7,7 +7,6 @@ import { BriefDocument } from '@/components/brief/BriefDocument';
 import { exportBriefToPdf } from '@/lib/briefExport';
 import type { BriefOutput, LLMBriefResponse } from '@/types/ontology';
 
-const BRIEF_CONTENT_ID = 'brief-permalink-content';
 
 function getBriefTitle(briefKind: string): string {
     if (briefKind === 'translation_brief') {
@@ -52,12 +51,12 @@ export default function BriefPermalinkPage() {
     }, [id]);
 
     const handleExportPdf = async () => {
-        if (!id) return;
+        if (!id || !brief) return;
 
         setIsExporting(true);
 
         try {
-            await exportBriefToPdf(BRIEF_CONTENT_ID, `dcts-brief-${id}.pdf`);
+            await exportBriefToPdf(brief, llmSummary, `dcts-brief-${id}.pdf`);
         } catch (exportError) {
             setError(exportError instanceof Error ? exportError.message : 'PDF 생성에 실패했습니다.');
         } finally {
@@ -113,7 +112,7 @@ export default function BriefPermalinkPage() {
                     </p>
                 </div>
 
-                <div id={BRIEF_CONTENT_ID}>
+                <div>
                     <BriefDocument brief={brief} llmSummary={llmSummary} />
                 </div>
 

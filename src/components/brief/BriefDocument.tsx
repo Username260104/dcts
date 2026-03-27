@@ -316,19 +316,19 @@ function StrategyGapDocument({ brief }: { brief: BriefOutput }) {
                 <ListBlock label="Missing Criteria" values={gapMemo.missingCriteria} />
             </Section>
 
-            {!!gapMemo.weakCriteria.length && (
+            {!!gapMemo.weakCriteria?.length && (
                 <Section title="D. 더 구체화가 필요한 기준">
                     <ListBlock label="Weak Criteria" values={gapMemo.weakCriteria} />
                 </Section>
             )}
 
-            {!!gapMemo.priorityGaps.length && (
+            {!!gapMemo.priorityGaps?.length && (
                 <Section title="E. 우선 보강해야 할 순서">
                     <ListBlock label="Priority Gaps" values={gapMemo.priorityGaps} />
                 </Section>
             )}
 
-            {!!gapMemo.contradictions.length && (
+            {!!gapMemo.contradictions?.length && (
                 <Section title="F. 충돌하는 지시">
                     <ListBlock label="Contradictions" values={gapMemo.contradictions} />
                 </Section>
@@ -371,7 +371,9 @@ function TokenCard({ label, value }: { label: string; value: string }) {
     );
 }
 
-function Block({ label, value }: { label: string; value: string }) {
+function Block({ label, value }: { label: string; value?: string }) {
+    if (!value) return null;
+
     return (
         <div>
             <p className="mb-1 text-xs font-medium text-gray-500">{label}</p>
@@ -380,8 +382,8 @@ function Block({ label, value }: { label: string; value: string }) {
     );
 }
 
-function ListBlock({ label, values }: { label: string; values: string[] }) {
-    if (values.length === 0) {
+function ListBlock({ label, values }: { label: string; values?: string[] }) {
+    if (!values || values.length === 0) {
         return null;
     }
 

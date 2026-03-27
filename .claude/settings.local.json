@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs grep:*)",
+      "Bash(node -e \"const html2pdf = require\\(''html2pdf.js''\\); console.log\\(typeof html2pdf, Object.keys\\(html2pdf\\)\\)\")",
+      "Bash(ls node_modules/html2pdf.js/*.d.ts)",
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npx next:*)",
+      "WebFetch(domain:registry.npmjs.org)",
+      "Bash(curl -L -o \"NotoSansKR-Regular.ttf\" \"https://github.com/google/fonts/raw/main/ofl/notosanskr/NotoSansKR%5Bwght%5D.ttf\")",
+      "Bash(curl -L -o \"NotoSansKR-Regular.ttf\" \"https://github.com/google/fonts/raw/main/ofl/notosanskr/static/NotoSansKR-Regular.ttf\")",
+      "Bash(curl -L -o \"NotoSansKR-Bold.ttf\" \"https://github.com/google/fonts/raw/main/ofl/notosanskr/static/NotoSansKR-Bold.ttf\")",
+      "Bash(xxd C:/Work/Projects/Hire/DesignCommunication/dcts/public/fonts/NotoSansKR-Regular.ttf)",
+      "Bash(rm -f NotoSansKR-Regular.ttf NotoSansKR-Bold.ttf)",
+      "Bash(curl -L -o \"NotoSansKR-Regular.otf\" \"https://github.com/googlefonts/noto-cjk/raw/main/Sans/OTF/Korean/NotoSansCJKkr-Regular.otf\")",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}

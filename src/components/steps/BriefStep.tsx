@@ -6,8 +6,6 @@ import ReturnToStartButton from '@/components/ReturnToStartButton';
 import { exportBriefToPdf } from '@/lib/briefExport';
 import { useSessionStore } from '@/store/sessionStore';
 
-const BRIEF_CONTENT_ID = 'brief-content';
-
 function getBriefTitle(briefKind: string): string {
     if (briefKind === 'translation_brief') {
         return '전략-디자인 번역 브리프';
@@ -56,7 +54,7 @@ export default function BriefStep() {
         setShareMessage(null);
 
         try {
-            await exportBriefToPdf(BRIEF_CONTENT_ID, `dcts-brief-${sessionState.sessionId}.pdf`);
+            await exportBriefToPdf(brief, llmSummary ?? null, `dcts-brief-${sessionState.sessionId}.pdf`);
         } catch (error) {
             setShareMessage(
                 error instanceof Error ? error.message : 'PDF 생성에 실패했습니다.'
@@ -101,7 +99,7 @@ export default function BriefStep() {
                 )}
             </div>
 
-            <div id={BRIEF_CONTENT_ID}>
+            <div>
                 <BriefDocument brief={brief} llmSummary={llmSummary} />
             </div>
 
