@@ -17,6 +17,7 @@ import type {
     StrategyArtifactType,
     StrategyBranchMapping,
     StrategyFieldKey,
+    StrategyQuestionOperationMode,
     StrategyGapMemo,
     StrategyReadinessChecks,
     StrategyState,
@@ -25,12 +26,18 @@ import type {
     UserContext,
     WorkflowQuestion,
 } from '@/types/ontology';
-import { MAX_QUESTIONS } from './constants';
+import { MAX_QUESTIONS, STRATEGY_FIELD_REPEAT_LIMIT } from './constants';
 import {
     getStrategyRule,
     STRATEGY_ARTIFACT_LABELS,
     STRATEGY_FIELD_LABELS,
 } from './strategyArtifacts';
+import {
+    getStrategyClarificationChoices,
+    STRATEGY_DIRECT_INPUT_LABEL,
+    STRATEGY_UNCLEAR_CHOICE_LABEL,
+    type StrategyClarificationField,
+} from './strategyChoiceLibrary';
 import {
     buildDeterministicGapMemo,
     buildDeterministicStrategyBrief,
@@ -44,6 +51,13 @@ const tokenData = tokens as DesignToken[];
 const DETAIL_FOCUSES = ['color', 'typography', 'layout', 'imagery', 'texture'] as const;
 type DetailFocus = (typeof DETAIL_FOCUSES)[number];
 const UNCLEAR_OPTION_LABEL = '잘 모르겠어요';
+const STRATEGY_CORE_CLARIFICATION_FIELDS: StrategyClarificationField[] = [
+    'decisionPriority',
+    'mustAvoid',
+    'mustAmplify',
+    'scopeNow',
+    'reviewCriteria',
+];
 const STRATEGY_LIST_FIELDS: StrategyFieldKey[] = [
     'pointsOfParity',
     'pointsOfDifference',
@@ -1392,6 +1406,233 @@ function mergeStrategyFieldValue(
     };
 }
 
+function setStrategyFieldValue(
+    schema: StrategyTranslationSchema,
+    field: StrategyFieldKey,
+    rawValue: string
+): StrategyTranslationSchema {
+    const nextValue = normalizeStrategyFieldValue(field, rawValue);
+
+    return {
+        ...schema,
+        [field]: nextValue,
+    };
+}
+
+type StrategyDirectionOperation = 'set' | 'append' | 'fallback' | 'noop';
+
+type ParsedStrategyDirection = {
+    operation: StrategyDirectionOperation;
+    field: StrategyFieldKey | 'artifactType';
+    value: string;
+};
+
+function createStrategyDirection(
+    operation: StrategyDirectionOperation,
+    field: StrategyFieldKey | 'artifactType',
+    value: string
+): string {
+    return `${operation}|${field}|${value}`;
+}
+
+export function parseStrategyDirectionOperation(
+    direction: string
+): ParsedStrategyDirection | null {
+    if (!direction.includes('|')) {
+        return null;
+    }
+
+    const firstPipeIndex = direction.indexOf('|');
+    const secondPipeIndex = direction.indexOf('|', firstPipeIndex + 1);
+
+    if (firstPipeIndex <= 0 || secondPipeIndex <= firstPipeIndex + 1) {
+        return null;
+    }
+
+    const operation = direction.slice(0, firstPipeIndex) as StrategyDirectionOperation;
+    const field = direction.slice(firstPipeIndex + 1, secondPipeIndex) as StrategyFieldKey | 'artifactType';
+    const value = direction.slice(secondPipeIndex + 1);
+
+    if (!['set', 'append', 'fallback', 'noop'].includes(operation)) {
+        return null;
+    }
+
+    return {
+        operation,
+        field,
+        value,
+    };
+}
+
+function getStrategyAskedFieldCount(
+    strategyState: StrategyState,
+    field: StrategyFieldKey | 'artifactType'
+): number {
+    return strategyState.askedFieldCounts?.[field] ?? 0;
+}
+
+function getNextAskedFieldCounts(
+    strategyState: StrategyState,
+    field: StrategyFieldKey | 'artifactType'
+): Partial<Record<StrategyFieldKey | 'artifactType', number>> {
+    return {
+        ...(strategyState.askedFieldCounts ?? {}),
+        [field]: getStrategyAskedFieldCount(strategyState, field) + 1,
+    };
+}
+
+function needsCoreStrategyClarification(
+    strategyState: StrategyState,
+    field: StrategyClarificationField
+): boolean {
+    if (field === 'decisionPriority' && strategyState.contradictions.length > 0) {
+        return true;
+    }
+
+    if (field === 'mustAvoid') {
+        const hasAvoidSignal = (strategyState.schema.mustAvoid?.length ?? 0) > 0
+            || (strategyState.schema.noGo?.length ?? 0) > 0;
+
+        if (!hasAvoidSignal) {
+            return true;
+        }
+    }
+
+    if (field === 'scopeNow' && !strategyState.schema.scopeNow?.trim()) {
+        return true;
+    }
+
+    return strategyState.missingFields.includes(field) || strategyState.weakFields.includes(field);
+}
+
+function getStrategyClarificationOperationMode(
+    field: StrategyClarificationField
+): StrategyQuestionOperationMode {
+    if (field === 'scopeNow' || field === 'decisionPriority') {
+        return 'set';
+    }
+
+    return 'append';
+}
+
+function getStrategyClarificationQuestionKind(
+    field: StrategyClarificationField
+): 'strategy_choice' | 'strategy_tradeoff' | 'strategy_scope' {
+    if (field === 'decisionPriority') {
+        return 'strategy_tradeoff';
+    }
+
+    if (field === 'scopeNow') {
+        return 'strategy_scope';
+    }
+
+    return 'strategy_choice';
+}
+
+function buildStrategyClarificationQuestionText(
+    field: StrategyClarificationField,
+    strategyState: StrategyState
+): string {
+    switch (field) {
+        case 'mustAmplify':
+            return '이번 차수에서 디자이너가 가장 먼저 더 강하게 보여줘야 하는 인상은 무엇인가요?';
+        case 'mustAvoid':
+            return '이번 방향이 어떤 인상으로 읽히면 가장 곤란한가요?';
+        case 'decisionPriority':
+            return strategyState.contradictions.length > 0
+                ? `지금 전략 문장 안에 우선순위 충돌이 보입니다.\n${strategyState.contradictions[0]}\n이번 차수에서 무엇을 먼저 지켜야 하나요?`
+                : '이번 차수에서 둘 다 가져갈 수 없다면 무엇을 먼저 지켜야 하나요?';
+        case 'scopeNow':
+            return '이번 차수에서 실제로 디자이너가 먼저 다뤄야 하는 표면은 어디인가요?';
+        case 'reviewCriteria':
+            return '리뷰 때 가장 먼저 통과해야 하는 기준은 무엇인가요?';
+        default:
+            return buildHandoffStrategyQuestion(field);
+    }
+}
+
+function buildStrategyOptionDirection(
+    field: StrategyClarificationField,
+    value: string
+): string {
+    return createStrategyDirection(
+        getStrategyClarificationOperationMode(field) === 'set' ? 'set' : 'append',
+        field,
+        value
+    );
+}
+
+function buildStrategyClarificationQuestion(
+    field: StrategyClarificationField,
+    strategyState: StrategyState,
+    userContext?: UserContext
+): WorkflowQuestion {
+    const suggestedValues = getStrategyClarificationChoices(field, strategyState, userContext);
+
+    return {
+        question: buildStrategyClarificationQuestionText(field, strategyState),
+        type: 'text_choice',
+        options: [
+            ...suggestedValues.map((value) => ({
+                label: value,
+                direction: buildStrategyOptionDirection(field, value),
+            })),
+            {
+                label: STRATEGY_UNCLEAR_CHOICE_LABEL,
+                direction: createStrategyDirection('noop', field, 'unclear'),
+            },
+            {
+                label: STRATEGY_DIRECT_INPUT_LABEL,
+                direction: createStrategyDirection('fallback', field, 'free_text'),
+            },
+        ],
+        meta: {
+            lane: 'strategy_to_design_translation',
+            targetField: field,
+            questionKind: getStrategyClarificationQuestionKind(field),
+            operationMode: getStrategyClarificationOperationMode(field),
+            suggestedValues,
+            fallbackToFreeText: true,
+        },
+    };
+}
+
+export function buildStrategyFillQuestion(
+    field: StrategyFieldKey,
+    strategyState?: StrategyState
+): WorkflowQuestion {
+    const needsGapPrompt = strategyState
+        ? strategyState.missingFields.includes(field)
+            || (field === 'scopeNow' && !strategyState.schema.scopeNow?.trim())
+        : false;
+    const question = field === 'decisionPriority' && strategyState?.contradictions.length
+        ? `우선순위 충돌을 해소하려면 이번 차수에서 무엇을 먼저 지키는지 한 문장으로 적어 주세요.\n${strategyState.contradictions[0]}`
+        : needsGapPrompt
+            ? buildHandoffStrategyQuestion(field)
+            : buildStrategyQualityQuestion(field);
+
+    return {
+        question,
+        options: [],
+        type: 'free_text',
+        meta: {
+            lane: 'strategy_to_design_translation',
+            targetField: field,
+            questionKind: 'strategy_fill',
+            operationMode: field === 'scopeNow' || field === 'decisionPriority' ? 'set' : 'append',
+        },
+    };
+}
+
+function getNextCoreClarificationField(
+    strategyState: StrategyState
+): StrategyClarificationField | null {
+    return STRATEGY_CORE_CLARIFICATION_FIELDS.find((field) => (
+        needsCoreStrategyClarification(strategyState, field)
+        && getStrategyAskedFieldCount(strategyState, field) < STRATEGY_FIELD_REPEAT_LIMIT
+    )) ?? null;
+}
+
 function evaluateStrategyReadiness(
     artifactType: StrategyArtifactType | undefined,
     schema: StrategyTranslationSchema,
@@ -1502,6 +1743,7 @@ function buildStrategyState(
         weakFields: readiness.weakFields,
         contradictions,
         askedFields: previousState?.askedFields ?? [],
+        askedFieldCounts: previousState?.askedFieldCounts ?? {},
         lastAskedField: previousState?.lastAskedField,
         summary,
         branchMapping: previousState?.branchMapping,
@@ -1536,78 +1778,32 @@ function buildStrategyArtifactQuestion(): WorkflowQuestion {
     };
 }
 
-function buildStrategyContradictionQuestion(strategyState: StrategyState): WorkflowQuestion {
-    return {
-        question: `지금 전략 문장 안에 우선순위 충돌이 있습니다.\n${strategyState.contradictions[0]}\n이번 차수에서 가장 먼저 지켜야 할 기준을 한 문장으로 적어 주세요.`,
-        options: [],
-        type: 'free_text',
-        meta: {
-            lane: 'strategy_to_design_translation',
-            targetField: 'reviewCriteria',
-            questionKind: 'strategy_contradiction',
-        },
-    };
-}
-
-function buildStrategyGapQuestion(field: StrategyFieldKey): WorkflowQuestion {
-    return {
-        question: buildHandoffStrategyQuestion(field),
-        options: [],
-        type: 'free_text',
-        meta: {
-            lane: 'strategy_to_design_translation',
-            targetField: field,
-            questionKind: 'strategy_gap',
-        },
-    };
-}
-
-function buildStrategyQualityWorkflowQuestion(field: StrategyFieldKey): WorkflowQuestion {
-    return {
-        question: buildStrategyQualityQuestion(field),
-        options: [],
-        type: 'free_text',
-        meta: {
-            lane: 'strategy_to_design_translation',
-            targetField: field,
-            questionKind: 'strategy_quality',
-        },
-    };
-}
-
 function buildReadableStrategyArtifactQuestion(): WorkflowQuestion {
-    return {
-        question: '지금 정리하려는 전략 산출물은 무엇에 가장 가깝나요?',
-        type: 'text_choice',
-        options: (
-            Object.entries(STRATEGY_ARTIFACT_LABELS) as Array<[StrategyArtifactType, string]>
-        ).map(([artifactType, label]) => ({
-            label,
-            direction: artifactType,
-        })),
-        meta: {
-            lane: 'strategy_to_design_translation',
-            targetField: 'artifactType',
-            questionKind: 'strategy_gap',
-        },
-    };
+    return buildStrategyArtifactQuestion();
 }
 
-function buildReadableStrategyContradictionQuestion(strategyState: StrategyState): WorkflowQuestion {
+function buildReadableStrategyContradictionQuestion(
+    strategyState: StrategyState,
+    userContext?: UserContext
+): WorkflowQuestion {
+    const question = buildStrategyClarificationQuestion('decisionPriority', strategyState, userContext);
+    const questionMeta = question.meta ?? {
+        lane: 'strategy_to_design_translation' as const,
+        targetField: 'decisionPriority' as const,
+        questionKind: 'strategy_tradeoff' as const,
+        operationMode: 'set' as const,
+        suggestedValues: [],
+        fallbackToFreeText: true,
+    };
+
     return {
-        question: `지금 정리된 전략 안에 우선순위 충돌이 있습니다.\n${strategyState.contradictions[0]}\n이번 차수에서 무엇을 먼저 지켜야 하는지 문장으로 적어 주세요.`,
-        options: [],
-        type: 'free_text',
+        ...question,
         meta: {
-            lane: 'strategy_to_design_translation',
-            targetField: 'reviewCriteria',
+            ...questionMeta,
             questionKind: 'strategy_contradiction',
         },
     };
 }
-
-void buildStrategyArtifactQuestion;
-void buildStrategyContradictionQuestion;
 
 function formatStrategyBranches(
     branchIds: string[],
@@ -1716,11 +1912,16 @@ export function mergeStrategyAnswerIntoState(
     const nextAskedFields = targetField
         ? [...new Set([...strategyState.askedFields, targetField])]
         : strategyState.askedFields;
+    const nextAskedFieldCounts = targetField
+        ? getNextAskedFieldCounts(strategyState, targetField)
+        : (strategyState.askedFieldCounts ?? {});
+    const parsedDirection = parseStrategyDirectionOperation(selectedDirection);
 
     if (!targetField) {
         return {
             ...strategyState,
             askedFields: nextAskedFields,
+            askedFieldCounts: nextAskedFieldCounts,
         };
     }
 
@@ -1729,37 +1930,81 @@ export function mergeStrategyAnswerIntoState(
         return {
             ...buildStrategyState(artifactType, strategyState.schema, strategyState, userContext),
             askedFields: nextAskedFields,
+            askedFieldCounts: nextAskedFieldCounts,
             lastAskedField: targetField,
         };
     }
 
-    const mergedSchema = mergeStrategyFieldValue(strategyState.schema, targetField, answerLabel);
+    const mergedSchema = (() => {
+        if (parsedDirection && parsedDirection.field === targetField) {
+            if (parsedDirection.operation === 'fallback' || parsedDirection.operation === 'noop') {
+                return strategyState.schema;
+            }
+
+            if (parsedDirection.operation === 'set') {
+                return setStrategyFieldValue(strategyState.schema, targetField, parsedDirection.value);
+            }
+
+            return mergeStrategyFieldValue(strategyState.schema, targetField, parsedDirection.value);
+        }
+
+        if (questionMeta?.operationMode === 'set') {
+            return setStrategyFieldValue(strategyState.schema, targetField, answerLabel);
+        }
+
+        return mergeStrategyFieldValue(strategyState.schema, targetField, answerLabel);
+    })();
 
     return {
         ...buildStrategyState(strategyState.artifactType, mergedSchema, strategyState, userContext),
         askedFields: nextAskedFields,
+        askedFieldCounts: nextAskedFieldCounts,
         lastAskedField: targetField,
     };
 }
 
-export function generateStrategyGapQuestion(strategyState: StrategyState): WorkflowQuestion | null {
+export function generateStrategyGapQuestion(
+    strategyState: StrategyState,
+    userContext?: UserContext
+): WorkflowQuestion | null {
     if (!strategyState.artifactType) {
         return buildReadableStrategyArtifactQuestion();
     }
 
-    if (strategyState.contradictions.length > 0) {
-        return buildReadableStrategyContradictionQuestion(strategyState);
+    if (
+        strategyState.contradictions.length > 0
+        && getStrategyAskedFieldCount(strategyState, 'decisionPriority') < STRATEGY_FIELD_REPEAT_LIMIT
+    ) {
+        return getStrategyAskedFieldCount(strategyState, 'decisionPriority') === 0
+            ? buildReadableStrategyContradictionQuestion(strategyState, userContext)
+            : buildStrategyFillQuestion('decisionPriority', strategyState);
+    }
+
+    const coreField = getNextCoreClarificationField(strategyState);
+    if (coreField) {
+        return getStrategyAskedFieldCount(strategyState, coreField) === 0
+            ? buildStrategyClarificationQuestion(coreField, strategyState, userContext)
+            : buildStrategyFillQuestion(coreField, strategyState);
     }
 
     const targetField = getNextStrategyTargetField(strategyState);
 
-    if (targetField && targetField !== 'artifactType') {
-        return buildStrategyGapQuestion(targetField);
+    if (
+        targetField
+        && targetField !== 'artifactType'
+        && !STRATEGY_CORE_CLARIFICATION_FIELDS.includes(targetField as StrategyClarificationField)
+        && getStrategyAskedFieldCount(strategyState, targetField) === 0
+    ) {
+        return buildStrategyFillQuestion(targetField, strategyState);
     }
 
     const weakField = getNextStrategyWeakField(strategyState);
-    if (weakField) {
-        return buildStrategyQualityWorkflowQuestion(weakField);
+    if (
+        weakField
+        && !STRATEGY_CORE_CLARIFICATION_FIELDS.includes(weakField as StrategyClarificationField)
+        && getStrategyAskedFieldCount(strategyState, weakField) === 0
+    ) {
+        return buildStrategyFillQuestion(weakField, strategyState);
     }
 
     return null;

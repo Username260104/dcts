@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { DETAIL_QUESTION_TARGET, MAX_QUESTIONS } from '@/lib/constants';
+import { DETAIL_QUESTION_TARGET, STRATEGY_CLARIFICATION_MAX } from '@/lib/constants';
 import {
+    buildStrategyFillQuestion,
     generateClientDetailQuestion,
     generateClientFollowUp,
     generateStrategyGapQuestion,
     mergeStrategyAnswerIntoState,
+    parseStrategyDirectionOperation,
 } from '@/lib/llmOrchestrator';
 import { createQuestionPayload, reconstructQuestionState } from '@/lib/sessionFlow';
 import {
@@ -328,8 +330,19 @@ function buildStrategyNextReason(
         return '상충하는 요구의 우선순위를 정해야 디자인 판단 기준을 고정할 수 있습니다.';
     }
 
-    if (nextQuestion.meta?.questionKind === 'strategy_quality') {
+    if (
+        nextQuestion.meta?.questionKind === 'strategy_fill'
+        || nextQuestion.meta?.questionKind === 'strategy_quality'
+    ) {
         return '핵심 기준은 있지만 아직 추상적이어서, 디자이너가 바로 쓸 수 있는 문장으로 더 구체화합니다.';
+    }
+
+    if (
+        nextQuestion.meta?.questionKind === 'strategy_choice'
+        || nextQuestion.meta?.questionKind === 'strategy_tradeoff'
+        || nextQuestion.meta?.questionKind === 'strategy_scope'
+    ) {
+        return '디자이너가 오해하기 쉬운 갈림길을 먼저 선택지로 좁혀 판단 기준을 고정합니다.';
     }
 
     return 'handoff 위험도가 높은 항목부터 보강해 디자인 판단 기준을 더 분명하게 고정합니다.';
@@ -388,6 +401,7 @@ async function handleStrategyAnswer(
         body.selectedDirection,
         body.sessionState.userContext
     );
+    const selectionOperation = parseStrategyDirectionOperation(body.selectedDirection);
 
     const updatedState: SessionState = {
         ...body.sessionState,
@@ -399,9 +413,13 @@ async function handleStrategyAnswer(
         converged: false,
     };
 
-    const nextQuestion = updatedState.questionCount >= MAX_QUESTIONS
+    const nextQuestion = updatedState.questionCount >= STRATEGY_CLARIFICATION_MAX
         ? null
-        : generateStrategyGapQuestion(mergedStrategyState);
+        : selectionOperation?.operation === 'fallback'
+            && selectionOperation.field === body.currentQuestionMeta?.targetField
+            && selectionOperation.field !== 'artifactType'
+            ? buildStrategyFillQuestion(selectionOperation.field, mergedStrategyState)
+            : generateStrategyGapQuestion(mergedStrategyState, body.sessionState.userContext);
 
     const shouldConverge = mergedStrategyState.readinessStatus === 'ready' || !nextQuestion;
     const finalState = updateLatestAnswerHistory({

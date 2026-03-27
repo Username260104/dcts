@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import ReturnToStartButton from '@/components/ReturnToStartButton';
-import { MAX_QUESTIONS } from '@/lib/constants';
+import { MAX_QUESTIONS, STRATEGY_CLARIFICATION_MAX } from '@/lib/constants';
 import { useSessionStore } from '@/store/sessionStore';
 
 export default function QuestionsStep() {
@@ -19,6 +19,7 @@ export default function QuestionsStep() {
     const questionType = currentQuestion?.type ?? 'text_choice';
     const isStrategyLane = sessionState?.jobType === 'strategy_to_design_translation';
     const missingCount = sessionState?.strategyState?.missingFields.length ?? 0;
+    const totalQuestions = isStrategyLane ? STRATEGY_CLARIFICATION_MAX : MAX_QUESTIONS;
     const summaryText = isStrategyLane
         ? sessionState?.strategyState?.summary
         : sessionState?.intentInterpretation;
@@ -60,7 +61,7 @@ export default function QuestionsStep() {
             <div className="mb-8 w-full max-w-lg">
                 <div className="mb-2 flex items-center justify-between">
                     <span className="text-xs text-gray-400">
-                        질문 {Math.min(questionCount + 1, MAX_QUESTIONS)} / {MAX_QUESTIONS}
+                        질문 {Math.min(questionCount + 1, totalQuestions)} / {totalQuestions}
                     </span>
                     <span className="text-xs text-gray-400">
                         {isStrategyLane
@@ -69,10 +70,10 @@ export default function QuestionsStep() {
                     </span>
                 </div>
                 <div className="h-1.5 w-full rounded-full bg-gray-200">
-                    <div
-                        className="h-1.5 rounded-full bg-gray-900 transition-all duration-500"
-                        style={{ width: `${(Math.min(questionCount + 1, MAX_QUESTIONS) / MAX_QUESTIONS) * 100}%` }}
-                    />
+                        <div
+                            className="h-1.5 rounded-full bg-gray-900 transition-all duration-500"
+                            style={{ width: `${(Math.min(questionCount + 1, totalQuestions) / totalQuestions) * 100}%` }}
+                        />
                 </div>
             </div>
 

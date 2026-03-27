@@ -57,7 +57,10 @@ export async function POST(
                 );
             }
 
-            const nextQuestion = generateStrategyGapQuestion(strategyState);
+            const nextQuestion = generateStrategyGapQuestion(
+                strategyState,
+                body.sessionState.userContext
+            );
             const sessionState: SessionState = {
                 ...body.sessionState,
                 pendingRefinement: true,

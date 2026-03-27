@@ -10,6 +10,16 @@ export type StrategyArtifactType =
 export type ReadinessStatus = 'ready' | 'needs_clarification' | 'blocked';
 export type BriefKind = 'interpretation_brief' | 'translation_brief' | 'gap_memo';
 export type DebugSourceKind = 'language_model' | 'fallback' | 'deterministic' | 'hybrid';
+export type StrategyQuestionKind =
+    | 'strategy_gap'
+    | 'strategy_contradiction'
+    | 'strategy_quality'
+    | 'strategy_choice'
+    | 'strategy_tradeoff'
+    | 'strategy_scope'
+    | 'strategy_fill';
+export type WorkflowQuestionKind = 'interpretation' | 'detail' | StrategyQuestionKind;
+export type StrategyQuestionOperationMode = 'set' | 'append' | 'clarify';
 
 export type TriggerType = 'directional' | 'negative' | 'ambiguous';
 
@@ -196,6 +206,7 @@ export interface StrategyState {
     weakFields: StrategyFieldKey[];
     contradictions: string[];
     askedFields: Array<StrategyFieldKey | 'artifactType'>;
+    askedFieldCounts?: Partial<Record<StrategyFieldKey | 'artifactType', number>>;
     lastAskedField?: StrategyFieldKey | 'artifactType';
     summary?: string;
     branchMapping?: StrategyBranchMapping;
@@ -206,7 +217,10 @@ export interface StrategyState {
 export interface WorkflowQuestionMeta {
     lane: JobType;
     targetField?: StrategyFieldKey | 'artifactType';
-    questionKind?: 'interpretation' | 'detail' | 'strategy_gap' | 'strategy_contradiction' | 'strategy_quality';
+    questionKind?: WorkflowQuestionKind;
+    operationMode?: StrategyQuestionOperationMode;
+    suggestedValues?: string[];
+    fallbackToFreeText?: boolean;
 }
 
 export interface WorkflowQuestion {

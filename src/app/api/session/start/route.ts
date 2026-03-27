@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
             const strategyState = await extractStrategySchema(body.feedbackText, body.context);
             const nextQuestion = strategyState.readinessStatus === 'ready'
                 ? null
-                : generateStrategyGapQuestion(strategyState);
+                : generateStrategyGapQuestion(strategyState, body.context);
 
             const sessionState: SessionState = {
                 sessionId,
