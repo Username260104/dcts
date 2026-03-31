@@ -10,6 +10,7 @@ const frequentTriggers = getFrequentTriggers();
 const MIN_TEXTAREA_HEIGHT = 48;
 const MAX_TEXTAREA_HEIGHT = 240;
 const ACCEPTED_FILE_TYPES = '.pdf,.docx,.txt,.md,.markdown,.json,.csv';
+const DEFAULT_ENTRY_PLACEHOLDER = '내용을 입력해주세요.';
 
 const entryCopy = {
     client: {
@@ -36,6 +37,17 @@ const entryCopy = {
     },
 } as const;
 
+const resolvedEntryCopy = {
+    client: {
+        ...entryCopy.client,
+        placeholder: DEFAULT_ENTRY_PLACEHOLDER,
+    },
+    strategist: {
+        ...entryCopy.strategist,
+        placeholder: DEFAULT_ENTRY_PLACEHOLDER,
+    },
+} as const;
+
 function formatFrequentTriggerLabel(expression: string): string {
     return expression.replace(/\s{2,}/g, ' ').trim();
 }
@@ -57,7 +69,7 @@ export default function EntryStep() {
     const setError = useSessionStore((state) => state.setError);
     const setStep = useSessionStore((state) => state.setStep);
     const hasInput = feedbackText.trim().length > 0;
-    const copy = entryCopy[inputRole];
+    const copy = resolvedEntryCopy[inputRole];
     const [isImportingFile, setIsImportingFile] = useState(false);
 
     useLayoutEffect(() => {
